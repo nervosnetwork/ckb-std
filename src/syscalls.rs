@@ -21,48 +21,48 @@ pub fn exit(code: i8) {
     syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT);
 }
 
-pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
+fn syscall_load(
+    mut len: usize,
+    offset: usize,
+    a3: u64,
+    a4: u64,
+    a5: u64,
+    a6: u64,
+    syscall_num: u64,
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
+    let old_len = len;
     buf.resize(len, 0);
+    let len_ptr: *mut usize = &mut len;
     let ret = syscall(
         buf.as_ptr() as u64,
-        len as u64,
+        len_ptr as u64,
         offset as u64,
-        0,
-        0,
-        0,
-        0,
-        SYS_LOAD_TX_HASH,
+        a3,
+        a4,
+        a5,
+        a6,
+        syscall_num,
     );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
+    // set buf len
+    unsafe {
+        buf.set_len(*len_ptr);
     }
     buf.shrink_to_fit();
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
+    } else if buf.len() > old_len {
+        return Err(SysError::LengthNotEnough);
+    }
     Ok(buf)
 }
 
+pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
+    syscall_load(len, offset, 0, 0, 0, 0, SYS_LOAD_TX_HASH)
+}
+
 pub fn load_script_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
-        0,
-        0,
-        0,
-        0,
-        SYS_LOAD_SCRIPT_HASH,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    syscall_load(len, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT_HASH)
 }
 
 pub fn load_cell(
@@ -71,25 +71,15 @@ pub fn load_cell(
     index: usize,
     source: Source,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         0,
         0,
         SYS_LOAD_CELL,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_input(
@@ -98,25 +88,15 @@ pub fn load_input(
     index: usize,
     source: Source,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         0,
         0,
         SYS_LOAD_INPUT,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_header(
@@ -125,25 +105,15 @@ pub fn load_header(
     index: usize,
     source: Source,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         0,
         0,
         SYS_LOAD_HEADER,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_witness(
@@ -152,47 +122,19 @@ pub fn load_witness(
     index: usize,
     source: Source,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         0,
         0,
         SYS_LOAD_WITNESS,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_transaction(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
-        0,
-        0,
-        0,
-        0,
-        SYS_LOAD_TRANSACTION,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    syscall_load(len, offset, 0, 0, 0, 0, SYS_LOAD_TRANSACTION)
 }
 
 pub fn load_cell_by_field(
@@ -202,25 +144,15 @@ pub fn load_cell_by_field(
     source: Source,
     field: CellField,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         field as u64,
         0,
         SYS_LOAD_CELL_BY_FIELD,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_header_by_field(
@@ -230,25 +162,15 @@ pub fn load_header_by_field(
     source: Source,
     field: HeaderField,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         field as u64,
         0,
         SYS_LOAD_HEADER_BY_FIELD,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_input_by_field(
@@ -258,25 +180,15 @@ pub fn load_input_by_field(
     source: Source,
     field: InputField,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         field as u64,
         0,
         SYS_LOAD_INPUT_BY_FIELD,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_cell_code(
@@ -286,25 +198,15 @@ pub fn load_cell_code(
     index: usize,
     source: Source,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(memory_size, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        memory_size as u64,
-        content_offset as u64,
+    syscall_load(
+        memory_size,
+        content_offset,
         content_size as u64,
         index as u64,
         source as u64,
         0,
         SYS_LOAD_CELL_DATA_AS_CODE,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > memory_size {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn load_cell_data(
@@ -313,25 +215,15 @@ pub fn load_cell_data(
     index: usize,
     source: Source,
 ) -> Result<Vec<u8>, SysError> {
-    let mut buf: Vec<u8> = Vec::new();
-    buf.resize(len, 0);
-    let ret = syscall(
-        buf.as_ptr() as u64,
-        len as u64,
-        offset as u64,
+    syscall_load(
+        len,
+        offset,
         index as u64,
         source as u64,
         0,
         0,
         SYS_LOAD_CELL_DATA,
-    );
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > len {
-        return Err(SysError::LengthNotEnough);
-    }
-    buf.shrink_to_fit();
-    Ok(buf)
+    )
 }
 
 pub fn debug(mut s: alloc::string::String) {
