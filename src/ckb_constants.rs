@@ -14,12 +14,26 @@ pub const SYS_LOAD_CELL_DATA_AS_CODE: u64 = 2091;
 pub const SYS_LOAD_CELL_DATA: u64 = 2092;
 pub const SYS_DEBUG: u64 = 2177;
 
+pub const CKB_SUCCESS: u64 = 0;
+
+#[derive(Eq, PartialEq, Debug)]
 #[repr(u64)]
-pub enum SysResult {
-    Success = 0,
+pub enum SysError {
     IndexOutOfBound = 1,
     ItemMissing = 2,
     LengthNotEnough = 3,
+}
+
+impl From<u64> for SysError {
+    fn from(errno: u64) -> SysError {
+        use SysError::*;
+        match errno {
+            1 => IndexOutOfBound,
+            2 => ItemMissing,
+            3 => LengthNotEnough,
+            n => panic!("unknown error no: {}", n),
+        }
+    }
 }
 
 #[repr(u64)]

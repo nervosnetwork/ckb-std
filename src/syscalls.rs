@@ -21,7 +21,7 @@ pub fn exit(code: i8) {
     syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT);
 }
 
-pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, u64> {
+pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -34,15 +34,15 @@ pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, u64> {
         0,
         SYS_LOAD_TX_HASH,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
 
-pub fn load_script_hash(len: usize, offset: usize) -> Result<Vec<u8>, u64> {
+pub fn load_script_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -55,15 +55,20 @@ pub fn load_script_hash(len: usize, offset: usize) -> Result<Vec<u8>, u64> {
         0,
         SYS_LOAD_SCRIPT_HASH,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
 
-pub fn load_cell(len: usize, offset: usize, index: usize, source: Source) -> Result<Vec<u8>, u64> {
+pub fn load_cell(
+    len: usize,
+    offset: usize,
+    index: usize,
+    source: Source,
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -76,15 +81,20 @@ pub fn load_cell(len: usize, offset: usize, index: usize, source: Source) -> Res
         0,
         SYS_LOAD_CELL,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
 
-pub fn load_input(len: usize, offset: usize, index: usize, source: Source) -> Result<Vec<u8>, u64> {
+pub fn load_input(
+    len: usize,
+    offset: usize,
+    index: usize,
+    source: Source,
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -97,10 +107,10 @@ pub fn load_input(len: usize, offset: usize, index: usize, source: Source) -> Re
         0,
         SYS_LOAD_INPUT,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -110,7 +120,7 @@ pub fn load_header(
     offset: usize,
     index: usize,
     source: Source,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -123,10 +133,10 @@ pub fn load_header(
         0,
         SYS_LOAD_HEADER,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -136,7 +146,7 @@ pub fn load_witness(
     offset: usize,
     index: usize,
     source: Source,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -149,15 +159,15 @@ pub fn load_witness(
         0,
         SYS_LOAD_WITNESS,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
 
-pub fn load_transaction(len: usize, offset: usize) -> Result<Vec<u8>, u64> {
+pub fn load_transaction(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -170,10 +180,10 @@ pub fn load_transaction(len: usize, offset: usize) -> Result<Vec<u8>, u64> {
         0,
         SYS_LOAD_TRANSACTION,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -184,7 +194,7 @@ pub fn load_cell_by_field(
     index: usize,
     source: Source,
     field: CellField,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -197,10 +207,10 @@ pub fn load_cell_by_field(
         0,
         SYS_LOAD_CELL_BY_FIELD,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -211,7 +221,7 @@ pub fn load_header_by_field(
     index: usize,
     source: Source,
     field: HeaderField,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -224,10 +234,10 @@ pub fn load_header_by_field(
         0,
         SYS_LOAD_HEADER_BY_FIELD,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -238,7 +248,7 @@ pub fn load_input_by_field(
     index: usize,
     source: Source,
     field: InputField,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -251,10 +261,10 @@ pub fn load_input_by_field(
         0,
         SYS_LOAD_INPUT_BY_FIELD,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -265,7 +275,7 @@ pub fn load_cell_code(
     content_size: usize,
     index: usize,
     source: Source,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(memory_size, 0);
     let ret = syscall(
@@ -278,10 +288,10 @@ pub fn load_cell_code(
         0,
         SYS_LOAD_CELL_DATA_AS_CODE,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > memory_size {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
@@ -291,7 +301,7 @@ pub fn load_cell_data(
     offset: usize,
     index: usize,
     source: Source,
-) -> Result<Vec<u8>, u64> {
+) -> Result<Vec<u8>, SysError> {
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(len, 0);
     let ret = syscall(
@@ -304,10 +314,10 @@ pub fn load_cell_data(
         0,
         SYS_LOAD_CELL_DATA,
     );
-    if ret != (SysResult::Success as u64) {
-        return Err(ret);
+    if ret != CKB_SUCCESS {
+        return Err(ret.into());
     } else if buf.len() > len {
-        return Err(SysResult::LengthNotEnough as u64);
+        return Err(SysError::LengthNotEnough);
     }
     Ok(buf)
 }
