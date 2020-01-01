@@ -14,29 +14,44 @@ pub const SYS_LOAD_CELL_DATA_AS_CODE: u64 = 2091;
 pub const SYS_LOAD_CELL_DATA: u64 = 2092;
 pub const SYS_DEBUG: u64 = 2177;
 
-pub const CKB_SUCCESS: u64 = 0;
-pub const CKB_INDEX_OUT_OF_BOUND: u64 = 1;
-pub const CKB_ITEM_MISSING: u64 = 2;
-pub const CKB_LENGTH_NOT_ENOUGH: u64 = 3;
+#[repr(u64)]
+pub enum SysResult {
+    Success = 0,
+    IndexOutOfBound = 1,
+    ItemMissing = 2,
+    LengthNotEnough = 3,
+}
 
-// pub const CKB_SOURCE_INPUT 1
-// pub const CKB_SOURCE_OUTPUT 2
-// pub const CKB_SOURCE_CELL_DEP 3
-// pub const CKB_SOURCE_HEADER_DEP 4
-// pub const CKB_SOURCE_GROUP_INPUT 0x0100000000000001
-// pub const CKB_SOURCE_GROUP_OUTPUT 0x0100000000000002
-//
-// pub const CKB_CELL_FIELD_CAPACITY 0
-// pub const CKB_CELL_FIELD_DATA_HASH 1
-// pub const CKB_CELL_FIELD_LOCK 2
-// pub const CKB_CELL_FIELD_LOCK_HASH 3
-// pub const CKB_CELL_FIELD_TYPE 4
-// pub const CKB_CELL_FIELD_TYPE_HASH 5
-// pub const CKB_CELL_FIELD_OCCUPIED_CAPACITY 6
-//
-// pub const CKB_HEADER_FIELD_EPOCH_NUMBER 0
-// pub const CKB_HEADER_FIELD_EPOCH_START_BLOCK_NUMBER 1
-// pub const CKB_HEADER_FIELD_EPOCH_LENGTH 2
-//
-// pub const CKB_INPUT_FIELD_OUT_POINT 0
-// pub const CKB_INPUT_FIELD_SINCE 1
+#[repr(u64)]
+pub enum Source {
+    Input = 1,
+    Output = 2,
+    CellDep = 3,
+    HeaderDep = 4,
+    GroupInput = 0x0100000000000001,
+    GroupOutput = 0x0100000000000002,
+}
+
+#[repr(u64)]
+pub enum CellField {
+    Capacity = 0,
+    DataHash = 1,
+    Lock = 2,
+    LockHash = 3,
+    Type = 4,
+    TypeHash = 5,
+    OccupiedCapacity = 6,
+}
+
+#[repr(u64)]
+pub enum HeaderField {
+    EpochNumber = 0,
+    EpochStartBlockNumber = 1,
+    EpochLength = 2,
+}
+
+#[repr(u64)]
+pub enum InputField {
+    OutPoint = 0,
+    Since = 1,
+}
