@@ -321,3 +321,9 @@ pub fn load_cell_data(
     }
     Ok(buf)
 }
+
+pub fn debug(mut s: alloc::string::String) {
+    s.push('\0');
+    let c_str = s.into_bytes();
+    syscall(c_str.as_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_DEBUG);
+}
