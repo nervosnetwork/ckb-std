@@ -39,6 +39,7 @@ pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -60,6 +61,7 @@ pub fn load_script_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> 
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -86,6 +88,7 @@ pub fn load_cell(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -112,6 +115,7 @@ pub fn load_input(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -138,6 +142,7 @@ pub fn load_header(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -164,6 +169,7 @@ pub fn load_witness(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -185,6 +191,7 @@ pub fn load_transaction(len: usize, offset: usize) -> Result<Vec<u8>, SysError> 
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -212,6 +219,7 @@ pub fn load_cell_by_field(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -239,6 +247,7 @@ pub fn load_header_by_field(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -266,6 +275,7 @@ pub fn load_input_by_field(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -293,6 +303,7 @@ pub fn load_cell_code(
     } else if buf.len() > memory_size {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
@@ -319,6 +330,7 @@ pub fn load_cell_data(
     } else if buf.len() > len {
         return Err(SysError::LengthNotEnough);
     }
+    buf.shrink_to_fit();
     Ok(buf)
 }
 
