@@ -3,6 +3,9 @@ name = "ckb-contract-std"
 version = "0.1.0-pre"
 authors = ["jjy <jjyruby@gmail.com>"]
 edition = "2018"
+license = "MIT"
+repository = "https://github.com/jjyr/ckb-contract-std"
+description = "This library contains serveral modules that could help you write CKB contract with Rust"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
