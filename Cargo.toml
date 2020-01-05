@@ -10,3 +10,4 @@ description = "This library contains serveral modules that could help you write 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+buddy-alloc = "0.1.0-pre.2"
