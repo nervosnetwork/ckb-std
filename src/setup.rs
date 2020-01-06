@@ -18,8 +18,7 @@ macro_rules! setup {
         #[no_mangle]
         pub extern "C" fn _start() -> ! {
             let f: fn() -> i8 = $main;
-            ckb_contract_std::syscalls::exit(f());
-            loop {}
+            ckb_contract_std::syscalls::exit(f())
         }
 
         #[lang = "eh_personality"]
@@ -55,8 +54,7 @@ macro_rules! setup {
             }
 
             ckb_contract_std::syscalls::debug(s);
-            ckb_contract_std::syscalls::exit(-1);
-            loop {}
+            ckb_contract_std::syscalls::exit(-1)
         }
     };
 }

@@ -17,8 +17,9 @@ pub fn syscall(
     return a0;
 }
 
-pub fn exit(code: i8) {
+pub fn exit(code: i8) -> ! {
     syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT);
+    loop {}
 }
 
 fn syscall_load(
