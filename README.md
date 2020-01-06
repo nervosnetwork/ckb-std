@@ -6,3 +6,5 @@ This library contains serveral modules that could help you write CKB contract wi
 * types: defines CKB blockchain data structures
 
 See this [article](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to write a contract in Rust.
+
+See also [ckb-contract-tool](https://github.com/jjyr/ckb-contract-tool) which helps you write tests.
