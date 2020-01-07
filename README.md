@@ -2,9 +2,10 @@
 
 This library contains serveral modules that could help you write CKB contract with Rust.
 
-* syscall: defines [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md) functions
-* types: defines CKB blockchain data structures
+* syscall module: defines [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md) functions
+* debug macro: a `println!` like macro helps debugging
+* setup macro: defines contract entry point
 
-See this [article](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to write a contract in Rust.
+Check `examples` and this [tutorial](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to use.
 
 See also [ckb-contract-tool](https://github.com/jjyr/ckb-contract-tool) which helps you write tests.
