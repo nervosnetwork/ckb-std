@@ -1,14 +1,26 @@
+/// Usage
+///
+/// ``` rust
+/// // define an entry point and initialize ckb-contract-std runtime
+/// setup!(main)
+/// // to indicate the heap size(default heap size is 1MB)
+/// setup!(main, 2 * 1024 * 1024)
+/// ```
 #[macro_export]
 macro_rules! setup {
     ($main:path) => {
+        setup!($main, 1024 * 1024);
+    };
+    ($main:path, $heap_size:expr) => {
         extern crate alloc;
+        const _HEAP_SIZE: usize = $heap_size;
 
-        pub static mut _HEAP: [u8; ckb_contract_std::buddy_alloc::REQUIRED_SPACE] =
-            [0u8; ckb_contract_std::buddy_alloc::REQUIRED_SPACE];
+        static mut _HEAP: [u8; _HEAP_SIZE] = [0u8; _HEAP_SIZE];
 
         #[global_allocator]
-        static ALLOC: ckb_contract_std::buddy_alloc::NonThreadsafeAlloc =
-            unsafe { ckb_contract_std::buddy_alloc::NonThreadsafeAlloc::new(_HEAP.as_ptr()) };
+        static ALLOC: ckb_contract_std::buddy_alloc::NonThreadsafeAlloc = unsafe {
+            ckb_contract_std::buddy_alloc::NonThreadsafeAlloc::new(_HEAP.as_ptr(), _HEAP_SIZE)
+        };
 
         #[alloc_error_handler]
         fn oom_handler(layout: alloc::alloc::Layout) -> ! {
