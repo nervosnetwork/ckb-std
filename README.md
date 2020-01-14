@@ -1,4 +1,5 @@
 # ckb-contract-std
+[![Crates.io](https://img.shields.io/crates/v/ckb-contract-std.svg)](https://crates.io/crates/ckb-contract-std)
 
 This library contains serveral modules that could help you write CKB contract with Rust.
 
@@ -6,6 +7,6 @@ This library contains serveral modules that could help you write CKB contract wi
 * debug macro: a `println!` like macro helps debugging
 * setup macro: defines contract entry point
 
-Check `examples` and this [tutorial](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to use.
+Check `examples`, [docs](https://docs.rs/crate/ckb-contract-std) and this [tutorial](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to use.
 
 See also [ckb-contract-tool](https://github.com/jjyr/ckb-contract-tool) which helps you write tests.
