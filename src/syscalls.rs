@@ -3,16 +3,24 @@ use alloc::vec::Vec;
 
 pub fn syscall(
     mut a0: u64,
-    _a1: u64,
-    _a2: u64,
-    _a3: u64,
-    _a4: u64,
-    _a5: u64,
-    _a6: u64,
-    _syscall: u64,
+    a1: u64,
+    a2: u64,
+    a3: u64,
+    a4: u64,
+    a5: u64,
+    a6: u64,
+    syscall_num: u64,
 ) -> u64 {
     unsafe {
-        asm!("ecall" : "+r"(a0));
+        asm!("mv a0, $0" :: "r"(a0) : "a0":"volatile");
+        asm!("mv a1, $0" :: "r"(a1) : "a1":"volatile");
+        asm!("mv a2, $0" :: "r"(a2) : "a2":"volatile");
+        asm!("mv a3, $0" :: "r"(a3) : "a3":"volatile");
+        asm!("mv a4, $0" :: "r"(a4) : "a4":"volatile");
+        asm!("mv a5, $0" :: "r"(a5) : "a5":"volatile");
+        asm!("mv a6, $0" :: "r"(a6) : "a6" :"volatile");
+        asm!("mv a7, $0" :: "r"(syscall_num) : "a7":"volatile");
+        asm!("ecall" : "+r"(a0):::"volatile");
     }
     return a0;
 }
