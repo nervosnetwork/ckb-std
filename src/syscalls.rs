@@ -1,6 +1,7 @@
 use crate::ckb_constants::*;
 use alloc::vec::Vec;
 
+#[inline(never)]
 pub fn syscall(
     mut a0: u64,
     a1: u64,
@@ -12,15 +13,8 @@ pub fn syscall(
     syscall_num: u64,
 ) -> u64 {
     unsafe {
-        asm!("mv a0, $0" :: "r"(a0) : "a0":"volatile");
-        asm!("mv a1, $0" :: "r"(a1) : "a1":"volatile");
-        asm!("mv a2, $0" :: "r"(a2) : "a2":"volatile");
-        asm!("mv a3, $0" :: "r"(a3) : "a3":"volatile");
-        asm!("mv a4, $0" :: "r"(a4) : "a4":"volatile");
-        asm!("mv a5, $0" :: "r"(a5) : "a5":"volatile");
-        asm!("mv a6, $0" :: "r"(a6) : "a6" :"volatile");
-        asm!("mv a7, $0" :: "r"(syscall_num) : "a7":"volatile");
-        asm!("ecall" : "+r"(a0):::"volatile");
+        asm!("ecall" : "+r"(a0):"r"(a1) "r"(a2) "r"(a3) "r"(a4) "r"(a5) "r"(a6) "r"(syscall_num)::"volatile");
+        asm!("fence" :::"memory":"volatile");
     }
     return a0;
 }
@@ -43,8 +37,9 @@ fn syscall_load(
     let old_len = len;
     buf.resize(len, 0);
     let len_ptr: *mut usize = &mut len;
+    let buf_ptr: *mut u8 = buf.as_mut_ptr();
     let ret = syscall(
-        buf.as_ptr() as u64,
+        buf_ptr as u64,
         len_ptr as u64,
         offset as u64,
         a3,
