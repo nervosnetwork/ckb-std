@@ -1,6 +1,6 @@
 [package]
 name = "ckb-contract-std"
-version = "0.1.3-pre"
+version = "0.1.4-pre"
 authors = ["jjy <jjyruby@gmail.com>"]
 edition = "2018"
 license = "MIT"
