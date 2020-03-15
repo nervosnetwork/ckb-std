@@ -230,6 +230,10 @@ pub fn load_cell_data(
     )
 }
 
+pub fn load_script(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
+    syscall_load(len, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT)
+}
+
 pub fn debug(mut s: alloc::string::String) {
     s.push('\0');
     let c_str = s.into_bytes();
