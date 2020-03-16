@@ -9,6 +9,10 @@ impl Since {
     const LOCK_BY_EPOCH_MASK: u64 = 0x2000_0000_0000_0000;
     const LOCK_BY_TIMESTAMP_MASK: u64 = 0x4000_0000_0000_0000;
 
+    pub fn new(v: u64) -> Self {
+        Since(v)
+    }
+
     pub fn is_absolute(self) -> bool {
         self.0 & Self::LOCK_TYPE_FLAG == 0
     }
