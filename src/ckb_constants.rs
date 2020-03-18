@@ -16,7 +16,7 @@ pub const SYS_DEBUG: u64 = 2177;
 
 pub const CKB_SUCCESS: u64 = 0;
 
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u64)]
 pub enum SysError {
     IndexOutOfBound = 1,
@@ -36,6 +36,7 @@ impl From<u64> for SysError {
     }
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u64)]
 pub enum Source {
     Input = 1,
@@ -46,6 +47,7 @@ pub enum Source {
     GroupOutput = 0x0100000000000002,
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u64)]
 pub enum CellField {
     Capacity = 0,
@@ -57,6 +59,7 @@ pub enum CellField {
     OccupiedCapacity = 6,
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u64)]
 pub enum HeaderField {
     EpochNumber = 0,
@@ -64,6 +67,7 @@ pub enum HeaderField {
     EpochLength = 2,
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u64)]
 pub enum InputField {
     OutPoint = 0,
