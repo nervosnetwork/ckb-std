@@ -5,7 +5,7 @@
 #![feature(panic_info_message)]
 
 use alloc::vec;
-use ckb_contract_std::{debug, setup};
+use ckb_std::{debug, entry, default_alloc};
 
 #[no_mangle]
 pub fn main() -> i8 {
@@ -14,4 +14,5 @@ pub fn main() -> i8 {
     0
 }
 
-setup!(main);
+entry!(main);
+default_alloc!();

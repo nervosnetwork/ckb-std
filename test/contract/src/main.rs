@@ -5,7 +5,7 @@
 #![feature(panic_info_message)]
 
 use alloc::vec;
-use ckb_contract_std::{debug, setup, syscalls, ckb_constants::*};
+use ckb_std::{debug, entry, default_alloc, syscalls, ckb_constants::*};
 use core::mem::size_of;
 
 fn test_basic(){
@@ -34,4 +34,5 @@ pub fn main() -> i8 {
     0
 }
 
-setup!(main);
+entry!(main);
+default_alloc!();
