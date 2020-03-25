@@ -1,26 +1,13 @@
 /// Usage
 ///
 /// ``` rust
-/// // define an entry point and initialize global allocator
-/// setup!(main)
-/// // indicate the heap size(default heap size is 64KB, with 16Bytes min allocated memory)
-/// setup!(main, 64 * 1024, 16)
+/// // define contract entry point
+/// entry!(main)
 /// ```
 #[macro_export]
-macro_rules! setup {
+macro_rules! entry {
     ($main:path) => {
-        setup!($main, 64 * 1024, 16);
-    };
-    ($main:path, $heap_size:expr, $min_block_size:expr) => {
         extern crate alloc;
-        const _HEAP_SIZE: usize = $heap_size;
-
-        static mut _HEAP: [u8; _HEAP_SIZE] = [0u8; _HEAP_SIZE];
-
-        #[global_allocator]
-        static ALLOC: ckb_contract_std::buddy_alloc::NonThreadsafeAlloc = unsafe {
-            ckb_contract_std::buddy_alloc::NonThreadsafeAlloc::new(_HEAP.as_ptr(), _HEAP_SIZE, $min_block_size)
-        };
 
         #[alloc_error_handler]
         fn oom_handler(layout: alloc::alloc::Layout) -> ! {
@@ -30,7 +17,7 @@ macro_rules! setup {
         #[no_mangle]
         pub extern "C" fn _start() -> ! {
             let f: fn() -> i8 = $main;
-            ckb_contract_std::syscalls::exit(f())
+            $crate::syscalls::exit(f())
         }
 
         #[lang = "eh_personality"]
@@ -65,8 +52,8 @@ macro_rules! setup {
                 s.push_str(&format!(", but can't get location information..."));
             }
 
-            ckb_contract_std::syscalls::debug(s);
-            ckb_contract_std::syscalls::exit(-1)
+            $crate::syscalls::debug(s);
+            $crate::syscalls::exit(-1)
         }
     };
 }
