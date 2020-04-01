@@ -5,7 +5,7 @@
 #![feature(panic_info_message)]
 
 use alloc::vec;
-use ckb_std::{debug, entry, default_alloc};
+use ckb_std::{debug, default_alloc, entry};
 
 #[no_mangle]
 pub fn main() -> i8 {

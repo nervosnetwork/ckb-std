@@ -38,7 +38,7 @@ fn syscall_load(
     buf.resize(len, 0);
     let len_ptr: *mut usize = &mut len;
     let buf_ptr: *mut u8 = buf.as_mut_ptr();
-    let ret = syscall(
+    let mut ret = syscall(
         buf_ptr as u64,
         len_ptr as u64,
         offset as u64,
@@ -48,17 +48,20 @@ fn syscall_load(
         a6,
         syscall_num,
     );
+    if len > old_len {
+        ret = SysError::LengthNotEnough as u64;
+    }
     // set buf len
-    unsafe {
-        buf.set_len(*len_ptr);
+    if ret == CKB_SUCCESS {
+        unsafe {
+            buf.set_len(*len_ptr);
+            debug_assert_eq!(*len_ptr, len);
+        }
+        buf.shrink_to_fit();
+        Ok(buf)
+    } else {
+        Err(ret.into())
     }
-    buf.shrink_to_fit();
-    if ret != CKB_SUCCESS {
-        return Err(ret.into());
-    } else if buf.len() > old_len {
-        return Err(SysError::LengthNotEnough);
-    }
-    Ok(buf)
 }
 
 pub fn load_tx_hash(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {

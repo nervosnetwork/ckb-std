@@ -17,7 +17,11 @@ macro_rules! default_alloc {
 
         #[global_allocator]
         static ALLOC: $crate::buddy_alloc::NonThreadsafeAlloc = unsafe {
-            $crate::buddy_alloc::NonThreadsafeAlloc::new(_HEAP.as_ptr(), _HEAP_SIZE, $min_block_size)
+            $crate::buddy_alloc::NonThreadsafeAlloc::new(
+                _HEAP.as_ptr(),
+                _HEAP_SIZE,
+                $min_block_size,
+            )
         };
-    }
+    };
 }

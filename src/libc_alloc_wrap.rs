@@ -1,4 +1,4 @@
-use alloc::alloc::{Layout, GlobalAlloc};
+use alloc::alloc::{GlobalAlloc, Layout};
 
 extern "C" {
     fn malloc(size: usize) -> *mut u8;

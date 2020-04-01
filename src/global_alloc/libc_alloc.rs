@@ -20,7 +20,7 @@ macro_rules! libc_alloc {
             static mut _HEAP: [u8; _HEAP_SIZE] = [0u8; _HEAP_SIZE];
             static mut _OFFSET: isize = 0;
 
-            unsafe{
+            unsafe {
                 let old_offset = _OFFSET;
                 _OFFSET += inc;
                 if _OFFSET < 0 || _OFFSET >= _HEAP_SIZE as isize {
@@ -31,8 +31,6 @@ macro_rules! libc_alloc {
         }
 
         #[global_allocator]
-        static ALLOC: $crate::libc_alloc::LibCAlloc = unsafe {
-            $crate::libc_alloc::LibCAlloc{}
-        };
-    }
+        static ALLOC: $crate::libc_alloc::LibCAlloc = unsafe { $crate::libc_alloc::LibCAlloc {} };
+    };
 }
