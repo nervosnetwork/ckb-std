@@ -10,11 +10,11 @@ pub fn syscall(
     a4: u64,
     a5: u64,
     a6: u64,
-    syscall_num: u64,
+    a7: u64,
 ) -> u64 {
     unsafe {
-        asm!("ecall" : "+r"(a0):"r"(a1) "r"(a2) "r"(a3) "r"(a4) "r"(a5) "r"(a6) "r"(syscall_num)::"volatile");
-        asm!("fence" :::"memory":"volatile");
+        llvm_asm!("ecall" : "+r"(a0):"r"(a1) "r"(a2) "r"(a3) "r"(a4) "r"(a5) "r"(a6) "r"(a7)::"volatile");
+        llvm_asm!("fence" :::"memory":"volatile");
     }
     return a0;
 }
