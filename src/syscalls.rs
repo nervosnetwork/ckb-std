@@ -1,26 +1,13 @@
 use crate::ckb_constants::*;
 use alloc::vec::Vec;
 
-#[inline(never)]
-pub fn syscall(
-    mut a0: u64,
-    a1: u64,
-    a2: u64,
-    a3: u64,
-    a4: u64,
-    a5: u64,
-    a6: u64,
-    a7: u64,
-) -> u64 {
-    unsafe {
-        llvm_asm!("ecall" : "+r"(a0):"r"(a1) "r"(a2) "r"(a3) "r"(a4) "r"(a5) "r"(a6) "r"(a7)::"volatile");
-        llvm_asm!("fence" :::"memory":"volatile");
-    }
-    return a0;
+#[link(name = "ckb-syscall")]
+extern "C" {
+    fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64;
 }
 
 pub fn exit(code: i8) -> ! {
-    syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT);
+    unsafe { syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT) };
     loop {}
 }
 
@@ -38,16 +25,18 @@ fn syscall_load(
     buf.resize(len, 0);
     let len_ptr: *mut usize = &mut len;
     let buf_ptr: *mut u8 = buf.as_mut_ptr();
-    let mut ret = syscall(
-        buf_ptr as u64,
-        len_ptr as u64,
-        offset as u64,
-        a3,
-        a4,
-        a5,
-        a6,
-        syscall_num,
-    );
+    let mut ret = unsafe {
+        syscall(
+            buf_ptr as u64,
+            len_ptr as u64,
+            offset as u64,
+            a3,
+            a4,
+            a5,
+            a6,
+            syscall_num,
+        )
+    };
     if len > old_len {
         ret = SysError::LengthNotEnough as u64;
     }
@@ -240,5 +229,7 @@ pub fn load_script(len: usize, offset: usize) -> Result<Vec<u8>, SysError> {
 pub fn debug(mut s: alloc::string::String) {
     s.push('\0');
     let c_str = s.into_bytes();
-    syscall(c_str.as_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_DEBUG);
+    unsafe {
+        syscall(c_str.as_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_DEBUG);
+    }
 }
