@@ -12,6 +12,6 @@ This library contains serveral modules that could help you write CKB contract wi
 
 To use `libc` global allocator, you must static link libc into the binary, and enable `libc` feature in this crate.
 
-Check `examples`, [docs](https://docs.rs/crate/ckb-std) and this [tutorial](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to use.
+Check `examples`, [tests](https://github.com/jjyr/ckb-std/blob/master/test/contract/src/main.rs), [docs](https://docs.rs/crate/ckb-std) and this [tutorial](https://justjjy.com/Build-CKB-contract-with-Rust-part-1) to learn how to use.
 
 See also [ckb-tool](https://github.com/jjyr/ckb-tool) which helps you write tests.
