@@ -15,38 +15,34 @@ fn test_basic() {
 
 fn test_load_cell_field() {
     let mut buf = [0u8; size_of::<u64>()];
-    let len = buf.len();
-    let full_data_len =
-        syscalls::load_cell_by_field(&mut buf, len, 0, 0, Source::GroupInput, CellField::Capacity)
-            .unwrap();
-    assert_eq!(full_data_len, len);
+    let len = syscalls::load_cell_by_field(&mut buf, 0, 0, Source::GroupInput, CellField::Capacity)
+        .unwrap();
+    assert_eq!(len, buf.len());
     let capacity = u64::from_le_bytes(buf);
     debug!("input capacity {}", capacity);
 }
 
 fn test_load_tx_hash() {
     let mut tx_hash = [0u8; 32];
-    let len = tx_hash.len();
-    let full_data_len = syscalls::load_tx_hash(&mut tx_hash, len, 0).unwrap();
-    assert_eq!(full_data_len, len);
+    let len = syscalls::load_tx_hash(&mut tx_hash, 0).unwrap();
+    assert_eq!(len, tx_hash.len());
     debug!("tx hash {:?}", tx_hash);
 }
 
 fn test_partial_load_tx_hash() {
     let mut tx_hash = [0u8; 32];
-    let len = tx_hash.len();
-    let full_data_len = syscalls::load_tx_hash(&mut tx_hash, len, 0).unwrap();
-    assert_eq!(full_data_len, len);
+    let len = syscalls::load_tx_hash(&mut tx_hash, 0).unwrap();
+    assert_eq!(len, tx_hash.len());
     assert_ne!(tx_hash, [0u8; 32]);
 
     // partial load ..16
     let mut buf = [0u8; 16];
-    let err = syscalls::load_tx_hash(&mut buf, 16, 0).unwrap_err();
+    let err = syscalls::load_tx_hash(&mut buf, 0).unwrap_err();
     assert_eq!(err, SysError::LengthNotEnough(32));
     assert_eq!(buf[..], tx_hash[..16]);
     // partial load 16..
-    let len = syscalls::load_tx_hash(&mut buf, 16, 16).unwrap();
-    assert_eq!(len, 16);
+    let len = syscalls::load_tx_hash(&mut buf, 16).unwrap();
+    assert_eq!(len, buf.len());
     assert_eq!(buf[..], tx_hash[16..]);
 }
 

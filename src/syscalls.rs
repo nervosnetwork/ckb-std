@@ -5,14 +5,17 @@ extern "C" {
     fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64;
 }
 
+/// Exit script
+/// The `0` code represents verification is success, others represent error code.
 pub fn exit(code: i8) -> ! {
     unsafe { syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT) };
     loop {}
 }
 
+/// Load data
+/// Return data length or syscall error
 fn syscall_load(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     a3: u64,
     a4: u64,
@@ -20,7 +23,7 @@ fn syscall_load(
     a6: u64,
     syscall_num: u64,
 ) -> Result<usize, SysError> {
-    let mut actual_data_len = len;
+    let mut actual_data_len = buf.len();
     let len_ptr: *mut usize = &mut actual_data_len;
     let buf_ptr: *mut u8 = buf.as_mut_ptr();
     let ret = unsafe {
@@ -35,27 +38,39 @@ fn syscall_load(
             syscall_num,
         )
     };
-    SysError::build_syscall_result(ret, len, actual_data_len)
+    SysError::build_syscall_result(ret, buf.len(), actual_data_len)
 }
 
-pub fn load_tx_hash(buf: &mut [u8], len: usize, offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, len, offset, 0, 0, 0, 0, SYS_LOAD_TX_HASH)
+/// Load tx hash
+/// buf: a writable buf
+/// offset: offset of data
+/// Return data length or syscall error
+pub fn load_tx_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
+    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_TX_HASH)
 }
 
-pub fn load_script_hash(buf: &mut [u8], len: usize, offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, len, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT_HASH)
+/// Load script hash
+/// buf: a writable buf
+/// offset: offset of data
+/// Return data length or syscall error
+pub fn load_script_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
+    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT_HASH)
 }
 
+/// Load cell
+/// buf: a writable buf
+/// offset: offset of data
+/// index: cell index
+/// source: cell source
+/// Return data length or syscall error
 pub fn load_cell(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -65,16 +80,20 @@ pub fn load_cell(
     )
 }
 
+/// Load input
+/// buf: a writable buf
+/// offset: offset of data
+/// index: cell index
+/// source: cell source
+/// Return data length or syscall error
 pub fn load_input(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -84,16 +103,20 @@ pub fn load_input(
     )
 }
 
+/// Load header
+/// buf: a writable buf
+/// offset: offset of data
+/// index: index
+/// source: source
+/// Return data length or syscall error
 pub fn load_header(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -103,16 +126,20 @@ pub fn load_header(
     )
 }
 
+/// Load witness
+/// buf: a writable buf
+/// offset: offset of data
+/// index: cell index
+/// source: cell source
+/// Return data length or syscall error
 pub fn load_witness(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -122,13 +149,23 @@ pub fn load_witness(
     )
 }
 
-pub fn load_transaction(buf: &mut [u8], len: usize, offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, len, offset, 0, 0, 0, 0, SYS_LOAD_TRANSACTION)
+/// Load transaction
+/// buf: a writable buf
+/// offset: offset of data
+/// Return data length or syscall error
+pub fn load_transaction(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
+    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_TRANSACTION)
 }
 
+/// Load cell by field
+/// buf: a writable buf
+/// offset: offset of data
+/// index: cell index
+/// source: cell source
+/// field: cell field to load
+/// Return data length or syscall error
 pub fn load_cell_by_field(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
@@ -136,7 +173,6 @@ pub fn load_cell_by_field(
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -146,9 +182,15 @@ pub fn load_cell_by_field(
     )
 }
 
+/// Load header by field
+/// buf: a writable buf
+/// offset: offset of data
+/// index: cell index
+/// source: cell source
+/// field: header field to load
+/// Return data length or syscall error
 pub fn load_header_by_field(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
@@ -156,7 +198,6 @@ pub fn load_header_by_field(
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -166,9 +207,15 @@ pub fn load_header_by_field(
     )
 }
 
+/// Load input by field
+/// buf: a writable buf
+/// offset: offset of data
+/// index: cell index
+/// source: cell source
+/// field: input field to load
+/// Return data length or syscall error
 pub fn load_input_by_field(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
@@ -176,7 +223,6 @@ pub fn load_input_by_field(
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -186,9 +232,15 @@ pub fn load_input_by_field(
     )
 }
 
+/// Load cell code, read cell data as executable code
+/// buf: a writable buf
+/// content_offset: offset of data
+/// content_size: length of data
+/// index: cell index
+/// source: cell source
+/// Return data length or syscall error
 pub fn load_cell_code(
     buf: &mut [u8],
-    memory_size: usize,
     content_offset: usize,
     content_size: usize,
     index: usize,
@@ -196,7 +248,6 @@ pub fn load_cell_code(
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        memory_size,
         content_offset,
         content_size as u64,
         index as u64,
@@ -206,16 +257,21 @@ pub fn load_cell_code(
     )
 }
 
+/// Load cell data, read cell data
+/// buf: a writable buf
+/// content_offset: offset of data
+/// content_size: length of data
+/// index: cell index
+/// source: cell source
+/// Return data length or syscall error
 pub fn load_cell_data(
     buf: &mut [u8],
-    len: usize,
     offset: usize,
     index: usize,
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
         buf,
-        len,
         offset,
         index as u64,
         source as u64,
@@ -225,8 +281,12 @@ pub fn load_cell_data(
     )
 }
 
-pub fn load_script(buf: &mut [u8], len: usize, offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, len, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT)
+/// Load script
+/// buf: a writable buf
+/// offset: offset of data
+/// Return data length or syscall error
+pub fn load_script(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
+    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT)
 }
 
 pub fn debug(mut s: alloc::string::String) {
