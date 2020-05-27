@@ -5,7 +5,7 @@
 #![feature(panic_info_message)]
 
 use alloc::vec;
-use ckb_std::{ckb_constants::*, debug, default_alloc, entry, syscalls};
+use ckb_std::{ckb_constants::*, error::SysError, debug, default_alloc, entry, syscalls};
 use core::mem::size_of;
 
 fn test_basic() {
