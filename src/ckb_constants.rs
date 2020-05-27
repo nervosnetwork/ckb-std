@@ -15,41 +15,6 @@ pub const SYS_LOAD_CELL_DATA: u64 = 2092;
 pub const SYS_DEBUG: u64 = 2177;
 
 pub const CKB_SUCCESS: u64 = 0;
-
-#[derive(Eq, PartialEq, Debug, Clone, Copy)]
-pub enum SysError {
-    /// Index out of bound
-    IndexOutOfBound,
-    /// Field is missing for the target
-    ItemMissing,
-    /// Buffer length is not enough, error contains actual data length
-    LengthNotEnough(usize),
-    /// Unknown syscall error number
-    Unknown(u64),
-}
-
-impl SysError {
-    pub(crate) fn build_syscall_result(
-        errno: u64,
-        load_len: usize,
-        actual_data_len: usize,
-    ) -> Result<usize, SysError> {
-        use SysError::*;
-
-        match errno {
-            0 => {
-                if actual_data_len > load_len {
-                    return Err(LengthNotEnough(actual_data_len));
-                }
-                return Ok(actual_data_len);
-            }
-            1 => Err(IndexOutOfBound),
-            2 => Err(ItemMissing),
-            _ => Err(Unknown(errno)),
-        }
-    }
-}
-
 #[derive(Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u64)]
 pub enum Source {

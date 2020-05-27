@@ -1,4 +1,6 @@
 use crate::ckb_constants::*;
+// re-export to maintain compatible with old versions
+pub use crate::error::SysError;
 
 #[link(name = "ckb-syscall")]
 extern "C" {
