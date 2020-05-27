@@ -5,7 +5,7 @@ CC := riscv64-unknown-elf-gcc
 default: integration-in-docker
 
 integration-in-docker:
-	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code ${DOCKER_IMAGE} bash -c 'cd /code && make integration; chown -R $$OWNER target'
+	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo:/root/.cargo ${DOCKER_IMAGE} bash -c 'cd /code && make integration; chown -R $$OWNER target'
 
 publish-in-docker:
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo:/root/.cargo ${DOCKER_IMAGE} bash -c 'cd /code && cargo publish --target ${TARGET}; chown -R $$OWNER target'
