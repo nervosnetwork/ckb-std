@@ -2,7 +2,7 @@
 ///
 /// Output a debug message
 ///
-/// Notice: to see the debug output, you must turn on `ckb_script` debug log in the CKB node configure.
+/// Notice: to see the debug output, you must turn on `ckb_script` debugging log in the CKB node configuration.
 ///
 /// # Example
 ///
