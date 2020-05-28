@@ -5,6 +5,7 @@
 #![feature(panic_info_message)]
 
 use alloc::vec;
+use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
 use ckb_std::{
     ckb_constants::*, ckb_types::prelude::*, debug, default_alloc, entry, error::SysError,
@@ -89,6 +90,24 @@ fn test_high_level_apis() {
     assert_eq!(tx_hash, tx_hash2);
 }
 
+fn test_query() {
+    let outputs: Vec<_> =
+        high_level::QueryIter::new(high_level::load_cell, Source::Output).collect();
+    assert_eq!(outputs.len(), 2);
+    let inputs: Vec<_> =
+        high_level::QueryIter::new(high_level::load_input, Source::Input).collect();
+    assert_eq!(inputs.len(), 1);
+    let cell_deps: Vec<_> =
+        high_level::QueryIter::new(high_level::load_cell, Source::CellDep).collect();
+    assert_eq!(cell_deps.len(), 2);
+    let header_deps: Vec<_> =
+        high_level::QueryIter::new(high_level::load_header, Source::HeaderDep).collect();
+    assert_eq!(header_deps.len(), 0);
+    let witnesses: Vec<_> =
+        high_level::QueryIter::new(high_level::load_witness_args, Source::Input).collect();
+    assert_eq!(witnesses.len(), 0);
+}
+
 #[no_mangle]
 pub fn main() -> i8 {
     test_basic();
@@ -96,6 +115,7 @@ pub fn main() -> i8 {
     test_load_tx_hash();
     test_partial_load_tx_hash();
     test_high_level_apis();
+    test_query();
     0
 }
 
