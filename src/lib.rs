@@ -16,3 +16,5 @@ pub mod syscalls;
 pub use buddy_alloc;
 #[cfg(feature = "ckb-types")]
 pub mod high_level;
+#[cfg(feature = "ckb-types")]
+pub use ckb_types;

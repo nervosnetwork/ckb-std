@@ -206,3 +206,34 @@ pub fn load_script() -> Result<Script, SysError> {
         Err(_err) => Err(SysError::Encoding),
     }
 }
+
+pub struct QueryIter<F> {
+    query_fn: F,
+    index: usize,
+    source: Source,
+}
+
+impl<F> QueryIter<F> {
+    pub fn new(query_fn: F, source: Source) -> Self {
+        QueryIter {
+            query_fn,
+            index: 0,
+            source,
+        }
+    }
+}
+
+impl<T, F: Fn(usize, Source) -> Result<T, SysError>> Iterator for QueryIter<F> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match (self.query_fn)(self.index, self.source) {
+            Ok(item) => {
+                self.index += 1;
+                Some(item)
+            }
+            Err(SysError::IndexOutOfBound) => None,
+            Err(err) => panic!("{:?}", err),
+        }
+    }
+}
