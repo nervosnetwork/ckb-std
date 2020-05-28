@@ -25,13 +25,21 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">/// Usage</span>
+<span class="doccomment">/// Defines global allocator</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ``` rust</span>
-<span class="doccomment">/// // define global allocator with defaut pure rust allocator</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// // define global allocator</span>
 <span class="doccomment">/// default_alloc!()</span>
-<span class="doccomment">/// // indicate the heap size(default heap size is 64KB, with 16Bytes min allocated memory)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // customize the heap size(default heap size is 64KB, min allocated memory is 16B)</span>
 <span class="doccomment">/// default_alloc!(64 * 1024, 16)</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["SysError",""]]});
+initSidebarItems({"enum":[["SysError","Syscall errors"]]});

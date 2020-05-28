@@ -34,13 +34,19 @@
 <span id="34">34</span>
 <span id="35">35</span>
 <span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">/// Usage</span>
+<span class="doccomment">/// Defines global allocator</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ``` rust</span>
-<span class="doccomment">/// // define global allocator with malloc/free</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// // define global allocator</span>
 <span class="doccomment">/// libc_alloc!()</span>
-<span class="doccomment">/// // indicate the heap size(default heap size is 64KB)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // customize the heap size(default heap size is 64KB)</span>
 <span class="doccomment">/// libc_alloc!(64 * 1024)</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>

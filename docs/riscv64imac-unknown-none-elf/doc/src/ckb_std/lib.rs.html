@@ -16,7 +16,29 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! ckb-std</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Modules</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * `high_level` module: defines high level syscall API</span>
+<span class="doccomment">//! * `syscalls` module: defines low level [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md)</span>
+<span class="doccomment">//! * `debug!` macro: a `println!` like macro helps debugging</span>
+<span class="doccomment">//! * `entry!` macro: defines contract entry point</span>
+<span class="doccomment">//! * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust</span>
+
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">llvm_asm</span>)]</span>
 
@@ -35,5 +57,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">buddy_alloc</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ckb-types&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">high_level</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ckb-types&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ckb_types</span>;
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "ckb_std";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
