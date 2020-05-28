@@ -88,6 +88,13 @@ fn test_high_level_apis() {
         buf
     };
     assert_eq!(tx_hash, tx_hash2);
+    let inputs_capacity = high_level::QueryIter::new(high_level::load_cell, Source::Input)
+        .map(|cell| cell.capacity().unpack())
+        .sum::<u64>();
+    let outputs_capacity = high_level::QueryIter::new(high_level::load_cell, Source::Output)
+        .map(|cell| cell.capacity().unpack())
+        .sum::<u64>();
+    assert_eq!(inputs_capacity, outputs_capacity);
 }
 
 fn test_query() {

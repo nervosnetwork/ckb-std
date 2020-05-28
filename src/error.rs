@@ -1,3 +1,4 @@
+/// Syscall errors
 #[derive(Eq, PartialEq, Debug, Clone, Copy)]
 pub enum SysError {
     /// Index out of bound

@@ -4,8 +4,18 @@ use crate::syscalls;
 use alloc::vec::Vec;
 use ckb_types::{packed::*, prelude::*};
 
+/// Default buffer size
 pub const BUF_SIZE: usize = 1024;
 
+/// Load tx hash
+///
+/// Return the tx hash or a syscall error
+///
+/// # Example
+///
+/// ```
+/// let tx_hash = load_tx_hash().unwrap();
+/// ```
 pub fn load_tx_hash() -> Result<[u8; 32], SysError> {
     let mut hash = [0u8; 32];
     let len = syscalls::load_tx_hash(&mut hash, 0)?;
@@ -13,6 +23,15 @@ pub fn load_tx_hash() -> Result<[u8; 32], SysError> {
     Ok(hash)
 }
 
+/// Load script hash
+///
+/// Return the script hash or a syscall error
+///
+/// # Example
+///
+/// ```
+/// let script_hash = load_script_hash().unwrap();
+/// ```
 pub fn load_script_hash() -> Result<[u8; 32], SysError> {
     let mut hash = [0u8; 32];
     let len = syscalls::load_script_hash(&mut hash, 0)?;
@@ -20,7 +39,7 @@ pub fn load_script_hash() -> Result<[u8; 32], SysError> {
     Ok(hash)
 }
 
-/// Common method to load all data from syscall
+/// Common method to fully load data from syscall
 fn load_data<F: Fn(&mut [u8], usize) -> Result<usize, SysError>>(
     syscall: F,
 ) -> Result<Vec<u8>, SysError> {
@@ -39,6 +58,20 @@ fn load_data<F: Fn(&mut [u8], usize) -> Result<usize, SysError>>(
     }
 }
 
+/// Load cell
+///
+/// Return the cell or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let cell_output = load_cell(0, Source::Input).unwrap();
+/// ```
 pub fn load_cell(index: usize, source: Source) -> Result<CellOutput, SysError> {
     let data = load_data(|buf, offset| syscalls::load_cell(buf, offset, index, source))?;
 
@@ -48,6 +81,20 @@ pub fn load_cell(index: usize, source: Source) -> Result<CellOutput, SysError> {
     }
 }
 
+/// Load input
+///
+/// Return the input or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let input = load_input(0, Source::Input).unwrap();
+/// ```
 pub fn load_input(index: usize, source: Source) -> Result<CellInput, SysError> {
     let data = load_data(|buf, offset| syscalls::load_input(buf, offset, index, source))?;
 
@@ -57,6 +104,20 @@ pub fn load_input(index: usize, source: Source) -> Result<CellInput, SysError> {
     }
 }
 
+/// Load header
+///
+/// Return the header or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let header = load_header(0, Source::HeaderDep).unwrap();
+/// ```
 pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
     let data = load_data(|buf, offset| syscalls::load_header(buf, offset, index, source))?;
 
@@ -66,6 +127,20 @@ pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
     }
 }
 
+/// Load witness args
+///
+/// Return the witness args or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let witness_args = load_witness_args(0, Source::Input).unwrap();
+/// ```
 pub fn load_witness_args(index: usize, source: Source) -> Result<WitnessArgs, SysError> {
     let data = load_data(|buf, offset| syscalls::load_witness(buf, offset, index, source))?;
 
@@ -75,6 +150,15 @@ pub fn load_witness_args(index: usize, source: Source) -> Result<WitnessArgs, Sy
     }
 }
 
+/// Load transaction
+///
+/// Return the transaction or a syscall error
+///
+/// # Example
+///
+/// ```
+/// let tx = load_transaction().unwrap();
+/// ```
 pub fn load_transaction() -> Result<Transaction, SysError> {
     let data = load_data(|buf, offset| syscalls::load_transaction(buf, offset))?;
 
@@ -84,8 +168,20 @@ pub fn load_transaction() -> Result<Transaction, SysError> {
     }
 }
 
-// Load cell by fields
-
+/// Load cell capacity
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let capacity = syscalls::load_cell_capacity(index, source).unwrap();
+/// ```
 pub fn load_cell_capacity(index: usize, source: Source) -> Result<u64, SysError> {
     let mut buf = [0u8; 8];
     let len = syscalls::load_cell_by_field(&mut buf, 0, index, source, CellField::Capacity)?;
@@ -93,6 +189,18 @@ pub fn load_cell_capacity(index: usize, source: Source) -> Result<u64, SysError>
     Ok(u64::from_le_bytes(buf))
 }
 
+/// Load cell occupied capacity
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let occupied_capacity = load_cell_occupied_capacity(index, source).unwrap();
+/// ```
 pub fn load_cell_occupied_capacity(index: usize, source: Source) -> Result<u64, SysError> {
     let mut buf = [0u8; 8];
     let len =
@@ -101,6 +209,18 @@ pub fn load_cell_occupied_capacity(index: usize, source: Source) -> Result<u64, 
     Ok(u64::from_le_bytes(buf))
 }
 
+/// Load cell data hash
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let data_hash = load_cell_data_hash(index, source).unwrap();
+/// ```
 pub fn load_cell_data_hash(index: usize, source: Source) -> Result<[u8; 32], SysError> {
     let mut buf = [0u8; 32];
     let len = syscalls::load_cell_by_field(&mut buf, 0, index, source, CellField::DataHash)?;
@@ -108,6 +228,18 @@ pub fn load_cell_data_hash(index: usize, source: Source) -> Result<[u8; 32], Sys
     Ok(buf)
 }
 
+/// Load cell lock hash
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let lock_hash = load_cell_lock_hash(index, source).unwrap();
+/// ```
 pub fn load_cell_lock_hash(index: usize, source: Source) -> Result<[u8; 32], SysError> {
     let mut buf = [0u8; 32];
     let len = syscalls::load_cell_by_field(&mut buf, 0, index, source, CellField::LockHash)?;
@@ -115,6 +247,18 @@ pub fn load_cell_lock_hash(index: usize, source: Source) -> Result<[u8; 32], Sys
     Ok(buf)
 }
 
+/// Load cell type hash
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let type_hash = load_cell_type_hash(index, source).unwrap();
+/// ```
 pub fn load_cell_type_hash(index: usize, source: Source) -> Result<[u8; 32], SysError> {
     let mut buf = [0u8; 32];
     let len = syscalls::load_cell_by_field(&mut buf, 0, index, source, CellField::TypeHash)?;
@@ -122,6 +266,20 @@ pub fn load_cell_type_hash(index: usize, source: Source) -> Result<[u8; 32], Sys
     Ok(buf)
 }
 
+/// Load cell lock
+///
+/// Return the lock script or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let lock = load_cell_lock(index, source).unwrap();
+/// ```
 pub fn load_cell_lock(index: usize, source: Source) -> Result<Script, SysError> {
     let data = load_data(|buf, offset| {
         syscalls::load_cell_by_field(buf, offset, index, source, CellField::Lock)
@@ -133,6 +291,20 @@ pub fn load_cell_lock(index: usize, source: Source) -> Result<Script, SysError> 
     }
 }
 
+/// Load cell type
+///
+/// Return the type script or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let type_script = load_cell_type(index, source).unwrap();
+/// ```
 pub fn load_cell_type(index: usize, source: Source) -> Result<Script, SysError> {
     let data = load_data(|buf, offset| {
         syscalls::load_cell_by_field(buf, offset, index, source, CellField::Type)
@@ -144,8 +316,18 @@ pub fn load_cell_type(index: usize, source: Source) -> Result<Script, SysError> 
     }
 }
 
-// Load header by field
-
+// Load header epoch number
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let epoch_number = load_header_epoch_number(index, source).unwrap();
+/// ```
 pub fn load_header_epoch_number(index: usize, source: Source) -> Result<u64, SysError> {
     let mut buf = [0u8; 8];
     let len = syscalls::load_header_by_field(&mut buf, 0, index, source, HeaderField::EpochNumber)?;
@@ -153,6 +335,18 @@ pub fn load_header_epoch_number(index: usize, source: Source) -> Result<u64, Sys
     Ok(u64::from_le_bytes(buf))
 }
 
+/// Load header epoch start block number
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let epoch_start_block_number = load_header_epoch_start_block_number(index, source).unwrap();
+/// ```
 pub fn load_header_epoch_start_block_number(index: usize, source: Source) -> Result<u64, SysError> {
     let mut buf = [0u8; 8];
     let len = syscalls::load_header_by_field(
@@ -166,6 +360,18 @@ pub fn load_header_epoch_start_block_number(index: usize, source: Source) -> Res
     Ok(u64::from_le_bytes(buf))
 }
 
+/// Load header epoch length
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let epoch_length = load_header_epoch_length(index, source).unwrap();
+/// ```
 pub fn load_header_epoch_length(index: usize, source: Source) -> Result<u64, SysError> {
     let mut buf = [0u8; 8];
     let len = syscalls::load_header_by_field(&mut buf, 0, index, source, HeaderField::EpochLength)?;
@@ -173,8 +379,18 @@ pub fn load_header_epoch_length(index: usize, source: Source) -> Result<u64, Sys
     Ok(u64::from_le_bytes(buf))
 }
 
-// Load input by field
-
+/// Load input since
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let since = load_input_since(index, source).unwrap();
+/// ```
 pub fn load_input_since(index: usize, source: Source) -> Result<u64, SysError> {
     let mut buf = [0u8; 8];
     let len = syscalls::load_input_by_field(&mut buf, 0, index, source, InputField::Since)?;
@@ -182,6 +398,18 @@ pub fn load_input_since(index: usize, source: Source) -> Result<u64, SysError> {
     Ok(u64::from_le_bytes(buf))
 }
 
+/// Load input out point
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let out_point = load_input_out_point(index, source).unwrap();
+/// ```
 pub fn load_input_out_point(index: usize, source: Source) -> Result<OutPoint, SysError> {
     let mut buf = [0u8; 36];
     let len = syscalls::load_input_by_field(&mut buf, 0, index, source, InputField::OutPoint)?;
@@ -192,12 +420,29 @@ pub fn load_input_out_point(index: usize, source: Source) -> Result<OutPoint, Sy
     }
 }
 
-/// Load cell data, read cell data
+/// Load cell data
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let data = load_cell_data(index, source).unwrap();
+/// ```
 pub fn load_cell_data(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
     load_data(|buf, offset| syscalls::load_cell_data(buf, offset, index, source))
 }
 
 /// Load script
+///
+/// # Example
+///
+/// ```
+/// let script = load_script().unwrap();
+/// ```
 pub fn load_script() -> Result<Script, SysError> {
     let data = load_data(|buf, offset| syscalls::load_script(buf, offset))?;
 
@@ -207,6 +452,25 @@ pub fn load_script() -> Result<Script, SysError> {
     }
 }
 
+/// QueryIter
+///
+/// A advanced iterator to manipulate cells/inputs/headers/witnesses
+///
+/// # Example
+///
+/// ```
+/// // calculate all inputs capacity
+/// let inputs_capacity = QueryIter::new(load_cell, Source::Input)
+/// .map(|cell| cell.capacity().unpack())
+/// .sum::<u64>();
+///
+/// // calculate all outputs capacity
+/// let outputs_capacity = QueryIter::new(load_cell, Source::Output)
+/// .map(|cell| cell.capacity().unpack())
+/// .sum::<u64>();
+///
+/// assert_eq!(inputs_capacity, outputs_capacity);
+/// ```
 pub struct QueryIter<F> {
     query_fn: F,
     index: usize,

@@ -1,13 +1,16 @@
 # ckb-std
-[![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std)
+[![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std) 
 
 This library contains serveral modules that help you write CKB contract with Rust.
 
 ## Usage
 
+[Documentation](https://justjjy.com/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html)
+
 ### Modules
 
 * `syscalls` module: defines [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md)
+* `high_level` module: defines high level APIs
 * `debug!` macro: a `println!` like macro helps debugging
 * `entry!` macro: defines contract entry point
 * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust

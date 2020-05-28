@@ -1,3 +1,4 @@
+/// Transaction input's since field
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Since(u64);
 

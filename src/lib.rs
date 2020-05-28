@@ -1,3 +1,13 @@
+//! ckb-std
+//!
+//! # Modules
+//!
+//! * `high_level` module: defines high level syscall API
+//! * `syscalls` module: defines low level [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md)
+//! * `debug!` macro: a `println!` like macro helps debugging
+//! * `entry!` macro: defines contract entry point
+//! * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust
+
 #![no_std]
 #![feature(llvm_asm)]
 

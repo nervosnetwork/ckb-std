@@ -7,8 +7,8 @@ extern "C" {
     fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64;
 }
 
-/// Exit script
-/// The `0` code represents verification is success, others represent error code.
+/// Exit, this script will be terminated after the exit syscall.
+/// exit code `0` represents verification is success, others represent error code.
 pub fn exit(code: i8) -> ! {
     unsafe { syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT) };
     loop {}
@@ -43,28 +43,56 @@ fn syscall_load(
     SysError::build_syscall_result(ret, buf.len(), actual_data_len)
 }
 
-/// Load tx hash
-/// buf: a writable buf
-/// offset: offset of data
-/// Return data length or syscall error
+/// Load transaction hash
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+///
+/// # Example
+///
+/// ```
+/// let mut tx_hash = [0u8; 32];
+/// let len = load_tx_hash(&mut tx_hash, 0).unwrap();
+/// assert_eq!(len, tx_hash.len());
+/// ```
 pub fn load_tx_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
     syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_TX_HASH)
 }
 
 /// Load script hash
-/// buf: a writable buf
-/// offset: offset of data
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+///
+/// # Example
+///
+/// ```
+/// let mut script_hash = [0u8; 32];
+/// let len = load_script_hash(&mut script_hash, 0).unwrap();
+/// assert_eq!(len, script_hash.len());
+/// ```
 pub fn load_script_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
     syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT_HASH)
 }
 
 /// Load cell
-/// buf: a writable buf
-/// offset: offset of data
-/// index: cell index
-/// source: cell source
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index of cell
+/// * `source` - source of cell
 pub fn load_cell(
     buf: &mut [u8],
     offset: usize,
@@ -83,11 +111,15 @@ pub fn load_cell(
 }
 
 /// Load input
-/// buf: a writable buf
-/// offset: offset of data
-/// index: cell index
-/// source: cell source
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index of cell
+/// * `source` - source of cell
 pub fn load_input(
     buf: &mut [u8],
     offset: usize,
@@ -106,11 +138,15 @@ pub fn load_input(
 }
 
 /// Load header
-/// buf: a writable buf
-/// offset: offset of data
-/// index: index
-/// source: source
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index of cell or header
+/// * `source` - source
 pub fn load_header(
     buf: &mut [u8],
     offset: usize,
@@ -129,11 +165,15 @@ pub fn load_header(
 }
 
 /// Load witness
-/// buf: a writable buf
-/// offset: offset of data
-/// index: cell index
-/// source: cell source
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index of cell
+/// * `source` - source
 pub fn load_witness(
     buf: &mut [u8],
     offset: usize,
@@ -152,20 +192,36 @@ pub fn load_witness(
 }
 
 /// Load transaction
-/// buf: a writable buf
-/// offset: offset of data
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
 pub fn load_transaction(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
     syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_TRANSACTION)
 }
 
 /// Load cell by field
-/// buf: a writable buf
-/// offset: offset of data
-/// index: cell index
-/// source: cell source
-/// field: cell field to load
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index of cell
+/// * `source` - source of cell
+/// * `field` - field of cell
+///
+/// # Example
+///
+/// ```
+/// let mut buf = [0u8; size_of::<u64>()];
+/// let len = load_cell_by_field(&mut buf, 0, 0, Source::GroupInput, CellField::Capacity).unwrap();
+/// assert_eq!(len, buf.len());
+/// ```
 pub fn load_cell_by_field(
     buf: &mut [u8],
     offset: usize,
@@ -185,12 +241,24 @@ pub fn load_cell_by_field(
 }
 
 /// Load header by field
-/// buf: a writable buf
-/// offset: offset of data
-/// index: cell index
-/// source: cell source
-/// field: header field to load
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index
+/// * `source` - source
+/// * `field` - field
+///
+/// # Example
+///
+/// ```
+/// let mut buf = [0u8; 8];
+/// let len = load_header_by_field(&mut buf, 0, index, source, HeaderField::EpochNumber)?;
+/// debug_assert_eq!(len, buf.len());
+/// ```
 pub fn load_header_by_field(
     buf: &mut [u8],
     offset: usize,
@@ -210,12 +278,24 @@ pub fn load_header_by_field(
 }
 
 /// Load input by field
-/// buf: a writable buf
-/// offset: offset of data
-/// index: cell index
-/// source: cell source
-/// field: input field to load
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index
+/// * `source` - source
+/// * `field` - field
+///
+/// # Example
+///
+/// ```
+/// let mut buf = [0u8; 8];
+/// let len = load_input_by_field(&mut buf, 0, index, source, InputField::Since)?;
+/// debug_assert_eq!(len, buf.len());
+/// ```
 pub fn load_input_by_field(
     buf: &mut [u8],
     offset: usize,
@@ -235,12 +315,16 @@ pub fn load_input_by_field(
 }
 
 /// Load cell code, read cell data as executable code
-/// buf: a writable buf
-/// content_offset: offset of data
-/// content_size: length of data
-/// index: cell index
-/// source: cell source
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `content_offset` - offset
+/// * `content_size` - read length
+/// * `index` - index
+/// * `source` - source
 pub fn load_cell_code(
     buf: &mut [u8],
     content_offset: usize,
@@ -260,12 +344,15 @@ pub fn load_cell_code(
 }
 
 /// Load cell data, read cell data
-/// buf: a writable buf
-/// content_offset: offset of data
-/// content_size: length of data
-/// index: cell index
-/// source: cell source
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index
+/// * `source` - source
 pub fn load_cell_data(
     buf: &mut [u8],
     offset: usize,
@@ -284,13 +371,24 @@ pub fn load_cell_data(
 }
 
 /// Load script
-/// buf: a writable buf
-/// offset: offset of data
-/// Return data length or syscall error
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
 pub fn load_script(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
     syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT)
 }
 
+/// Output debug message
+///
+/// You should use the macro version syscall: `debug!`
+///
+/// # Arguments
+///
+/// * `s` - string to output
 pub fn debug(mut s: alloc::string::String) {
     s.push('\0');
     let c_str = s.into_bytes();

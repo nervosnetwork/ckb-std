@@ -1,9 +1,13 @@
-/// Usage
+/// Defines global allocator
 ///
-/// ``` rust
-/// // define global allocator with defaut pure rust allocator
+///
+/// # Example
+///
+/// ```
+/// // define global allocator
 /// default_alloc!()
-/// // indicate the heap size(default heap size is 64KB, with 16Bytes min allocated memory)
+///
+/// // customize the heap size(default heap size is 64KB, min allocated memory is 16B)
 /// default_alloc!(64 * 1024, 16)
 /// ```
 #[macro_export]

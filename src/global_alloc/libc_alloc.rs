@@ -1,9 +1,12 @@
-/// Usage
+/// Defines global allocator
 ///
-/// ``` rust
-/// // define global allocator with malloc/free
+/// # Example
+///
+/// ```
+/// // define global allocator
 /// libc_alloc!()
-/// // indicate the heap size(default heap size is 64KB)
+///
+/// // customize the heap size(default heap size is 64KB)
 /// libc_alloc!(64 * 1024)
 /// ```
 #[macro_export]

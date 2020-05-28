@@ -1,6 +1,9 @@
-/// Usage
+/// Define entry point
 ///
-/// ``` rust
+///
+/// # Example
+///
+/// ```
 /// // define contract entry point
 /// entry!(main)
 /// ```
