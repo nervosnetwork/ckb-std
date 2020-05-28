@@ -10,6 +10,9 @@ integration-in-docker:
 publish-in-docker:
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo:/root/.cargo ${DOCKER_IMAGE} bash -c 'cd /code && cargo publish --target ${TARGET}; chown -R $$OWNER target'
 
+doc:
+	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo:/root/.cargo ${DOCKER_IMAGE} bash -c 'cd /code && cargo doc --target ${TARGET} --target-dir docs; chown -R $$OWNER docs'
+
 integration: check test
 
 test:

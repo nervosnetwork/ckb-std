@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["buddy_alloc"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/alloc/global/trait.GlobalAlloc.html\" title=\"trait core::alloc::global::GlobalAlloc\">GlobalAlloc</a> for <a class=\"struct\" href=\"buddy_alloc/struct.NonThreadsafeAlloc.html\" title=\"struct buddy_alloc::NonThreadsafeAlloc\">NonThreadsafeAlloc</a>","synthetic":false,"types":["buddy_alloc::non_threadsafe_alloc::NonThreadsafeAlloc"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
