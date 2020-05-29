@@ -63,14 +63,18 @@ fn test_partial_load_tx_hash() {
 }
 
 fn test_high_level_apis() {
-    let tx = high_level::load_transaction().unwrap();
-    let output = high_level::load_cell(0, Source::Output).unwrap();
+    use high_level::*;
+
+    let tx = load_transaction().unwrap();
+    let output = load_cell(0, Source::Output).unwrap();
     let output2 = tx.raw().outputs().get(0).unwrap();
     assert_eq!(output.as_slice(), output2.as_slice());
-    let script = high_level::load_script().unwrap();
-    let lock_script = high_level::load_cell_lock(0, Source::Input).unwrap();
+
+    let script = load_script().unwrap();
+    let lock_script = load_cell_lock(0, Source::Input).unwrap();
     assert_eq!(script.as_slice(), lock_script.as_slice());
-    let lock_hash = high_level::load_cell_lock_hash(0, Source::Input).unwrap();
+
+    let lock_hash = load_cell_lock_hash(0, Source::Input).unwrap();
     let lock_hash2 = {
         let mut buf = [0u8; 32];
         let mut hasher = new_blake2b();
@@ -79,7 +83,8 @@ fn test_high_level_apis() {
         buf
     };
     assert_eq!(lock_hash, lock_hash2);
-    let tx_hash = high_level::load_tx_hash().unwrap();
+
+    let tx_hash = load_tx_hash().unwrap();
     let tx_hash2 = {
         let mut buf = [0u8; 32];
         let mut hasher = new_blake2b();
@@ -88,30 +93,32 @@ fn test_high_level_apis() {
         buf
     };
     assert_eq!(tx_hash, tx_hash2);
-    let inputs_capacity = high_level::QueryIter::new(high_level::load_cell, Source::Input)
+
+    let inputs_capacity = QueryIter::new(load_cell, Source::Input)
         .map(|cell| cell.capacity().unpack())
         .sum::<u64>();
-    let outputs_capacity = high_level::QueryIter::new(high_level::load_cell, Source::Output)
+    let outputs_capacity = QueryIter::new(load_cell, Source::Output)
         .map(|cell| cell.capacity().unpack())
         .sum::<u64>();
     assert_eq!(inputs_capacity, outputs_capacity);
 }
 
 fn test_query() {
-    let outputs: Vec<_> =
-        high_level::QueryIter::new(high_level::load_cell, Source::Output).collect();
+    use high_level::*;
+
+    let outputs: Vec<_> = QueryIter::new(load_cell, Source::Output).collect();
     assert_eq!(outputs.len(), 2);
-    let inputs: Vec<_> =
-        high_level::QueryIter::new(high_level::load_input, Source::Input).collect();
+
+    let inputs: Vec<_> = QueryIter::new(load_input, Source::Input).collect();
     assert_eq!(inputs.len(), 1);
-    let cell_deps: Vec<_> =
-        high_level::QueryIter::new(high_level::load_cell, Source::CellDep).collect();
+
+    let cell_deps: Vec<_> = QueryIter::new(load_cell, Source::CellDep).collect();
     assert_eq!(cell_deps.len(), 2);
-    let header_deps: Vec<_> =
-        high_level::QueryIter::new(high_level::load_header, Source::HeaderDep).collect();
+
+    let header_deps: Vec<_> = QueryIter::new(load_header, Source::HeaderDep).collect();
     assert_eq!(header_deps.len(), 0);
-    let witnesses: Vec<_> =
-        high_level::QueryIter::new(high_level::load_witness_args, Source::Input).collect();
+
+    let witnesses: Vec<_> = QueryIter::new(load_witness_args, Source::Input).collect();
     assert_eq!(witnesses.len(), 0);
 }
 
