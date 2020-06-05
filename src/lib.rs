@@ -17,13 +17,12 @@ pub mod ckb_constants;
 pub mod debug;
 pub mod entry;
 pub mod error;
-pub mod global_alloc;
+pub mod global_alloc_macro;
 #[cfg(feature = "libc")]
-pub mod libc_alloc_wrap;
+pub mod libc_wrap;
 pub mod since;
 pub mod syscalls;
-#[cfg(feature = "buddy-alloc")]
-pub use buddy_alloc;
+pub use ckb_allocator;
 #[cfg(feature = "ckb-types")]
 pub mod high_level;
 #[cfg(feature = "ckb-types")]

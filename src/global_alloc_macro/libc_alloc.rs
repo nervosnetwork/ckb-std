@@ -15,8 +15,6 @@ macro_rules! libc_alloc {
         libc_alloc!(64 * 1024);
     };
     ($heap_size:expr) => {
-        extern crate alloc;
-
         #[no_mangle]
         fn _sbrk(inc: isize) -> *mut u8 {
             const _HEAP_SIZE: usize = $heap_size;
@@ -34,6 +32,6 @@ macro_rules! libc_alloc {
         }
 
         #[global_allocator]
-        static ALLOC: $crate::libc_alloc::LibCAlloc = unsafe { $crate::libc_alloc::LibCAlloc {} };
+        static ALLOC: $crate::libc_wrap::LibCAlloc = unsafe { $crate::libc_wrap::LibCAlloc {} };
     };
 }

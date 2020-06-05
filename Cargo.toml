@@ -10,12 +10,12 @@ description = "This library contains serveral modules help you write CKB contrac
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["buddy-alloc", "ckb-types"]
+default = ["ckb-allocator", "ckb-types"]
 libc = []
 
 [build-dependencies]
 cc = "1.0"
 
 [dependencies]
-buddy-alloc = { version = "0.2.0", optional = true }
 ckb-types = { package = "ckb-standalone-types", version = "0.0.1-pre.1", default-features = false, optional = true }
+ckb-allocator = { path = "ckb-allocator", optional = true }
