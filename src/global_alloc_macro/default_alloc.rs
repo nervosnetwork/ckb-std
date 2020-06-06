@@ -14,13 +14,13 @@
 /// //
 /// // User can invoke macro with arguments to customize the heap size
 /// // The default heap size arguments are:
-/// // (fixed heap size 64 KB, dynamic heap size 64KB, dynamic heap min memory block 64B)
-/// default_alloc!(64 * 1024, 64 * 1024, 64)
+/// // (fixed heap size 16KB, dynamic heap size 16KB, dynamic heap min memory block 64B)
+/// default_alloc!(16 * 1024, 16 * 1024, 64)
 /// ```
 #[macro_export]
 macro_rules! default_alloc {
     () => {
-        default_alloc!(64 * 1024, 64 * 1024, 64);
+        default_alloc!(16 * 1024, 16 * 1024, 64);
     };
     ($fixed_block_heap_size:expr, $heap_size:expr, $min_block_size:expr) => {
         static mut _BUDDY_HEAP: [u8; $heap_size] = [0u8; $heap_size];
