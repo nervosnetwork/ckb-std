@@ -9,7 +9,7 @@
 ///
 /// // Default allocator uses a mixed allocation strategy:
 /// //
-/// // * Fixed block heap, which can only allocate fixed size memory block
+/// // * Fixed block heap, which can only allocate fixed size(128B) memory block
 /// // * Dynamic memory heap, which can allocate any size memory block
 /// //
 /// // User can invoke macro with arguments to customize the heap size
