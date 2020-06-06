@@ -1,40 +1,34 @@
 //! Mixed strategy allocator
 
-use super::bitmap_alloc::{BitmapAlloc, MIN_MEMORY_BLOCK};
+use super::block_list_alloc::{BlockListAlloc, BLOCK_SIZE};
 use buddy_alloc::NonThreadsafeAlloc as BuddyAlloc;
 use core::alloc::{GlobalAlloc, Layout};
 
 /// Use buddy allocator if request bytes is large than this,
-/// otherwise use bitmap allocator
-const BITMAP_ALLOC_LIMIT: usize = MIN_MEMORY_BLOCK;
+/// otherwise use block list allocator
+const BLOCK_ALLOC_LIMIT: usize = BLOCK_SIZE;
 
-/// To break through the const function limitation
-/// we receive BitmapAlloc as a pointer.
 pub struct MixedAlloc {
-    bitmap_alloc_ptr: *mut BitmapAlloc,
+    block_list_alloc: BlockListAlloc,
     buddy_alloc: BuddyAlloc,
 }
 
 impl MixedAlloc {
-    pub const fn new(bitmap_alloc_ptr: *const BitmapAlloc, buddy_alloc: BuddyAlloc) -> Self {
+    pub const fn new(block_list_alloc: BlockListAlloc, buddy_alloc: BuddyAlloc) -> Self {
         MixedAlloc {
-            bitmap_alloc_ptr: bitmap_alloc_ptr as *mut BitmapAlloc,
+            block_list_alloc,
             buddy_alloc,
         }
-    }
-
-    unsafe fn bitmap_alloc(&self) -> &mut BitmapAlloc {
-        self.bitmap_alloc_ptr.as_mut().unwrap()
     }
 }
 
 unsafe impl GlobalAlloc for MixedAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let bytes = layout.size();
-        if bytes > BITMAP_ALLOC_LIMIT {
+        if bytes > BLOCK_ALLOC_LIMIT {
             self.buddy_alloc.alloc(layout)
         } else {
-            let mut p = self.bitmap_alloc().malloc(bytes);
+            let mut p = self.block_list_alloc.alloc(layout);
             if p.is_null() {
                 p = self.buddy_alloc.alloc(layout);
             }
@@ -43,8 +37,8 @@ unsafe impl GlobalAlloc for MixedAlloc {
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        if self.bitmap_alloc().contains_ptr(ptr) {
-            self.bitmap_alloc().free(ptr, layout.size());
+        if self.block_list_alloc.contains_ptr(ptr) {
+            self.block_list_alloc.dealloc(ptr, layout);
         } else {
             self.buddy_alloc.dealloc(ptr, layout);
         }

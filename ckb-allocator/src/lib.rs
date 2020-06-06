@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 
-pub mod bitmap_alloc;
+pub mod block_list_alloc;
 pub mod mixed_alloc;
 
 /// reexports
