@@ -17,25 +17,22 @@ This library contains serveral modules that help you write CKB contract with Rus
 
 ### Memory allocator
 
-`ckb-std` supports two memory allocators: default allocator(pure rust) and libc allocator(libc dependent).
+Default allocator uses a mixed allocation strategy:
 
-#### Default allocator
+* Fixed block heap, only allocate fixed size(64B) memory block
+* Dynamic memory heap, allocate any size memory block
 
-Default allocator allocate `64K` bytes memory, a panic will occured if out of memory.
+User can invoke macro with arguments to customize the heap size. The default heap size arguments are:
 
-Use the macro to change the default value:
+(fixed heap size 4KB, dynamic heap size 64KB, dynamic heap min memory block 64B)
+
+Use the macro with arguments to change it:
 
 ``` rust
-// indicate the heap size(default heap size is 64KB, with 16B minimal memory block)
-default_alloc!(64 * 1024, 16)
+default_alloc!(4 * 1024, 64 * 1024, 64)
 ```
 
-> Beware, the allocate parameters affect cycles of the contract; you should always test the contract after customizing parameters.
-
-
-#### LibC allocator
-
-To use `libc` global allocator, you must static link libc into the binary, and enable `libc` feature in this crate.
+> Beware, use difference heap size or memory block size may affect cycles of the contract; you should always test the contract after customizing parameters.
 
 ### Examples
 
