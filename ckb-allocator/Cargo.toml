@@ -3,6 +3,8 @@ name = "ckb-allocator"
 version = "0.1.0"
 authors = ["jjy <jjyruby@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "CKB allocator"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

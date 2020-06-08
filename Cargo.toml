@@ -1,11 +1,12 @@
 [package]
 name = "ckb-std"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["jjy <jjyruby@gmail.com>"]
 edition = "2018"
 license = "MIT"
 repository = "https://github.com/jjyr/ckb-std"
 description = "This library contains serveral modules help you write CKB contract with Rust"
+exclude = ["docs"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,4 +19,4 @@ cc = "1.0"
 
 [dependencies]
 ckb-types = { package = "ckb-standalone-types", version = "0.0.1-pre.1", default-features = false, optional = true }
-ckb-allocator = { path = "ckb-allocator", optional = true }
+ckb-allocator = { version = "0.1", optional = true }
