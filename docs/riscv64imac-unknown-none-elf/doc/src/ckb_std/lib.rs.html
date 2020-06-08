@@ -27,7 +27,6 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
-<span id="30">30</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! ckb-std</span>
 <span class="doccomment">//!</span>
@@ -48,13 +47,12 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">debug</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">entry</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">global_alloc</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">global_alloc_macro</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;libc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">libc_alloc_wrap</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">libc_wrap</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">since</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">syscalls</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;buddy-alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">buddy_alloc</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ckb_allocator</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ckb-types&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">high_level</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ckb-types&quot;</span>)]</span>

@@ -1,1 +1,1 @@
-initSidebarItems({"macro":[["debug","debug macro"],["default_alloc","Defines global allocator"],["entry","Define entry point"],["libc_alloc","Defines global allocator"]],"mod":[["ckb_constants",""],["debug",""],["entry",""],["error",""],["global_alloc",""],["high_level",""],["since",""],["syscalls",""]]});
+initSidebarItems({"macro":[["debug","debug macro"],["default_alloc","Defines global allocator"],["entry","Define entry point"]],"mod":[["ckb_constants",""],["debug",""],["entry",""],["error",""],["global_alloc_macro",""],["high_level",""],["since",""],["syscalls",""]]});
