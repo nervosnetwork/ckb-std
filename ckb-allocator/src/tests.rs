@@ -15,7 +15,7 @@ fn test_basic_malloc() {
     // alloc a min block
     with_allocator(
         |mut allocator| {
-            let p = allocator.malloc(256);
+            let p = allocator.malloc(64);
             let p_addr = p as usize;
             assert!(!p.is_null());
             // memory writeable
@@ -115,8 +115,8 @@ fn test_free_bug() {
         |mut allocator| {
             let p1 = allocator.malloc(32);
             allocator.free(p1);
-            let p2 = allocator.malloc(256);
-            let p3 = allocator.malloc(138);
+            let p2 = allocator.malloc(64);
+            let p3 = allocator.malloc(61);
             allocator.free(p2);
             allocator.free(p3);
         },
