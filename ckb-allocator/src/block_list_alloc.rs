@@ -4,8 +4,8 @@
 use core::alloc::{GlobalAlloc, Layout};
 use core::cell::RefCell;
 
-// Block size is 256 Bytes
-pub const BLOCK_SIZE: usize = 256;
+// Block size is 64 Bytes
+pub const BLOCK_SIZE: usize = 64;
 
 struct Node {
     next: *mut Node,

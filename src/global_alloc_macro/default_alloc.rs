@@ -9,18 +9,18 @@
 ///
 /// // Default allocator uses a mixed allocation strategy:
 /// //
-/// // * Fixed block heap, which can only allocate fixed size(128B) memory block
+/// // * Fixed block heap, which can only allocate fixed size(64B) memory block
 /// // * Dynamic memory heap, which can allocate any size memory block
 /// //
 /// // User can invoke macro with arguments to customize the heap size
 /// // The default heap size arguments are:
-/// // (fixed heap size 16KB, dynamic heap size 64KB, dynamic heap min memory block 64B)
-/// default_alloc!(16 * 1024, 64 * 1024, 64)
+/// // (fixed heap size 4KB, dynamic heap size 64KB, dynamic heap min memory block 64B)
+/// default_alloc!(4 * 1024, 64 * 1024, 64)
 /// ```
 #[macro_export]
 macro_rules! default_alloc {
     () => {
-        default_alloc!(16 * 1024, 64 * 1024, 64);
+        default_alloc!(4 * 1024, 64 * 1024, 64);
     };
     ($fixed_block_heap_size:expr, $heap_size:expr, $min_block_size:expr) => {
         static mut _BUDDY_HEAP: [u8; $heap_size] = [0u8; $heap_size];
