@@ -1,0 +1,25 @@
+TARGET = Some("riscv64imac-unknown-none-elf")
+OPT_LEVEL = Some("0")
+HOST = Some("x86_64-unknown-linux-gnu")
+CC_riscv64imac-unknown-none-elf = None
+CC_riscv64imac_unknown_none_elf = None
+TARGET_CC = None
+CC = None
+CROSS_COMPILE = None
+CFLAGS_riscv64imac-unknown-none-elf = None
+CFLAGS_riscv64imac_unknown_none_elf = None
+TARGET_CFLAGS = None
+CFLAGS = None
+CRATE_CC_NO_DEFAULTS = None
+DEBUG = Some("true")
+CARGO_CFG_TARGET_FEATURE = None
+running: "riscv64-unknown-elf-gcc" "-O0" "-ffunction-sections" "-fdata-sections" "-g" "-fno-omit-frame-pointer" "-march=rv64imac" "-mabi=lp64" "-mcmodel=medany" "-Wall" "-Wextra" "-o" "/code/docs/riscv64imac-unknown-none-elf/debug/build/ckb-std-4b7463184c000e3c/out/src/asm/syscall.o" "-c" "src/asm/syscall.S"
+exit code: 0
+AR_riscv64imac-unknown-none-elf = None
+AR_riscv64imac_unknown_none_elf = None
+TARGET_AR = None
+AR = None
+running: "riscv64-unknown-elf-ar" "crs" "/code/docs/riscv64imac-unknown-none-elf/debug/build/ckb-std-4b7463184c000e3c/out/libckb-syscall.a" "/code/docs/riscv64imac-unknown-none-elf/debug/build/ckb-std-4b7463184c000e3c/out/src/asm/syscall.o"
+exit code: 0
+cargo:rustc-link-lib=static=ckb-syscall
+cargo:rustc-link-search=native=/code/docs/riscv64imac-unknown-none-elf/debug/build/ckb-std-4b7463184c000e3c/out

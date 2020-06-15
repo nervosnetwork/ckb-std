@@ -58,13 +58,13 @@
 <span class="doccomment">/// //</span>
 <span class="doccomment">/// // User can invoke macro with arguments to customize the heap size</span>
 <span class="doccomment">/// // The default heap size arguments are:</span>
-<span class="doccomment">/// // (fixed heap size 4KB, dynamic heap size 64KB, dynamic heap min memory block 64B)</span>
-<span class="doccomment">/// default_alloc!(4 * 1024, 64 * 1024, 64)</span>
+<span class="doccomment">/// // (fixed heap size 4KB, dynamic heap size 516KB, dynamic heap min memory block 64B)</span>
+<span class="doccomment">/// default_alloc!(4 * 1024, 516 * 1024, 64)</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">default_alloc</span> {
     () <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">default_alloc</span><span class="macro">!</span>(<span class="number">4</span> <span class="op">*</span> <span class="number">1024</span>, <span class="number">64</span> <span class="op">*</span> <span class="number">1024</span>, <span class="number">64</span>);
+        <span class="macro">default_alloc</span><span class="macro">!</span>(<span class="number">4</span> <span class="op">*</span> <span class="number">1024</span>, <span class="number">516</span> <span class="op">*</span> <span class="number">1024</span>, <span class="number">64</span>);
     };
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fixed_block_heap_size</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">heap_size</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min_block_size</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">_BUDDY_HEAP</span>: [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">heap_size</span>] <span class="op">=</span> [<span class="number">0u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">heap_size</span>];
