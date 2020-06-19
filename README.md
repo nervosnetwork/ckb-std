@@ -5,7 +5,7 @@ This library contains serveral modules that help you write CKB contract with Rus
 
 ## Usage
 
-[Documentation](https://justjjy.com/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html)
+[Documentation](https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html)
 
 ### Modules
 
