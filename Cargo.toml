@@ -1,6 +1,6 @@
 [package]
 name = "ckb-std"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["jjy <jjyruby@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -12,7 +12,6 @@ exclude = ["docs"]
 
 [features]
 default = ["ckb-allocator", "ckb-types"]
-libc = []
 
 [build-dependencies]
 cc = "1.0"

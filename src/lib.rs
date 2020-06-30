@@ -18,8 +18,6 @@ pub mod debug;
 pub mod entry;
 pub mod error;
 pub mod global_alloc_macro;
-#[cfg(feature = "libc")]
-pub mod libc_wrap;
 pub mod since;
 pub mod syscalls;
 pub use ckb_allocator;
