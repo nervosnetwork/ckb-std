@@ -1,7 +1,7 @@
 # ckb-std
 [![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std) 
 
-This library contains serveral modules that help you write CKB contract with Rust.
+This library contains several modules that help you write CKB contract with Rust.
 
 ## Usage
 
