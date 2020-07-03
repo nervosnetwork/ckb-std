@@ -13,7 +13,7 @@ This library contains several modules that help you write CKB contract with Rust
 * `high_level` module: defines high level APIs
 * `debug!` macro: a `println!` like macro helps debugging
 * `entry!` macro: defines contract entry point
-* `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust
+* `default_alloc!` macro: defines global allocator for no-std rust
 
 ### Memory allocator
 
@@ -24,15 +24,15 @@ Default allocator uses a mixed allocation strategy:
 
 User can invoke macro with arguments to customize the heap size. The default heap size arguments are:
 
-(fixed heap size 4KB, dynamic heap size 64KB, dynamic heap min memory block 64B)
+(fixed heap size 4KB, dynamic heap size 516KB, dynamic heap min memory block 64B)
 
 Use the macro with arguments to change it:
 
 ``` rust
-default_alloc!(4 * 1024, 64 * 1024, 64)
+default_alloc!(4 * 1024, 516 * 1024, 64)
 ```
 
-> Beware, use difference heap size or memory block size may affect cycles of the contract; you should always test the contract after customizing parameters.
+> Beware, use difference heap size or memory block size may affect the verification result of the contract, some runtime errors such as **out of memory** may occur; you should always test the contract after customizing.
 
 ### Examples
 
