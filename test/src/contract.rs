@@ -3,7 +3,7 @@ use ckb_tool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, pre
 use std::fs::File;
 use std::io::Read;
 
-const MAX_CYCLES: u64 = 100_0000;
+const MAX_CYCLES: u64 = 1000_0000;
 
 #[test]
 fn it_works() {
@@ -11,7 +11,7 @@ fn it_works() {
     let mut context = Context::default();
     let contract_bin = {
         let mut buf = Vec::new();
-        File::open("contract/target/riscv64imac-unknown-none-elf/release/contract")
+        File::open("contract/target/riscv64imac-unknown-none-elf/debug/contract")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");

@@ -1,7 +1,7 @@
 use crate::ckb_constants::*;
+use crate::debug;
 use crate::error::SysError;
 use crate::syscalls;
-use crate::debug;
 use alloc::vec::Vec;
 use ckb_types::{packed::*, prelude::*};
 
@@ -250,6 +250,8 @@ pub fn load_cell_lock_hash(index: usize, source: Source) -> Result<[u8; 32], Sys
 
 /// Load cell type hash
 ///
+/// return None if the cell has no type
+///
 /// # Arguments
 ///
 /// * `index` - index
@@ -258,13 +260,18 @@ pub fn load_cell_lock_hash(index: usize, source: Source) -> Result<[u8; 32], Sys
 /// # Example
 ///
 /// ```
-/// let type_hash = load_cell_type_hash(index, source).unwrap();
+/// let type_hash = load_cell_type_hash(index, source).unwrap().unwrap();
 /// ```
-pub fn load_cell_type_hash(index: usize, source: Source) -> Result<[u8; 32], SysError> {
+pub fn load_cell_type_hash(index: usize, source: Source) -> Result<Option<[u8; 32]>, SysError> {
     let mut buf = [0u8; 32];
-    let len = syscalls::load_cell_by_field(&mut buf, 0, index, source, CellField::TypeHash)?;
-    debug_assert_eq!(len, buf.len());
-    Ok(buf)
+    match syscalls::load_cell_by_field(&mut buf, 0, index, source, CellField::TypeHash) {
+        Ok(len) => {
+            debug_assert_eq!(len, buf.len());
+            Ok(Some(buf))
+        }
+        Err(SysError::ItemMissing) => Ok(None),
+        Err(err) => Err(err),
+    }
 }
 
 /// Load cell lock
@@ -294,7 +301,7 @@ pub fn load_cell_lock(index: usize, source: Source) -> Result<Script, SysError> 
 
 /// Load cell type
 ///
-/// Return the type script or a syscall error
+/// Return the type script or a syscall error, return None if the cell has no type
 ///
 /// # Arguments
 ///
@@ -304,15 +311,19 @@ pub fn load_cell_lock(index: usize, source: Source) -> Result<Script, SysError> 
 /// # Example
 ///
 /// ```
-/// let type_script = load_cell_type(index, source).unwrap();
+/// let type_script = load_cell_type(index, source).unwrap().unwrap();
 /// ```
-pub fn load_cell_type(index: usize, source: Source) -> Result<Script, SysError> {
-    let data = load_data(|buf, offset| {
+pub fn load_cell_type(index: usize, source: Source) -> Result<Option<Script>, SysError> {
+    let data = match load_data(|buf, offset| {
         syscalls::load_cell_by_field(buf, offset, index, source, CellField::Type)
-    })?;
+    }) {
+        Ok(data) => data,
+        Err(SysError::ItemMissing) => return Ok(None),
+        Err(err) => return Err(err),
+    };
 
     match ScriptReader::verify(&data, false) {
-        Ok(()) => Ok(Script::new_unchecked(data.into())),
+        Ok(()) => Ok(Some(Script::new_unchecked(data.into()))),
         Err(_err) => Err(SysError::Encoding),
     }
 }
@@ -460,14 +471,15 @@ pub fn load_script() -> Result<Script, SysError> {
 /// # Example
 ///
 /// ```
+/// use high_level::load_cell_capacity;
 /// // calculate all inputs capacity
-/// let inputs_capacity = QueryIter::new(load_cell, Source::Input)
-/// .map(|cell| cell.capacity().unpack())
+/// let inputs_capacity = QueryIter::new(load_cell_capacity, Source::Input)
+/// .map(|capacity| capacity.unwrap_or(0))
 /// .sum::<u64>();
 ///
 /// // calculate all outputs capacity
-/// let outputs_capacity = QueryIter::new(load_cell, Source::Output)
-/// .map(|cell| cell.capacity().unpack())
+/// let outputs_capacity = QueryIter::new(load_cell_capacity, Source::Output)
+/// .map(|capacity| capacity.unwrap_or(0))
 /// .sum::<u64>();
 ///
 /// assert_eq!(inputs_capacity, outputs_capacity);
@@ -479,6 +491,21 @@ pub struct QueryIter<F> {
 }
 
 impl<F> QueryIter<F> {
+    /// new
+    ///
+    /// # Arguments
+    ///
+    /// * `query_fn` - A high level query function, which accept `(index, source)` as args and
+    /// returns Result<T, SysError>. Examples: `load_cell`, `load_cell_data`,`load_witness_args`, `load_input`, `load_header`, ...
+    /// * `source` - source
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use high_level::load_cell;
+    /// // iterate all inputs cells
+    /// let iter = QueryIter::new(load_cell, Source::Input)
+    /// ```
     pub fn new(query_fn: F, source: Source) -> Self {
         QueryIter {
             query_fn,

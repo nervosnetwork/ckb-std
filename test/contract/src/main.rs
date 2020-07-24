@@ -120,6 +120,12 @@ fn test_query() {
 
     let witnesses: Vec<_> = QueryIter::new(load_witness_args, Source::Input).collect();
     assert_eq!(witnesses.len(), 0);
+
+    let type_hashes: Option<Vec<_>> = QueryIter::new(load_cell_type_hash, Source::Input).collect::<Option<_>>();
+    assert!(type_hashes.is_none());
+
+    let type_scripts: Option<Vec<_>> = QueryIter::new(load_cell_type, Source::Input).collect::<Option<_>>();
+    assert!(type_scripts.is_none());
 }
 
 #[no_mangle]

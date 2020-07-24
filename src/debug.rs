@@ -1,6 +1,7 @@
 /// debug macro
 ///
-/// Output a debug message
+/// Output a debug message.
+/// This macro only compiled under debug build and does nothing in release build.
 ///
 /// Notice: to see the debug output, you must turn on `ckb_script` debugging log in the CKB node configuration.
 ///
