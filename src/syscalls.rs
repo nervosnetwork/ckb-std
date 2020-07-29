@@ -17,7 +17,8 @@ pub fn exit(code: i8) -> ! {
 /// Load data
 /// Return data length or syscall error
 fn syscall_load(
-    buf: &mut [u8],
+    buf_ptr: *mut u8,
+    len: usize,
     offset: usize,
     a3: u64,
     a4: u64,
@@ -25,9 +26,8 @@ fn syscall_load(
     a6: u64,
     syscall_num: u64,
 ) -> Result<usize, SysError> {
-    let mut actual_data_len = buf.len();
+    let mut actual_data_len = len;
     let len_ptr: *mut usize = &mut actual_data_len;
-    let buf_ptr: *mut u8 = buf.as_mut_ptr();
     let ret = unsafe {
         syscall(
             buf_ptr as u64,
@@ -40,7 +40,7 @@ fn syscall_load(
             syscall_num,
         )
     };
-    SysError::build_syscall_result(ret, buf.len(), actual_data_len)
+    SysError::build_syscall_result(ret, len, actual_data_len)
 }
 
 /// Load transaction hash
@@ -60,7 +60,16 @@ fn syscall_load(
 /// assert_eq!(len, tx_hash.len());
 /// ```
 pub fn load_tx_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_TX_HASH)
+    syscall_load(
+        buf.as_mut_ptr(),
+        buf.len(),
+        offset,
+        0,
+        0,
+        0,
+        0,
+        SYS_LOAD_TX_HASH,
+    )
 }
 
 /// Load script hash
@@ -80,7 +89,16 @@ pub fn load_tx_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
 /// assert_eq!(len, script_hash.len());
 /// ```
 pub fn load_script_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT_HASH)
+    syscall_load(
+        buf.as_mut_ptr(),
+        buf.len(),
+        offset,
+        0,
+        0,
+        0,
+        0,
+        SYS_LOAD_SCRIPT_HASH,
+    )
 }
 
 /// Load cell
@@ -100,7 +118,8 @@ pub fn load_cell(
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -127,7 +146,8 @@ pub fn load_input(
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -154,7 +174,8 @@ pub fn load_header(
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -181,7 +202,8 @@ pub fn load_witness(
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -200,7 +222,16 @@ pub fn load_witness(
 /// * `buf` - a writable buf used to receive the data
 /// * `offset` - offset
 pub fn load_transaction(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_TRANSACTION)
+    syscall_load(
+        buf.as_mut_ptr(),
+        buf.len(),
+        offset,
+        0,
+        0,
+        0,
+        0,
+        SYS_LOAD_TRANSACTION,
+    )
 }
 
 /// Load cell by field
@@ -230,7 +261,8 @@ pub fn load_cell_by_field(
     field: CellField,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -267,7 +299,8 @@ pub fn load_header_by_field(
     field: HeaderField,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -304,42 +337,14 @@ pub fn load_input_by_field(
     field: InputField,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
         field as u64,
         0,
         SYS_LOAD_INPUT_BY_FIELD,
-    )
-}
-
-/// Load cell code, read cell data as executable code
-///
-/// Return the loaded data length or a syscall error
-///
-/// # Arguments
-///
-/// * `buf` - a writable buf used to receive the data
-/// * `content_offset` - offset
-/// * `content_size` - read length
-/// * `index` - index
-/// * `source` - source
-pub fn load_cell_code(
-    buf: &mut [u8],
-    content_offset: usize,
-    content_size: usize,
-    index: usize,
-    source: Source,
-) -> Result<usize, SysError> {
-    syscall_load(
-        buf,
-        content_offset,
-        content_size as u64,
-        index as u64,
-        source as u64,
-        0,
-        SYS_LOAD_CELL_DATA_AS_CODE,
     )
 }
 
@@ -360,7 +365,8 @@ pub fn load_cell_data(
     source: Source,
 ) -> Result<usize, SysError> {
     syscall_load(
-        buf,
+        buf.as_mut_ptr(),
+        buf.len(),
         offset,
         index as u64,
         source as u64,
@@ -379,7 +385,16 @@ pub fn load_cell_data(
 /// * `buf` - a writable buf used to receive the data
 /// * `offset` - offset
 pub fn load_script(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
-    syscall_load(buf, offset, 0, 0, 0, 0, SYS_LOAD_SCRIPT)
+    syscall_load(
+        buf.as_mut_ptr(),
+        buf.len(),
+        offset,
+        0,
+        0,
+        0,
+        0,
+        SYS_LOAD_SCRIPT,
+    )
 }
 
 /// Output debug message
@@ -395,4 +410,69 @@ pub fn debug(mut s: alloc::string::String) {
     unsafe {
         syscall(c_str.as_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_DEBUG);
     }
+}
+
+/// Load cell data, read cell data
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf_ptr` - a writable pointer used to receive the data
+/// * `len` - length that the `buf_ptr` can receives.
+/// * `offset` - offset
+/// * `index` - index
+/// * `source` - source
+pub fn load_cell_data_raw(
+    buf_ptr: *mut u8,
+    len: usize,
+    offset: usize,
+    index: usize,
+    source: Source,
+) -> Result<usize, SysError> {
+    syscall_load(
+        buf_ptr,
+        len,
+        offset,
+        index as u64,
+        source as u64,
+        0,
+        0,
+        SYS_LOAD_CELL_DATA,
+    )
+}
+
+/// Load cell code, read cell data as executable code
+///
+/// Return the loaded data length or a syscall error
+///
+/// # Arguments
+///
+/// * `buf_ptr` - a writable pointer used to receive the data
+/// * `len` - length that the `buf_ptr` can receives.
+/// * `content_offset` - offset
+/// * `content_size` - read length
+/// * `index` - index
+/// * `source` - source
+pub fn load_cell_code(
+    buf_ptr: *mut u8,
+    len: usize,
+    content_offset: usize,
+    content_size: usize,
+    index: usize,
+    source: Source,
+) -> Result<usize, SysError> {
+    let ret = unsafe {
+        syscall(
+            buf_ptr as u64,
+            len as u64,
+            content_offset as u64,
+            content_size as u64,
+            index as u64,
+            source as u64,
+            0,
+            SYS_LOAD_CELL_DATA_AS_CODE,
+        )
+    };
+    SysError::build_syscall_result(ret, len, len)
 }

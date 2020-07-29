@@ -3,3 +3,5 @@
 Cargo.lock
 docs/**/*
 !docs/riscv64imac-unknown-none-elf/doc/
+*.so
+*.debug

@@ -532,3 +532,24 @@ impl<T, F: Fn(usize, Source) -> Result<T, SysError>> Iterator for QueryIter<F> {
         }
     }
 }
+
+/// Find cell by data_hash
+///
+/// Iterate and find the cell which data hash equals `data_hash`,
+/// return the index of the first cell we found, otherwise return None.
+///
+pub fn find_cell_by_data_hash(data_hash: &[u8], source: Source) -> Result<Option<usize>, SysError> {
+    let mut buf = [0u8; 32];
+    for i in 0.. {
+        let len = match syscalls::load_cell_by_field(&mut buf, 0, i, source, CellField::DataHash) {
+            Ok(len) => len,
+            Err(SysError::IndexOutOfBound) => break,
+            Err(err) => return Err(err),
+        };
+        debug_assert_eq!(len, buf.len());
+        if data_hash == &buf[..] {
+            return Ok(Some(i));
+        }
+    }
+    Ok(None)
+}
