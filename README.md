@@ -11,6 +11,7 @@ This library contains several modules that help you write CKB contract with Rust
 
 * `syscalls` module: defines [CKB syscalls](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md)
 * `high_level` module: defines high level APIs
+* `dynamic_loading` module: dynamic loading primitives
 * `debug!` macro: a `println!` like macro helps debugging
 * `entry!` macro: defines contract entry point
 * `default_alloc!` macro: defines global allocator for no-std rust
