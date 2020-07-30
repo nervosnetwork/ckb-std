@@ -51,7 +51,6 @@ fn test_small_size_malloc() {
         |mut allocator| {
             let mut available_bytes = buf.len();
             while available_bytes >= BLOCK_SIZE {
-                dbg!(available_bytes);
                 assert!(!allocator.malloc(BLOCK_SIZE).is_null());
                 available_bytes -= BLOCK_SIZE;
             }
