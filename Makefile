@@ -13,8 +13,18 @@ integration-in-docker: test-shared-lib
 publish-in-docker:
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo/git:/root/.cargo/git -v ${HOME}/.cargo/registry:/root/.cargo/registry -v ${HOME}/.cargo/credentials:/root/.cargo/credentials -w/code ${DOCKER_IMAGE} bash -c 'cargo publish --target ${TARGET}; make fix-permission-in-docker'
 
-doc:
+generate-doc:
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo/git:/root/.cargo/git -v ${HOME}/.cargo/registry:/root/.cargo/registry -w/code ${DOCKER_IMAGE} bash -c 'cargo doc --target ${TARGET} --target-dir docs; make fix-permission-in-docker'
+
+publish-doc:
+	git checkout gh-page
+	git reset --hard master
+	make generate-doc
+	git add .
+	git commit -m "update doc" || true
+	git push -f upstream
+	git checkout master
+	echo "done"
 
 clean:
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo/git:/root/.cargo/git -v ${HOME}/.cargo/registry:/root/.cargo/registry -v ${HOME}/.cargo/credentials:/root/.cargo/credentials -w/code ${DOCKER_IMAGE} bash -c 'cargo clean; make -C test clean'
