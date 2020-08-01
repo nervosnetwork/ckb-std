@@ -76,7 +76,7 @@ use core::marker::PhantomData;
 use core::mem::{size_of, MaybeUninit};
 
 #[repr(C)]
-pub struct Elf64Ehdr {
+struct Elf64Ehdr {
     e_ident: [u8; 16],
     e_type: u16,
     e_machine: u16,
@@ -98,7 +98,7 @@ const SHT_RELA: usize = 4;
 const SHT_DYNSYM: usize = 11;
 
 #[repr(C)]
-pub struct Elf64Shdr {
+struct Elf64Shdr {
     sh_name: u32,
     sh_type: u32,
     sh_flags: u64,
@@ -115,7 +115,7 @@ const PT_LOAD: usize = 1;
 const PF_X: usize = 1;
 
 #[repr(C)]
-pub struct Elf64Phdr {
+struct Elf64Phdr {
     p_type: u32,
     p_flags: u32,
     p_offset: u64,
@@ -127,7 +127,7 @@ pub struct Elf64Phdr {
 }
 
 #[repr(C)]
-pub struct Elf64Sym {
+struct Elf64Sym {
     st_name: u32,
     st_info: u8,
     st_other: u8,
@@ -139,7 +139,7 @@ pub struct Elf64Sym {
 const R_RISCV_RELATIVE: usize = 3;
 
 #[repr(C)]
-pub struct Elf64Rela {
+struct Elf64Rela {
     r_offset: u64,
     r_info: u64,
     r_addend: i64,
