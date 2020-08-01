@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["NUMBER_SIZE",""]],"fn":[["hex_string",""],["pack_number",""],["unpack_number",""]],"mod":[["bytes",""],["error",""],["io",""],["prelude",""]],"type":[["Number",""]]});

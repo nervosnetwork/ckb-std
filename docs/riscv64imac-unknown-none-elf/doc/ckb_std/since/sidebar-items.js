@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["LockValue",""]],"struct":[["EpochNumberWithFraction",""],["Since","Transaction input's since field"]]});

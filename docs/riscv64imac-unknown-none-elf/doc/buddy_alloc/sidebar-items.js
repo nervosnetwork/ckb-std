@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["buddy_alloc","Buddy alloc, This code heavily references from https://pdos.csail.mit.edu/6.828/2019/lec/malloc.c Check wiki to learn the algorithm: https://en.wikipedia.org/wiki/Buddy_memory_allocation"]],"struct":[["NonThreadsafeAlloc","NonThreadsafeAlloc perfect for single threaded devices"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["Builder",""],["Entity",""],["Pack",""],["PackVec",""],["Reader",""],["Unpack",""]]});
