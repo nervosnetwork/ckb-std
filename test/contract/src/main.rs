@@ -28,6 +28,12 @@ fn test_basic() {
     debug!("{:?}", v.len());
 }
 
+fn test_load_data() {
+    let data = high_level::load_cell_data(0, Source::Output).unwrap();
+    assert_eq!(data.len(), 1000);
+    assert!(data.iter().all(|&b| b == 42));
+}
+
 fn test_load_cell_field() {
     let mut buf = [0u8; size_of::<u64>()];
     let len = syscalls::load_cell_by_field(&mut buf, 0, 0, Source::GroupInput, CellField::Capacity)
@@ -180,6 +186,7 @@ fn test_dynamic_loading() {
 #[no_mangle]
 pub fn main() -> i8 {
     test_basic();
+    test_load_data();
     test_load_cell_field();
     test_load_tx_hash();
     test_partial_load_tx_hash();

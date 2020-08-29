@@ -59,7 +59,9 @@ fn it_works() {
             .build(),
     ];
 
-    let outputs_data = vec![Bytes::new(); 2];
+    let mut outputs_data : Vec<Bytes> = Vec::new();
+    outputs_data.push(vec![42u8; 1000].into());
+    outputs_data.push(Bytes::new());
 
     // build transaction
     let tx = TransactionBuilder::default()

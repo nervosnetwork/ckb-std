@@ -49,6 +49,7 @@ fn load_data<F: Fn(&mut [u8], usize) -> Result<usize, SysError>>(
         Ok(len) => Ok(buf[..len].to_vec()),
         Err(SysError::LengthNotEnough(actual_size)) => {
             let mut data = Vec::with_capacity(actual_size);
+            data.resize(actual_size, 0);
             let loaded_len = buf.len();
             data[..loaded_len].copy_from_slice(&buf);
             let len = syscall(&mut data[loaded_len..], loaded_len)?;
