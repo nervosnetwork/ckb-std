@@ -405,7 +405,7 @@ impl<T> CKBDLContext<T> {
                             Source::CellDep,
                         ) {
                             Ok(len) => len,
-                            Err(SysError::LengthNotEnough(_)) => len,
+                            Err(SysError::LengthNotEnough(_)) => filesz,
                             Err(err) => return Err(err.into()),
                         };
                         if loaded_len < filesz {
@@ -486,7 +486,7 @@ impl<T> CKBDLContext<T> {
                                 Source::CellDep,
                             ) {
                                 Ok(len) => len,
-                                Err(SysError::LengthNotEnough(_)) => len,
+                                Err(SysError::LengthNotEnough(_)) => load_length,
                                 Err(err) => return Err(err.into()),
                             }
                         };
