@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `dynamic_loading` mod in crate `ckb_std`."><meta name="keywords" content="rust, rustlang, rust-lang, dynamic_loading"><title>ckb_std::dynamic_loading - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../ckb_std/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a><p class='location'>Module dynamic_loading</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class='location'><a href='../index.html'>ckb_std</a></p><script>window.sidebarCurrent = {name: 'dynamic_loading', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/ckb_std/dynamic_loading.rs.html#1-535' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../index.html'>ckb_std</a>::<wbr><a class="mod" href=''>dynamic_loading</a></span></h1><div class='docblock'><p>This module supports dynamic loading a library from an on-chain cell.</p>
+<h1 id="pre-requirement" class="section-header"><a href="#pre-requirement">Pre-requirement</a></h1>
+<ul>
+<li>Shared library: a standard ELF shared library, usually with a <code>.so</code> file extension (<a href="https://github.com/nervosnetwork/ckb-miscellaneous-scripts">example of how to create a shared library</a>).</li>
+<li>Shared library cell: deploy the shared library to the chain.</li>
+<li>Transaction: use the CellDep field reference to the shared library cell.</li>
+</ul>
+<h1 id="example" class="section-header"><a href="#example">Example</a></h1>
+<p>Shared library(C)</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="ident">typedef</span> <span class="ident">unsigned</span> <span class="ident">long</span> <span class="ident">size_t</span>;
+
+<span class="ident">__attribute__</span>((<span class="ident">visibility</span>(<span class="string">&quot;default&quot;</span>))) <span class="ident">int</span>
+<span class="ident">plus_42</span>(<span class="ident">size_t</span> <span class="ident">num</span>) {
+  <span class="kw">return</span> <span class="number">42</span> <span class="op">+</span> <span class="ident">num</span>;
+}
+
+<span class="ident">__attribute__</span>((<span class="ident">visibility</span>(<span class="string">&quot;default&quot;</span>))) <span class="ident">char</span> <span class="op">*</span>
+<span class="ident">foo</span>() {
+  <span class="kw">return</span> <span class="string">&quot;foo&quot;</span>;
+}</pre></div>
+<p>Rust contract</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">ckb_std</span>::<span class="ident">dynamic_loading</span>::{<span class="ident">CKBDLContext</span>, <span class="ident">Symbol</span>};
+
+<span class="doccomment">/// code hash of the shared library</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CODE_HASH_SHARED_LIB</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> [<span class="number">235</span>, <span class="number">179</span>, <span class="number">185</span>, <span class="number">44</span>, <span class="number">159</span>, <span class="number">213</span>, <span class="number">242</span>, <span class="number">94</span>, <span class="number">42</span>, <span class="number">196</span>, <span class="number">68</span>, <span class="number">5</span>, <span class="number">213</span>, <span class="number">248</span>, <span class="number">71</span>, <span class="number">106</span>, <span class="number">136</span>, <span class="number">183</span>, <span class="number">99</span>, <span class="number">125</span>, <span class="number">37</span>, <span class="number">214</span>, <span class="number">63</span>, <span class="number">59</span>, <span class="number">57</span>, <span class="number">87</span>, <span class="number">65</span>, <span class="number">80</span>, <span class="number">177</span>, <span class="number">92</span>, <span class="number">23</span>, <span class="number">255</span>];
+
+<span class="comment">// create a dynamic loading context instance</span>
+<span class="comment">// we use [u8; 64 * 1024] as the buffer to receive the code, the size of the buffer must be</span>
+<span class="comment">// aligned to PAGE_SIZE 4096, otherwise will return an error.</span>
+<span class="comment">//</span>
+<span class="comment">// NOTICE: CKB-VM using a W^X memory model, after loading code into memory pages, these pages can&#39;t</span>
+<span class="comment">// be deallocated, which means we should never drop a CKBDLContext instance, otherwise a</span>
+<span class="comment">// InvalidPermission error will occuer to terminate our script.</span>
+<span class="comment">//</span>
+<span class="comment">// [W^X memory model](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0003-ckb-vm/0003-ckb-vm.md#wx-memory)</span>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">CKBDLContext</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">64</span> <span class="op">*</span> <span class="number">1024</span>]<span class="op">&gt;</span>::<span class="ident">new</span>();
+
+<span class="comment">// load a shared library from dep cells</span>
+<span class="kw">let</span> <span class="ident">lib</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="ident">CODE_HASH_SHARED_LIB</span>).<span class="ident">expect</span>(<span class="string">&quot;load shared lib&quot;</span>);
+
+<span class="kw">unsafe</span> {
+    <span class="kw">type</span> <span class="ident">Plus42</span> <span class="op">=</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
+    <span class="kw">let</span> <span class="ident">plus_42</span>: <span class="ident">Symbol</span><span class="op">&lt;</span><span class="ident">Plus42</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">lib</span>.<span class="ident">get</span>(<span class="string">b&quot;plus_42&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;find plus_42&quot;</span>);
+    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">plus_42</span>(<span class="number">13</span>), <span class="number">13</span> <span class="op">+</span> <span class="number">42</span>);
+
+    <span class="kw">type</span> <span class="ident">Foo</span> <span class="op">=</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>;
+    <span class="kw">let</span> <span class="ident">foo</span>: <span class="ident">Symbol</span><span class="op">&lt;</span><span class="ident">Foo</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">lib</span>.<span class="ident">get</span>(<span class="string">b&quot;foo&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;find foo&quot;</span>);
+    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">foo</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">3</span>];
+    <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">copy_from</span>(<span class="ident">ptr</span>, <span class="ident">buf</span>.<span class="ident">len</span>());
+    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..], <span class="string">b&quot;foo&quot;</span>);
+}</pre></div>
+<p>The core part of this module is inspired from
+https://github.com/nervosnetwork/ckb-c-stdlib/blob/eae8c4c974ce68ca8062521747a16e8e59de755f/ckb_dlfcn.h</p>
+<p>The ELF parsing code is inspired from
+https://github.com/riscv/riscv-pk/blob/master/pk/elf.h
+original code is in BSD license.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.CKBDLContext.html" title='ckb_std::dynamic_loading::CKBDLContext struct'>CKBDLContext</a></td><td class='docblock-short'><p>Dynamic loading context
+T represent a buffer type, for example: [u8; 64 * 1024], the size of T must aligned with
+PAGE_SIZE 4096.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Library.html" title='ckb_std::dynamic_loading::Library struct'>Library</a></td><td class='docblock-short'><p>Dynamic loaded library</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Symbol.html" title='ckb_std::dynamic_loading::Symbol struct'>Symbol</a></td><td class='docblock-short'><p>Wrapper of dynamic loaded symbols</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.Error.html" title='ckb_std::dynamic_loading::Error enum'>Error</a></td><td class='docblock-short'><p>Dynamic loading errors</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "ckb_std";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

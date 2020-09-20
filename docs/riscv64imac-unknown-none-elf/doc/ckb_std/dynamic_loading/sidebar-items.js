@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","Dynamic loading errors"]],"struct":[["CKBDLContext","Dynamic loading context T represent a buffer type, for example: [u8; 64 * 1024], the size of T must aligned with PAGE_SIZE 4096."],["Library","Dynamic loaded library"],["Symbol","Wrapper of dynamic loaded symbols"]]});
