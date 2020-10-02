@@ -1,5 +1,5 @@
 TARGET := riscv64imac-unknown-none-elf
-DOCKER_IMAGE := jjy0/ckb-capsule-recipe-rust:2020-5-9
+DOCKER_IMAGE := jjy0/ckb-capsule-recipe-rust:2020-9-28
 CC := riscv64-unknown-elf-gcc
 
 default: integration-in-docker
