@@ -27,17 +27,17 @@ macro_rules! default_alloc {
         static mut _FIXED_BLOCK_HEAP: [u8; $fixed_block_heap_size] = [0u8; $fixed_block_heap_size];
 
         #[global_allocator]
-        static ALLOC: $crate::ckb_allocator::mixed_alloc::MixedAlloc = unsafe {
-            let block_list_alloc = $crate::ckb_allocator::block_list_alloc::BlockListAlloc::new(
+        static ALLOC: $crate::buddy_alloc::NonThreadsafeAlloc = unsafe {
+            let fast_param = $crate::buddy_alloc::FastAllocParam::new(
                 _FIXED_BLOCK_HEAP.as_ptr(),
                 $fixed_block_heap_size,
             );
-            let buddy_alloc = $crate::ckb_allocator::buddy_alloc::NonThreadsafeAlloc::new(
+            let buddy_param = $crate::buddy_alloc::BuddyAllocParam::new(
                 _BUDDY_HEAP.as_ptr(),
                 $heap_size,
                 $min_block_size,
             );
-            $crate::ckb_allocator::mixed_alloc::MixedAlloc::new(block_list_alloc, buddy_alloc)
+            $crate::buddy_alloc::NonThreadsafeAlloc::new(fast_param, buddy_param)
         };
     };
 }
