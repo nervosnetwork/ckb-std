@@ -5,7 +5,7 @@ This library contains several modules that help you write CKB contract with Rust
 
 ## Usage
 
-[Documentation](https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html)
+[Documentation](https://docs.rs/ckb-std/0.6.3/ckb_std/)
 
 ### Modules
 
