@@ -2,9 +2,15 @@ use crate::ckb_constants::*;
 // re-export to maintain compatible with old versions
 pub use crate::error::SysError;
 
+#[cfg(target_arch = "riscv64")]
 #[link(name = "ckb-syscall")]
 extern "C" {
     fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64;
+}
+
+#[cfg(not(target_arch = "riscv64"))]
+fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64 {
+    return u64::MAX;
 }
 
 /// Exit, this script will be terminated after the exit syscall.
