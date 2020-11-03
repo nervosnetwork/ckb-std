@@ -73,9 +73,10 @@ use crate::high_level::find_cell_by_data_hash;
 use crate::syscalls::{load_cell_code, load_cell_data_raw};
 use core::cmp::{max, min};
 use core::marker::PhantomData;
-use core::mem::{size_of, MaybeUninit};
+use core::mem::{size_of, zeroed};
 
 #[repr(C)]
+#[derive(Default)]
 struct Elf64Ehdr {
     e_ident: [u8; 16],
     e_type: u16,
@@ -98,6 +99,7 @@ const SHT_RELA: usize = 4;
 const SHT_DYNSYM: usize = 11;
 
 #[repr(C)]
+#[derive(Default)]
 struct Elf64Shdr {
     sh_name: u32,
     sh_type: u32,
@@ -115,6 +117,7 @@ const PT_LOAD: usize = 1;
 const PF_X: usize = 1;
 
 #[repr(C)]
+#[derive(Default)]
 struct Elf64Phdr {
     p_type: u32,
     p_flags: u32,
@@ -139,6 +142,7 @@ struct Elf64Sym {
 const R_RISCV_RELATIVE: usize = 3;
 
 #[repr(C)]
+#[derive(Default)]
 struct Elf64Rela {
     r_offset: u64,
     r_info: u64,
@@ -270,9 +274,13 @@ impl Library {
 pub struct CKBDLContext<T>(T);
 
 impl<T> CKBDLContext<T> {
+    /// # Unsafe
+    ///
+    /// Undefined behavior will happen if the type T is not a [u8; length]
+    ///
     /// Create instance of dynamic loading context
     pub fn new() -> Self {
-        unsafe { MaybeUninit::<CKBDLContext<T>>::uninit().assume_init() }
+        unsafe { zeroed() }
     }
 
     /// Load a shared library from dep cells
@@ -329,7 +337,7 @@ impl<T> CKBDLContext<T> {
                 .ok_or(Error::CellNotFound)?;
 
             // Basic ELF header parsing
-            let mut hdr = MaybeUninit::<Elf64Ehdr>::uninit().assume_init();
+            let mut hdr = Elf64Ehdr::default();
             let len = size_of::<Elf64Ehdr>();
             let loaded_len = {
                 let elf_hdr_ptr = &mut hdr as *mut Elf64Ehdr;
@@ -351,7 +359,7 @@ impl<T> CKBDLContext<T> {
             }
 
             // Parse program headers and load relevant parts
-            let mut program_hdrs = MaybeUninit::<[Elf64Phdr; 16]>::uninit().assume_init();
+            let mut program_hdrs: [Elf64Phdr; 16] = Default::default();
             let len = size_of::<Elf64Phdr>() * hdr.e_phnum as usize;
             let loaded_len = {
                 let ptr = program_hdrs.as_mut_ptr();
@@ -419,7 +427,7 @@ impl<T> CKBDLContext<T> {
             // Parse sectioin header & relocation headers,
             // Perform necessary relocations.
 
-            let mut section_hdrs = MaybeUninit::<[Elf64Shdr; 32]>::uninit().assume_init();
+            let mut section_hdrs: [Elf64Shdr; 32] = Default::default();
             let len = size_of::<Elf64Shdr>() * hdr.e_shnum as usize;
             let loaded_len = {
                 let ptr = section_hdrs.as_mut_ptr();
@@ -442,7 +450,7 @@ impl<T> CKBDLContext<T> {
             // First load shstrtab tab, this is temporary code only needed in ELF loading
             // phase here.
             let shshrtab = &section_hdrs[hdr.e_shstrndx as usize];
-            let mut shrtab = MaybeUninit::<[u8; 4096]>::uninit().assume_init();
+            let mut shrtab = [0u8; 4096];
             if shshrtab.sh_size > 4096 {
                 return Err(Error::InvalidElf);
             }
@@ -472,8 +480,7 @@ impl<T> CKBDLContext<T> {
                     let mut relocation_size = (sh.sh_size / sh.sh_entsize) as usize;
                     let mut current_offset = sh.sh_offset as usize;
                     while relocation_size > 0 {
-                        let mut relocations =
-                            MaybeUninit::<[Elf64Rela; 64]>::uninit().assume_init();
+                        let mut relocations: [Elf64Rela; 64] = zeroed();
                         let load_size = min(relocation_size, 64) as usize;
                         let load_length = load_size * size_of::<Elf64Rela>();
                         let loaded_len = {

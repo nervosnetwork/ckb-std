@@ -18,10 +18,10 @@ pub mod debug;
 pub mod entry;
 pub mod error;
 pub mod global_alloc_macro;
-pub mod since;
-pub mod syscalls;
 #[cfg(feature = "ckb-types")]
 pub mod high_level;
+pub mod since;
+pub mod syscalls;
 #[cfg(feature = "ckb-types")]
 pub use ckb_types;
 pub mod dynamic_loading;
