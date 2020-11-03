@@ -279,8 +279,8 @@ impl<T> CKBDLContext<T> {
     /// Undefined behavior will happen if the type T is not a [u8; length]
     ///
     /// Create instance of dynamic loading context
-    pub fn new() -> Self {
-        unsafe { zeroed() }
+    pub unsafe fn new() -> Self {
+        zeroed()
     }
 
     /// Load a shared library from dep cells
