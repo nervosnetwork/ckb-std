@@ -1,6 +1,4 @@
-use crate::ckb_constants::*;
-// re-export to maintain compatible with old versions
-pub use crate::error::SysError;
+use crate::{ckb_constants::*, error::SysError};
 
 #[cfg(target_arch = "riscv64")]
 #[link(name = "ckb-syscall")]
