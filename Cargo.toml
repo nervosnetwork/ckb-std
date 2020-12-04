@@ -1,10 +1,10 @@
 [package]
 name = "ckb-std"
 version = "0.7.2"
-authors = ["jjy <jjyruby@gmail.com>"]
+authors = ["Nervos network"]
 edition = "2018"
 license = "MIT"
-repository = "https://github.com/jjyr/ckb-std"
+repository = "https://github.com/nervosnetwork/ckb-std"
 description = "This library contains serveral modules help you write CKB contract with Rust"
 exclude = ["docs"]
 
