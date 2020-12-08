@@ -191,7 +191,7 @@ pub fn load_cell_data_raw(
 ) -> Result<usize, SysError> {
     let mut actual_data_len = len as u64;
     let len_ptr: *mut u64 = &mut actual_data_len;
-    let ret = sim::ckb_load_header(
+    let ret = sim::ckb_load_cell_data(
         buf_ptr as *mut c_void,
         len_ptr,
         offset as u64,
