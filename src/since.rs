@@ -5,6 +5,7 @@ pub struct Since(u64);
 impl Since {
     const LOCK_TYPE_FLAG: u64 = 1 << 63;
     const METRIC_TYPE_FLAG_MASK: u64 = 0x6000_0000_0000_0000;
+    const FLAGS_MASK: u64 = 0xff00_0000_0000_0000;
     const VALUE_MASK: u64 = 0x00ff_ffff_ffff_ffff;
     const REMAIN_FLAGS_BITS: u64 = 0x1f00_0000_0000_0000;
     const LOCK_BY_BLOCK_NUMBER_MASK: u64 = 0x0000_0000_0000_0000;
@@ -13,6 +14,10 @@ impl Since {
 
     pub fn new(v: u64) -> Self {
         Since(v)
+    }
+
+    pub fn as_u64(self) -> u64 {
+        self.0
     }
 
     pub fn is_absolute(self) -> bool {
@@ -27,6 +32,10 @@ impl Since {
     pub fn flags_is_valid(self) -> bool {
         (self.0 & Self::REMAIN_FLAGS_BITS == 0)
             && ((self.0 & Self::METRIC_TYPE_FLAG_MASK) != Self::METRIC_TYPE_FLAG_MASK)
+    }
+
+    pub fn flags(self) -> u64 {
+        self.0 & Self::FLAGS_MASK
     }
 
     pub fn extract_lock_value(self) -> Option<LockValue> {
