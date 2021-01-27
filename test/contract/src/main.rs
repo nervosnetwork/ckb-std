@@ -11,8 +11,10 @@ use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
 use ckb_std::{
     ckb_constants::*, ckb_types::prelude::*, debug, default_alloc, dynamic_loading, entry,
-    error::SysError, high_level, syscalls,
+    error::SysError, high_level, syscalls
 };
+use ckb_std::dynamic_loading_c_impl;
+
 use code_hashes::CODE_HASH_SHARED_LIB;
 use core::mem::{size_of, size_of_val};
 
@@ -184,6 +186,53 @@ fn test_dynamic_loading() {
         }
     }
 }
+
+fn test_dynamic_loading_c_impl() {
+    unsafe {
+        let mut context = dynamic_loading_c_impl::CKBDLContext::<[u8; 64 * 1024]>::new();
+        let lib = context
+            .load(&CODE_HASH_SHARED_LIB)
+            .expect("load shared lib");
+        type Plus42 = unsafe extern "C" fn(n: usize) -> usize;
+        let plus_42: dynamic_loading_c_impl::Symbol<Plus42> = lib.get(b"plus_42").expect("find plus_42");
+        assert_eq!(plus_42(13), 13 + 42);
+
+        let foo: dynamic_loading_c_impl::Symbol<Foo> = lib.get(b"foo").expect("find foo");
+        let ptr = foo();
+        let mut buf = [0u8; 3];
+        buf.as_mut_ptr().copy_from(ptr, buf.len());
+        assert_eq!(&buf[..], b"foo");
+
+        // load multiple libraries
+        let mut size = size_of_val(&context) - lib.consumed_size();
+        let mut offset = lib.consumed_size();
+        let mut libs = Vec::new();
+
+        for _i in 0..3 {
+            let lib = context
+                .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size)
+                .expect("load shared lib");
+            size -= lib.consumed_size();
+            offset += lib.consumed_size();
+            libs.push(lib);
+        }
+
+        type Foo = unsafe extern "C" fn() -> *const u8;
+
+        for lib in libs {
+            let plus_42: dynamic_loading_c_impl::Symbol<Plus42> =
+                lib.get(b"plus_42").expect("find plus_42");
+            assert_eq!(plus_42(13), 13 + 42);
+
+            let foo: dynamic_loading_c_impl::Symbol<Foo> = lib.get(b"foo").expect("find foo");
+            let ptr = foo();
+            let mut buf = [0u8; 3];
+            buf.as_mut_ptr().copy_from(ptr, buf.len());
+            assert_eq!(&buf[..], b"foo");
+        }
+    }
+}
+
 
 #[no_mangle]
 pub fn main() -> i8 {

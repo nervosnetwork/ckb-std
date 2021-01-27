@@ -8,5 +8,9 @@ fn main() {
         cc::Build::new()
             .file("src/asm/syscall.S")
             .compile("ckb-syscall");
+        
+        // link against "dynamic loading" lib
+        println!("cargo:rustc-link-search=native=./dl-c-impl/build/");
+        println!("cargo:rustc-link-lib=static=dl-c-impl");
     }
 }
