@@ -9,6 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
     - name: Install Rust target
       run: rustup target add riscv64imac-unknown-none-elf
     - name: Install tools
