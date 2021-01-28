@@ -21,7 +21,10 @@ clean:
 test-shared-lib:
 	make -C test/shared-lib all-via-docker
 
-integration: check test
+build-dl-c-impl:
+	make -C dl-c-impl
+	
+integration: check build-dl-c-impl test
 
 test:
 	make -C test test

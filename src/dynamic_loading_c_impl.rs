@@ -3,8 +3,9 @@ use crate::debug;
 use core::marker::PhantomData;
 use core::mem::{size_of, zeroed};
 
+
 // #[cfg(target_arch = "riscv64")]
-#[link(name = "dl-c-impl")]
+#[link(name = "dl-c-impl", kind="static")]
 extern "C" {
     // we use "usize" to reperesent void*: it's opaque
     fn ckb_dlopen2(dep_cell_hash: *const u8, hash_type: u8,
@@ -18,16 +19,12 @@ extern "C" {
 pub enum Error {
     /// Create context error
     ContextFailure,
-    /// Parse ELF header error
-    InvalidElf,
-    /// Memory not enough
-    MemoryNotEnough,
-    /// Can't find the cell
-    CellNotFound,
     /// Invalid alignment
     InvalidAlign,
     /// Syscall error
     Sys(SysError),
+    /// ckb_dlopen2 failed
+    OpenFailed(isize),
 }
 
 impl From<SysError> for Error {
@@ -85,8 +82,17 @@ impl Library {
     ///
     /// Return None if not found the symbol
     pub unsafe fn get<S>(&self, symbol: &[u8]) -> Option<Symbol<S>> {
-        let ptr = ckb_dlsym(self.handle, symbol.as_ptr());
+        let mut s = symbol.to_vec();
+        if s.len() > 0 {
+            if s[s.len() - 1] != 0 {
+                s.push(0);
+            }
+        } else {
+            panic!("symbol with zero length");
+        }
+        let ptr = ckb_dlsym(self.handle, s.as_ptr());
         if ptr == 0 {
+            debug!("warning, ckb_dlsym returns 0, handle = {:?}, symbol = {:?}", self.handle, symbol);
             None
         } else {
             Some(Symbol::new(ptr))
@@ -129,11 +135,14 @@ impl<T> CKBDLContext<T> {
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
             let code = ckb_dlopen2(dep_cell_data_hash.as_ptr(), hash_type, aligned_addr, 
                 aligned_size, &mut handle as *mut usize, &mut consumed_size as *mut usize);
-            debug!("ckb_dlopen2 return {:?}", code);
-            // TODO: check code and return
-            library.handle = handle;
-            library.consumed_size = consumed_size;
-            return Ok(library);
+            if code != 0 {
+                debug!("warning, ckb_dlopen2 return {:?}", code);
+                return Err(Error::OpenFailed(code));
+            } else {
+                library.handle = handle;
+                library.consumed_size = consumed_size;
+                return Ok(library);
+            }
         }
     }
 

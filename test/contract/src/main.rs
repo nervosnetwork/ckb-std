@@ -243,7 +243,10 @@ pub fn main() -> i8 {
     test_partial_load_tx_hash();
     test_high_level_apis();
     test_query();
-    test_dynamic_loading();
+    // don't run test_dynamic_loading_c_impl at same time, 
+    // the stack is marked as executable already and can't be re-used
+    // test_dynamic_loading();
+    test_dynamic_loading_c_impl();
     0
 }
 

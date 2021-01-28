@@ -1,5 +1,5 @@
 
-TARGET := riscv64-unknown-linux-gnu
+TARGET := riscv64-unknown-elf
 CC := $(TARGET)-gcc
 LD := $(TARGET)-gcc
 AR := $(TARGET)-ar
@@ -16,7 +16,7 @@ build/libdl-c-impl.a: build/lib.o
 	$(AR) rcs $@ $^
 
 build/%.o: %.c
-	$(CC) $(CFLAGS) -C -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f build/*.o build/*.a
