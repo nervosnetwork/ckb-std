@@ -143,7 +143,7 @@ fn test_query() {
 
 type ContextTypeOld = dynamic_loading::CKBDLContext::<[u8; 64 * 1024]>;
 
-fn test_dynamic_loading(mut context: ContextTypeOld) {
+fn test_dynamic_loading(context: &mut ContextTypeOld) {
     unsafe {
         let lib = context
             .load(&CODE_HASH_SHARED_LIB)
@@ -159,7 +159,7 @@ fn test_dynamic_loading(mut context: ContextTypeOld) {
         assert_eq!(&buf[..], b"foo");
 
         // load multiple libraries
-        let mut size = size_of_val(&context) - lib.consumed_size();
+        let mut size = size_of_val(context) - lib.consumed_size();
         let mut offset = lib.consumed_size();
         let mut libs = Vec::new();
 
@@ -190,7 +190,7 @@ fn test_dynamic_loading(mut context: ContextTypeOld) {
 
 type ContextType = dynamic_loading_c_impl::CKBDLContext::<[u8; 64 * 1024]>;
 
-fn test_dynamic_loading_c_impl(mut context: ContextType) {
+fn test_dynamic_loading_c_impl(context: &mut ContextType) {
     unsafe {
         let lib = context
             .load(&CODE_HASH_SHARED_LIB)
@@ -206,7 +206,7 @@ fn test_dynamic_loading_c_impl(mut context: ContextType) {
         assert_eq!(&buf[..], b"foo");
 
         // load multiple libraries
-        let mut size = size_of_val(&context) - lib.consumed_size();
+        let mut size = size_of_val(context) - lib.consumed_size();
         let mut offset = lib.consumed_size();
         let mut libs = Vec::new();
 
@@ -246,11 +246,11 @@ pub fn main() -> i8 {
     test_high_level_apis();
     test_query();
     unsafe {
-        let context = ContextType::new();
-        let old_context = ContextTypeOld::new();
+        let mut context = ContextType::new();
+        let mut old_context = ContextTypeOld::new();
 
-        test_dynamic_loading(old_context);
-        test_dynamic_loading_c_impl(context);
+        test_dynamic_loading(&mut old_context);
+        test_dynamic_loading_c_impl(&mut context);
     }
     0
 }

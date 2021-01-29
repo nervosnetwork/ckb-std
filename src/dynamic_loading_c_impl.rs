@@ -3,8 +3,6 @@ use crate::debug;
 use core::marker::PhantomData;
 use core::mem::{size_of, zeroed};
 
-
-// #[cfg(target_arch = "riscv64")]
 #[link(name = "dl-c-impl", kind="static")]
 extern "C" {
     // we use "usize" to reperesent void*: it's opaque
