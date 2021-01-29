@@ -141,9 +141,10 @@ fn test_query() {
     assert!(type_scripts.is_none());
 }
 
-fn test_dynamic_loading() {
+type ContextTypeOld = dynamic_loading::CKBDLContext::<[u8; 64 * 1024]>;
+
+fn test_dynamic_loading(mut context: ContextTypeOld) {
     unsafe {
-        let mut context = dynamic_loading::CKBDLContext::<[u8; 64 * 1024]>::new();
         let lib = context
             .load(&CODE_HASH_SHARED_LIB)
             .expect("load shared lib");
@@ -187,9 +188,10 @@ fn test_dynamic_loading() {
     }
 }
 
-fn test_dynamic_loading_c_impl() {
+type ContextType = dynamic_loading_c_impl::CKBDLContext::<[u8; 64 * 1024]>;
+
+fn test_dynamic_loading_c_impl(mut context: ContextType) {
     unsafe {
-        let mut context = dynamic_loading_c_impl::CKBDLContext::<[u8; 64 * 1024]>::new();
         let lib = context
             .load(&CODE_HASH_SHARED_LIB)
             .expect("load shared lib");
@@ -243,10 +245,13 @@ pub fn main() -> i8 {
     test_partial_load_tx_hash();
     test_high_level_apis();
     test_query();
-    // don't run test_dynamic_loading_c_impl at same time, 
-    // the stack is marked as executable already and can't be re-used
-    // test_dynamic_loading();
-    test_dynamic_loading_c_impl();
+    unsafe {
+        let context = ContextType::new();
+        let old_context = ContextTypeOld::new();
+
+        test_dynamic_loading(old_context);
+        test_dynamic_loading_c_impl(context);
+    }
     0
 }
 

@@ -273,6 +273,7 @@ impl Library {
 #[repr(align(4096))]
 pub struct CKBDLContext<T>(T);
 
+#[deprecated]
 impl<T> CKBDLContext<T> {
     /// # Unsafe
     ///

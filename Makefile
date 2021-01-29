@@ -10,7 +10,7 @@ fix-permission-in-docker:
 integration-in-docker: test-shared-lib
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo/git:/root/.cargo/git -v ${HOME}/.cargo/registry:/root/.cargo/registry -w/code ${DOCKER_IMAGE} bash -c 'make integration; CODE=$$?; make fix-permission-in-docker; exit $$CODE'
 
-publish-crate:
+publish-crate: build-dl-c-imp_via-docker
 	docker run --rm -eOWNER=`id -u`:`id -g` -v `pwd`:/code -v ${HOME}/.cargo/git:/root/.cargo/git -v ${HOME}/.cargo/registry:/root/.cargo/registry -v ${HOME}/.cargo/credentials:/root/.cargo/credentials -w/code ${DOCKER_IMAGE} bash -c 'cargo publish --target ${TARGET}; make fix-permission-in-docker'
 
 publish: publish-crate
@@ -23,10 +23,13 @@ test-shared-lib:
 
 build-dl-c-impl:
 	make -C dl-c-impl
-	
+
+build-dl-c-imp_via-docker:
+	make -C dl-c-impl all-via-docker
+
 integration: check build-dl-c-impl test
 
-test:
+test: build-dl-c-impl
 	make -C test test
 
 check:
