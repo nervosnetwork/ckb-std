@@ -8,7 +8,7 @@ use core::ptr::null;
 #[link(name = "dl-c-impl", kind="static")]
 extern "C" {
     fn ckb_dlopen2(dep_cell_hash: *const u8, hash_type: u8,
-                aligned_addr: *mut u8, aligned_size: usize, handle: &mut *const c_void,
+                aligned_addr: *mut u8, aligned_size: usize, handle: *mut *const c_void,
                 consumed_size: *mut usize) -> isize;
     fn ckb_dlsym(handle: *const c_void, symbol: *const u8) -> usize;
 }
@@ -133,7 +133,7 @@ impl<T> CKBDLContext<T> {
             let aligned_size = size;
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
             let code = ckb_dlopen2(dep_cell_data_hash.as_ptr(), hash_type, aligned_addr, 
-                aligned_size, &mut handle, &mut consumed_size as *mut usize);
+                aligned_size, &mut handle as *mut *const c_void, &mut consumed_size as *mut usize);
             if code != 0 {
                 debug!("warning, ckb_dlopen2 return {:?}", code);
                 return Err(Error::OpenFailed(code));
