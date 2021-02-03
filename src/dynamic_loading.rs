@@ -273,6 +273,10 @@ impl Library {
 #[repr(align(4096))]
 pub struct CKBDLContext<T>(T);
 
+#[deprecated(
+    since = "0.7.3",
+    note = "Please use the dynamic_loading_c_impl instead"
+)]
 impl<T> CKBDLContext<T> {
     /// # Unsafe
     ///
