@@ -18,7 +18,7 @@ fn main() {
         .include("dl-c-impl/ckb-c-stdlib")
         .include("dl-c-impl/ckb-c-stdlib/libc")
         .flag("-Wall")
-        // .flag("-Werror")
+        .flag("-Werror")
         .flag("-Wno-unused-parameter")
         .flag("-Wno-nonnull")
         .define("__SHARED_LIBRARY__", None);
