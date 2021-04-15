@@ -1,6 +1,6 @@
 [package]
 name = "ckb-std"
-version = "0.7.3"
+version = "0.7.4"
 authors = ["Nervos network"]
 edition = "2018"
 license = "MIT"
