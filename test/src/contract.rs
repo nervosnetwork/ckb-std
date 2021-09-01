@@ -1,5 +1,5 @@
 use ckb_testtool::context::Context;
-use ckb_tool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
+use ckb_testtool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
 use std::fs::File;
 use std::io::Read;
 

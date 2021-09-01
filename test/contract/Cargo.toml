@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 ckb-std = { path = "../.." }
-blake2b-ref = { version = "0.1", default-features = false }
+blake2b-ref = { version = "0.3", default-features = false }
 
 [build-dependencies]
 blake2b-rs = "0.1.5"
