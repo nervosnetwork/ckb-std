@@ -1,15 +1,20 @@
-use crate::error::SysError;
 use crate::debug;
+use crate::error::SysError;
+use core::ffi::c_void;
 use core::marker::PhantomData;
 use core::mem::{size_of, zeroed};
-use core::ffi::c_void;
 use core::ptr::null;
 
-#[link(name = "dl-c-impl", kind="static")]
+#[link(name = "dl-c-impl", kind = "static")]
 extern "C" {
-    fn ckb_dlopen2(dep_cell_hash: *const u8, hash_type: u8,
-                aligned_addr: *mut u8, aligned_size: usize, handle: *mut *const c_void,
-                consumed_size: *mut usize) -> isize;
+    fn ckb_dlopen2(
+        dep_cell_hash: *const u8,
+        hash_type: u8,
+        aligned_addr: *mut u8,
+        aligned_size: usize,
+        handle: *mut *const c_void,
+        consumed_size: *mut usize,
+    ) -> isize;
     fn ckb_dlsym(handle: *const c_void, symbol: *const u8) -> usize;
 }
 
@@ -91,7 +96,10 @@ impl Library {
         }
         let ptr = ckb_dlsym(self.handle, s.as_ptr());
         if ptr == 0 {
-            debug!("warning, ckb_dlsym returns 0, handle = {:?}, symbol = {:?}", self.handle, symbol);
+            debug!(
+                "warning, ckb_dlsym returns 0, handle = {:?}, symbol = {:?}",
+                self.handle, symbol
+            );
             None
         } else {
             Some(Symbol::new(ptr))
@@ -101,7 +109,6 @@ impl Library {
 
 const RISCV_PGSIZE_SHIFT: usize = 12;
 const RISCV_PGSIZE: usize = 1 << RISCV_PGSIZE_SHIFT; // 4096
-
 
 #[repr(C)]
 #[repr(align(4096))]
@@ -126,14 +133,20 @@ impl<T> CKBDLContext<T> {
         }
 
         unsafe {
-            let mut handle : *const c_void = null();
-            let mut consumed_size : usize = 0;
-            let hash_type : u8 = 0;
+            let mut handle: *const c_void = null();
+            let mut consumed_size: usize = 0;
+            let hash_type: u8 = 0;
             let mut library = Library::new();
             let aligned_size = size;
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
-            let code = ckb_dlopen2(dep_cell_data_hash.as_ptr(), hash_type, aligned_addr, 
-                aligned_size, &mut handle as *mut *const c_void, &mut consumed_size as *mut usize);
+            let code = ckb_dlopen2(
+                dep_cell_data_hash.as_ptr(),
+                hash_type,
+                aligned_addr,
+                aligned_size,
+                &mut handle as *mut *const c_void,
+                &mut consumed_size as *mut usize,
+            );
             if code != 0 {
                 debug!("warning, ckb_dlopen2 return {:?}", code);
                 return Err(Error::OpenFailed(code));

@@ -28,8 +28,8 @@ fn main() {
         cc::Build::new()
             .file("src/asm/syscall.S")
             .compile("ckb-syscall");
-        build.
-            flag("-Wno-nonnull-compare")
+        build
+            .flag("-Wno-nonnull-compare")
             .flag("-nostartfiles")
             .compile("dl-c-impl");
     } else {
