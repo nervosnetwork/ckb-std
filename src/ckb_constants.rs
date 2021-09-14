@@ -1,4 +1,7 @@
 pub const SYS_EXIT: u64 = 93;
+pub const SYS_VM_VERSION: u64 = 2041;
+pub const SYS_CURRENT_CYCLES: u64 = 2042;
+pub const SYS_EXEC: u64 = 2043;
 pub const SYS_LOAD_TRANSACTION: u64 = 2051;
 pub const SYS_LOAD_SCRIPT: u64 = 2052;
 pub const SYS_LOAD_TX_HASH: u64 = 2061;

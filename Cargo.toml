@@ -19,6 +19,7 @@ simulator = [ "ckb-x64-simulator" ]
 cc = "1.0"
 
 [dependencies]
+cstr_core = "0.2.4"
 ckb-types = { package = "ckb-standalone-types", version = "0.1.1", default-features = false, optional = true }
 buddy-alloc = { version = "0.4.1", optional = true }
 ckb-x64-simulator = { version = "0.5.0", optional = true }

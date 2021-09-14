@@ -26,7 +26,7 @@ impl SysError {
                 if actual_data_len > load_len {
                     return Err(LengthNotEnough(actual_data_len));
                 }
-                return Ok(actual_data_len);
+                Ok(actual_data_len)
             }
             1 => Err(IndexOutOfBound),
             2 => Err(ItemMissing),
