@@ -542,6 +542,11 @@ pub fn exec(
     argc: i32,
     argv: &[&CStr],
 ) -> u64 {
+    // https://www.gnu.org/software/libc/manual/html_node/Program-Arguments.html
+    let mut argv_ptr = alloc::vec![core::ptr::null(); argc as usize + 1];
+    for (idx, cstr) in argv.into_iter().enumerate() {
+        argv_ptr[idx] = cstr.as_ptr();
+    }
     unsafe {
         syscall(
             index as u64,
@@ -549,7 +554,7 @@ pub fn exec(
             place as u64,
             bounds as u64,
             argc as u64,
-            argv.as_ptr() as u64,
+            argv_ptr.as_ptr() as u64,
             0,
             SYS_EXEC,
         )

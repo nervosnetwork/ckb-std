@@ -606,6 +606,9 @@ pub fn exec_cell(
     argc: i32,
     argv: &[&CStr],
 ) -> Result<u64, SysError> {
+    if argc != argv.len() as i32 {
+        return Err(SysError::InvalidExecArgv);
+    }
     let index = look_for_dep_with_hash2(code_hash, hash_type)?;
     let bounds: usize = (offset as usize) << 32 | (length as usize);
     Ok(syscalls::exec(

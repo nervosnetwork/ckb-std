@@ -11,6 +11,8 @@ pub enum SysError {
     Encoding,
     /// Unknown syscall error number
     Unknown(u64),
+    /// Invalid exec argv argument
+    InvalidExecArgv,
 }
 
 impl SysError {
