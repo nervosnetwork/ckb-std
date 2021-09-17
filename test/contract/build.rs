@@ -39,7 +39,7 @@ fn main() {
         format!("CODE_HASH_{}", name.to_uppercase().replace("-", "_")),
         hash
     )
-        .expect("write to code_hashes.rs");
+    .expect("write to code_hashes.rs");
 }
 
 pub fn new_blake2b() -> Blake2b {
@@ -47,4 +47,3 @@ pub fn new_blake2b() -> Blake2b {
         .personal(CKB_HASH_PERSONALIZATION)
         .build()
 }
-

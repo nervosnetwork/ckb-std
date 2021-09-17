@@ -12,6 +12,9 @@ path = "src/main.rs"
 name = "exec-caller"
 path = "src/exec_caller.rs"
 [[bin]]
+name = "exec-caller-by-code-hash"
+path = "src/exec_caller_by_code_hash.rs"
+[[bin]]
 name = "exec-callee"
 path = "src/exec_callee.rs"
 

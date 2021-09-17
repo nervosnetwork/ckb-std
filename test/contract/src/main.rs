@@ -10,11 +10,11 @@ mod code_hashes;
 use alloc::vec;
 use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
+use ckb_std::dynamic_loading_c_impl;
 use ckb_std::{
     ckb_constants::*, ckb_types::prelude::*, debug, default_alloc, dynamic_loading, entry,
-    error::SysError, high_level, syscalls
+    error::SysError, high_level, syscalls,
 };
-use ckb_std::dynamic_loading_c_impl;
 
 use code_hashes::CODE_HASH_SHARED_LIB;
 use core::mem::{size_of, size_of_val};
@@ -142,7 +142,7 @@ fn test_query() {
     assert!(type_scripts.is_none());
 }
 
-type ContextTypeOld = dynamic_loading::CKBDLContext::<[u8; 64 * 1024]>;
+type ContextTypeOld = dynamic_loading::CKBDLContext<[u8; 64 * 1024]>;
 
 fn test_dynamic_loading(context: &mut ContextTypeOld) {
     unsafe {
@@ -189,7 +189,7 @@ fn test_dynamic_loading(context: &mut ContextTypeOld) {
     }
 }
 
-type ContextType = dynamic_loading_c_impl::CKBDLContext::<[u8; 64 * 1024]>;
+type ContextType = dynamic_loading_c_impl::CKBDLContext<[u8; 64 * 1024]>;
 
 fn test_dynamic_loading_c_impl(context: &mut ContextType) {
     unsafe {
@@ -197,7 +197,8 @@ fn test_dynamic_loading_c_impl(context: &mut ContextType) {
             .load(&CODE_HASH_SHARED_LIB)
             .expect("load shared lib");
         type Plus42 = unsafe extern "C" fn(n: usize) -> usize;
-        let plus_42: dynamic_loading_c_impl::Symbol<Plus42> = lib.get(b"plus_42").expect("find plus_42");
+        let plus_42: dynamic_loading_c_impl::Symbol<Plus42> =
+            lib.get(b"plus_42").expect("find plus_42");
         assert_eq!(plus_42(13), 13 + 42);
 
         let foo: dynamic_loading_c_impl::Symbol<Foo> = lib.get(b"foo").expect("find foo");
