@@ -539,11 +539,12 @@ pub fn exec(
     source: Source,
     place: usize,
     bounds: usize,
-    argc: i32,
+    // argc: i32,
     argv: &[&CStr],
 ) -> u64 {
     // https://www.gnu.org/software/libc/manual/html_node/Program-Arguments.html
-    let mut argv_ptr = alloc::vec![core::ptr::null(); argc as usize + 1];
+    let argc = argv.len();
+    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
     for (idx, cstr) in argv.into_iter().enumerate() {
         argv_ptr[idx] = cstr.as_ptr();
     }

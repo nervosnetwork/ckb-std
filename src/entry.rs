@@ -19,8 +19,34 @@ macro_rules! entry {
 
         #[no_mangle]
         pub extern "C" fn _start() -> ! {
-            let f: fn() -> i8 = $main;
-            $crate::syscalls::exit(f())
+            #[cfg(target_arch = "riscv64")]
+            unsafe {
+                asm!(
+                    "lw a0, 0(sp)",
+                    "addi a1, sp, 8",
+                    "li a2, 0",
+                    "call {}",
+                    "li a7, 93",
+                    "ecall",
+                    sym $main,
+                    options(noreturn)
+                );
+            }
+            #[cfg(not(target_arch = "riscv64"))]
+            unsafe {
+                asm!(
+                    "mov rsp, rdi",
+                    "mov rsp, rsi",
+                    "add 8, rsi",
+                    "mov 0 rdx",
+                    "call {}",
+                    "mov rax rdi",
+                    "mov 60 rax",
+                    "syscall",
+                    sym $main,
+                    options(noreturn)
+                );
+            }
         }
 
         #[lang = "eh_personality"]

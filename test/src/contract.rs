@@ -1,5 +1,5 @@
-use ckb_testtool::context::Context;
 use ckb_testtool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
+use ckb_testtool::context::Context;
 use std::fs::File;
 use std::io::Read;
 
@@ -29,7 +29,9 @@ fn it_works() {
         Bytes::from(buf)
     };
     let shared_lib_out_point = context.deploy_cell(shared_lib_bin);
-    let shared_lib_dep = CellDep::new_builder().out_point(shared_lib_out_point).build();
+    let shared_lib_dep = CellDep::new_builder()
+        .out_point(shared_lib_out_point)
+        .build();
 
     // prepare scripts
     let lock_script = context
@@ -59,7 +61,7 @@ fn it_works() {
             .build(),
     ];
 
-    let mut outputs_data : Vec<Bytes> = Vec::new();
+    let mut outputs_data: Vec<Bytes> = Vec::new();
     outputs_data.push(vec![42u8; 1000].into());
     outputs_data.push(Bytes::new());
 
