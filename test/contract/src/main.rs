@@ -236,6 +236,17 @@ fn test_dynamic_loading_c_impl(context: &mut ContextType) {
     }
 }
 
+fn test_vm_version() {
+    let version = syscalls::vm_version().unwrap();
+    debug!("vm version: {}", version);
+    assert_eq!(version, 1);
+}
+
+fn test_current_cycles() {
+    let cycles = syscalls::current_cycles();
+    debug!("current cycles: {}", cycles);
+    assert!(cycles > 1000);
+}
 
 #[no_mangle]
 pub fn main() -> i8 {
@@ -253,6 +264,8 @@ pub fn main() -> i8 {
         test_dynamic_loading(&mut old_context);
         test_dynamic_loading_c_impl(&mut context);
     }
+    test_vm_version();
+    test_current_cycles();
     0
 }
 
