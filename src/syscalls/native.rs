@@ -1,4 +1,5 @@
 use crate::{ckb_constants::*, error::SysError};
+use cstr_core::CStr;
 
 #[cfg(target_arch = "riscv64")]
 #[link(name = "ckb-syscall")]
@@ -7,8 +8,17 @@ extern "C" {
 }
 
 #[cfg(not(target_arch = "riscv64"))]
-fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64 {
-    return u64::MAX;
+unsafe fn syscall(
+    _a0: u64,
+    _a1: u64,
+    _a2: u64,
+    _a3: u64,
+    _a4: u64,
+    _a5: u64,
+    _a6: u64,
+    _a7: u64,
+) -> u64 {
+    u64::MAX
 }
 
 /// Exit, this script will be terminated after the exit syscall.
@@ -479,4 +489,75 @@ pub fn load_cell_code(
         )
     };
     SysError::build_syscall_result(ret, len, len)
+}
+
+/// *VM version* syscall returns current running VM version, so far 2 values will be returned:
+///   - Error for Lina CKB-VM version
+///   - 1 for the new hardfork CKB-VM version.
+///
+/// This syscall consumes 500 cycles.
+pub fn vm_version() -> Result<u64, SysError> {
+    let ret = unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_VM_VERSION) };
+    if ret == 1 {
+        Ok(1)
+    } else {
+        Err(SysError::Unknown(ret))
+    }
+}
+
+/// *Current Cycles* returns current cycle consumption just before executing this syscall.
+///  This syscall consumes 500 cycles.
+pub fn current_cycles() -> u64 {
+    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_CURRENT_CYCLES) }
+}
+
+/// Exec runs an executable file from specified cell data in the context of an
+/// already existing machine, replacing the previous executable. The used cycles
+/// does not change, but the code, registers and memory of the vm are replaced
+/// by those of the new program. It's cycles consumption consists of two parts:
+///
+/// - Fixed 500 cycles
+/// - Initial Loading Cycles (https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0014-vm-cycle-limits/0014-vm-cycle-limits.md)
+///
+/// The arguments used here are:
+///
+///   * `index`: an index value denoting the index of entries to read.
+///   * `source`: a flag denoting the source of cells or witnesses to locate, possible values include:
+///       + 1: input cells.
+///       + `0x0100000000000001`: input cells with the same running script as current script
+///       + 2: output cells.
+///       + `0x0100000000000002`: output cells with the same running script as current script
+///       + 3: dep cells.
+///   * `place`: A value of 0 or 1:
+///       + 0: read from cell data
+///       + 1: read from witness
+///   * `bounds`: high 32 bits means `offset`, low 32 bits means `length`. if `length` equals to zero, it read to end instead of reading 0 bytes.
+///   * `argc`: argc contains the number of arguments passed to the program
+///   * `argv`: argv is a one-dimensional array of strings
+pub fn exec(
+    index: usize,
+    source: Source,
+    place: usize,
+    bounds: usize,
+    // argc: i32,
+    argv: &[&CStr],
+) -> u64 {
+    // https://www.gnu.org/software/libc/manual/html_node/Program-Arguments.html
+    let argc = argv.len();
+    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
+    for (idx, cstr) in argv.into_iter().enumerate() {
+        argv_ptr[idx] = cstr.as_ptr();
+    }
+    unsafe {
+        syscall(
+            index as u64,
+            source as u64,
+            place as u64,
+            bounds as u64,
+            argc as u64,
+            argv_ptr.as_ptr() as u64,
+            0,
+            SYS_EXEC,
+        )
+    }
 }

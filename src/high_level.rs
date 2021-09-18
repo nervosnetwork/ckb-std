@@ -2,8 +2,9 @@ use crate::ckb_constants::*;
 use crate::debug;
 use crate::error::SysError;
 use crate::syscalls;
-use alloc::vec::Vec;
-use ckb_types::{packed::*, prelude::*};
+use alloc::{vec, vec::Vec};
+use ckb_types::{core::ScriptHashType, packed::*, prelude::*};
+use cstr_core::CStr;
 
 /// Default buffer size
 pub const BUF_SIZE: usize = 1024;
@@ -48,8 +49,7 @@ fn load_data<F: Fn(&mut [u8], usize) -> Result<usize, SysError>>(
     match syscall(&mut buf, 0) {
         Ok(len) => Ok(buf[..len].to_vec()),
         Err(SysError::LengthNotEnough(actual_size)) => {
-            let mut data = Vec::with_capacity(actual_size);
-            data.resize(actual_size, 0);
+            let mut data = vec![0; actual_size];
             let loaded_len = buf.len();
             data[..loaded_len].copy_from_slice(&buf);
             let len = syscall(&mut data[loaded_len..], loaded_len)?;
@@ -553,4 +553,59 @@ pub fn find_cell_by_data_hash(data_hash: &[u8], source: Source) -> Result<Option
         }
     }
     Ok(None)
+}
+
+/// Look for a dep cell with specific code hash, code_hash should be a buffer
+/// with 32 bytes.
+///
+pub fn look_for_dep_with_hash2(
+    code_hash: &[u8],
+    hash_type: ScriptHashType,
+) -> Result<usize, SysError> {
+    let field = match hash_type {
+        ScriptHashType::Type => CellField::TypeHash,
+        _ => CellField::DataHash,
+    };
+    let mut current: usize = 0;
+    loop {
+        let mut buf = [0u8; 32];
+        match syscalls::load_cell_by_field(&mut buf, 0, current, Source::CellDep, field) {
+            Ok(len) => {
+                debug_assert_eq!(len, buf.len());
+                if buf == code_hash {
+                    return Ok(current);
+                }
+            }
+            Err(SysError::ItemMissing) => {}
+            Err(SysError::IndexOutOfBound) => {
+                return Err(SysError::IndexOutOfBound);
+            }
+            Err(err) => {
+                return Err(err);
+            }
+        }
+        current += 1;
+    }
+}
+
+pub fn look_for_dep_with_data_hash(data_hash: &[u8]) -> Result<usize, SysError> {
+    look_for_dep_with_hash2(data_hash, ScriptHashType::Data)
+}
+
+/// Exec a cell in cell dep.
+///
+/// # Arguments
+///
+/// * `code_hash` - the code hash to search cell in cell deps.
+/// * `hash_type` - the hash type to search cell in cell deps.
+pub fn exec_cell(
+    code_hash: &[u8],
+    hash_type: ScriptHashType,
+    offset: u32,
+    length: u32,
+    argv: &[&CStr],
+) -> Result<u64, SysError> {
+    let index = look_for_dep_with_hash2(code_hash, hash_type)?;
+    let bounds: usize = (offset as usize) << 32 | (length as usize);
+    Ok(syscalls::exec(index, Source::CellDep, 0, bounds, argv))
 }

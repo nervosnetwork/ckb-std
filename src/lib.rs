@@ -28,3 +28,4 @@ pub mod dynamic_loading;
 pub mod dynamic_loading_c_impl;
 #[cfg(feature = "allocator")]
 pub use buddy_alloc;
+pub use cstr_core;
