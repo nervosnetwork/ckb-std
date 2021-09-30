@@ -33,20 +33,7 @@ macro_rules! entry {
                 );
             }
             #[cfg(not(target_arch = "riscv64"))]
-            unsafe {
-                asm!(
-                    "mov rsp, rdi",
-                    "mov rsp, rsi",
-                    "add 8, rsi",
-                    "mov 0 rdx",
-                    "call {}",
-                    "mov rax rdi",
-                    "mov 60 rax",
-                    "syscall",
-                    sym $main,
-                    options(noreturn)
-                );
-            }
+            panic!("This macro is only valid for riscv64 target");
         }
 
         #[lang = "eh_personality"]
