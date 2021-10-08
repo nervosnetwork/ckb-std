@@ -241,7 +241,7 @@ fn test_vm_version() {
 fn test_current_cycles() {
     let cycles = syscalls::current_cycles();
     debug!("current cycles: {}", cycles);
-    assert!(cycles > 1000);
+    assert!(cycles > 300);
 }
 
 pub fn main() -> Result<(), Error> {

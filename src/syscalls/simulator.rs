@@ -1,6 +1,8 @@
 use crate::{ckb_constants::*, error::SysError};
+use ckb_types::core::ScriptHashType;
 use ckb_x64_simulator as sim;
 use core::ffi::c_void;
+use cstr_core::CStr;
 
 pub fn exit(code: i8) -> ! {
     sim::ckb_exit(code);
@@ -210,4 +212,50 @@ pub fn load_cell_code(
     _source: Source,
 ) -> Result<usize, SysError> {
     panic!("This is not supported in the simulator!");
+}
+
+pub fn vm_version() -> Result<u64, SysError> {
+    let ret = sim::ckb_vm_version();
+    if ret == 1 {
+        Ok(1)
+    } else {
+        Err(SysError::Unknown(ret as i64 as u64))
+    }
+}
+
+pub fn current_cycles() -> u64 {
+    sim::ckb_current_cycles()
+}
+
+pub fn exec(
+    _index: usize,
+    _source: Source,
+    _place: usize,
+    _bounds: usize,
+    // argc: i32,
+    _argv: &[&CStr],
+) -> u64 {
+    panic!("please use exec_cell instead");
+}
+
+pub fn exec_cell(
+    code_hash: &[u8],
+    hash_type: ScriptHashType,
+    offset: u32,
+    length: u32,
+    argv: &[&CStr],
+) -> Result<u64, SysError> {
+    let argc = argv.len();
+    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
+    for (idx, cstr) in argv.into_iter().enumerate() {
+        argv_ptr[idx] = cstr.to_bytes_with_nul().as_ptr();
+    }
+    Ok(sim::ckb_exec_cell(
+        code_hash.as_ptr(),
+        hash_type as u8,
+        offset,
+        length,
+        argc as i32,
+        argv_ptr.as_ptr(),
+    ) as i64 as u64)
 }
