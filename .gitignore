@@ -5,6 +5,7 @@
 Cargo.lock
 *.so
 *.debug
+test/simulator/data/*
 docs/*
 !docs/riscv64imac-unknown-none-elf/
 docs/riscv64imac-unknown-none-elf/*

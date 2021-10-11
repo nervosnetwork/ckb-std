@@ -1,5 +1,13 @@
-use ckb_testtool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
+use super::util::{blake2b_256, dump_mock_tx};
+use ckb_testtool::ckb_types::{
+    bytes::Bytes,
+    core::{ScriptHashType, TransactionBuilder},
+    packed::*,
+    prelude::*,
+};
 use ckb_testtool::context::Context;
+use ckb_x64_simulator::RunningSetup;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 
@@ -89,7 +97,7 @@ fn test_exec_by_code_hash() {
             .expect("read code");
         Bytes::from(buf)
     };
-    let callee_out_point = context.deploy_cell(callee_bin);
+    let callee_out_point = context.deploy_cell(callee_bin.clone());
 
     let caller_lock_script_dep = CellDep::new_builder()
         .out_point(caller_out_point.clone())
@@ -125,6 +133,28 @@ fn test_exec_by_code_hash() {
         .cell_dep(caller_lock_script_dep)
         .build();
     let tx = context.complete_tx(tx);
+
+    let test_case_name = "test_exec_by_code_hash";
+    let mut native_binaries = HashMap::default();
+    let key_string = {
+        let mut buffer = Vec::with_capacity(32 + 1 + 4 + 4);
+        // See entry_exec_caller_by_code_hash.rs for the arguments to choose
+        buffer.extend_from_slice(&blake2b_256(callee_bin.as_ref())[..]);
+        buffer.push(ScriptHashType::Data1 as u8);
+        buffer.extend_from_slice(&0u32.to_be_bytes()[..]);
+        buffer.extend_from_slice(&0u32.to_be_bytes()[..]);
+        format!("0x{}", faster_hex::hex_string(&buffer))
+    };
+    native_binaries.insert(key_string, "target/debug/exec-callee".to_string());
+    let setup = RunningSetup {
+        is_lock_script: true,
+        is_output: false,
+        script_index: 0,
+        vm_version: 1,
+        native_binaries,
+    };
+    dump_mock_tx(test_case_name, &tx, &context, &setup);
+
     // run
     let cycles = context
         .verify_tx(&tx, MAX_CYCLES)

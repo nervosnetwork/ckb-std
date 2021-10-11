@@ -8,5 +8,7 @@ edition = "2018"
 
 [dependencies]
 ckb-testtool = "0.6.1"
-tentacle-multiaddr = "=0.3.0"
-tentacle-secio = "=0.5.0"
+serde_json = "1.0"
+ckb-mock-tx-types = "0.1.0"
+blake2b-rs = "0.1.5"
+faster-hex = "0.6"
