@@ -605,7 +605,12 @@ pub fn exec_cell(
     length: u32,
     argv: &[&CStr],
 ) -> Result<u64, SysError> {
-    let index = look_for_dep_with_hash2(code_hash, hash_type)?;
-    let bounds: usize = (offset as usize) << 32 | (length as usize);
-    Ok(syscalls::exec(index, Source::CellDep, 0, bounds, argv))
+    #[cfg(not(feature = "simulator"))]
+    {
+        let index = look_for_dep_with_hash2(code_hash, hash_type)?;
+        let bounds: usize = (offset as usize) << 32 | (length as usize);
+        Ok(syscalls::exec(index, Source::CellDep, 0, bounds, argv))
+    }
+    #[cfg(feature = "simulator")]
+    syscalls::exec_cell(code_hash, hash_type, offset, length, argv)
 }
