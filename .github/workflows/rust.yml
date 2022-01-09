@@ -16,4 +16,6 @@ jobs:
     - name: Install tools
       run: make install-tools
     - name: Run integration
-      run: make
+      run: make integration
+    - name: Run tests
+      run: make test

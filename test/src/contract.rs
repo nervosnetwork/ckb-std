@@ -11,7 +11,7 @@ fn it_works() {
     let mut context = Context::default();
     let contract_bin = {
         let mut buf = Vec::new();
-        File::open("contract/target/riscv64imac-unknown-none-elf/debug/contract")
+        File::open("../build/debug/ckb-std-tests")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
@@ -29,6 +29,7 @@ fn it_works() {
         Bytes::from(buf)
     };
     let shared_lib_out_point = context.deploy_cell(shared_lib_bin);
+    
     let shared_lib_dep = CellDep::new_builder()
         .out_point(shared_lib_out_point)
         .build();

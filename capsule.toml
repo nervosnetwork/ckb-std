@@ -1,0 +1,29 @@
+
+# # path of rust contracts workspace directory,
+# # a `Cargo.toml` file is expected under the directory.
+# toolchain = "nightly-2021-12-25"
+# docker_image = "thewawar/ckb-capsule:2021-12-25"
+
+# capsule version
+version = "0.7.3 96bf4af"
+# path of deployment config file
+deployment = "deployment.toml"
+
+[rust]
+workspace_dir = "contracts"
+
+[[contracts]]
+name = "ckb-std-tests"
+template_type = "Rust"
+
+[[contracts]]
+name = "exec-callee"
+template_type = "Rust"
+
+[[contracts]]
+name = "exec-caller"
+template_type = "Rust"
+
+[[contracts]]
+name = "exec-caller-by-code-hash"
+template_type = "Rust"

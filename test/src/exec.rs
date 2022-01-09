@@ -10,7 +10,7 @@ fn test_exec_by_index() {
     let mut context = Context::default();
     let caller_bin = {
         let mut buf = Vec::new();
-        File::open("contract/target/riscv64imac-unknown-none-elf/debug/exec-caller")
+        File::open("../build/debug/exec-caller")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
@@ -19,13 +19,14 @@ fn test_exec_by_index() {
     let caller_out_point = context.deploy_cell(caller_bin);
     let callee_bin = {
         let mut buf = Vec::new();
-        File::open("contract/target/riscv64imac-unknown-none-elf/debug/exec-callee")
+        File::open("../build/debug/exec-callee")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
         Bytes::from(buf)
     };
     let callee_out_point = context.deploy_cell(callee_bin);
+    
 
     let caller_lock_script_dep = CellDep::new_builder()
         .out_point(caller_out_point.clone())
@@ -73,7 +74,7 @@ fn test_exec_by_code_hash() {
     let mut context = Context::default();
     let caller_bin = {
         let mut buf = Vec::new();
-        File::open("contract/target/riscv64imac-unknown-none-elf/debug/exec-caller-by-code-hash")
+        File::open("../build/debug/exec-caller-by-code-hash")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
@@ -82,7 +83,7 @@ fn test_exec_by_code_hash() {
     let caller_out_point = context.deploy_cell(caller_bin);
     let callee_bin = {
         let mut buf = Vec::new();
-        File::open("contract/target/riscv64imac-unknown-none-elf/debug/exec-callee")
+        File::open("../build/debug/exec-callee")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");

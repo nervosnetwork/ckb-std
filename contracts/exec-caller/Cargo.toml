@@ -1,12 +1,9 @@
 [package]
-name = "ckb-rust-demo"
+name = "exec-caller"
 version = "0.1.0"
-authors = ["Nervos network"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ckb-testtool = "0.6.1"
-tentacle-multiaddr = "=0.3.0"
-tentacle-secio = "=0.5.0"
+ckb-std = { path = "../../" }
