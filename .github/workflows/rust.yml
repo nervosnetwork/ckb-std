@@ -16,6 +16,6 @@ jobs:
     - name: Install tools
       run: make install-tools
     - name: Run integration
-      run: make integration
+      run: make integration-in-docker
     - name: Run tests
       run: make test
