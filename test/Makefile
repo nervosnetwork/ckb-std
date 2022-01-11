@@ -3,7 +3,7 @@ test: clean build
 
 build:
 	make -C shared-lib all-via-docker
-	@./build_test_contracts.sh
+	cd .. && capsule build
 
 clean:
 	rm -rf ../build
