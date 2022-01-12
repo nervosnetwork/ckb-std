@@ -1,5 +1,5 @@
 TARGET := riscv64imac-unknown-none-elf
-DOCKER_IMAGE := thewawar/ckb-capsule:2021-08-16
+DOCKER_IMAGE := thewawar/ckb-capsule:2021-12-25
 CC := riscv64-unknown-elf-gcc
 
 default: integration-in-docker
@@ -21,7 +21,7 @@ clean:
 test-shared-lib:
 	make -C test/shared-lib all-via-docker
 
-integration: check test
+integration: check
 
 test:
 	make -C test test

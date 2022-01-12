@@ -1,4 +1,6 @@
 /target
+/contracts/target
+/build/
 **/*.rs.bk
 Cargo.lock
 *.so

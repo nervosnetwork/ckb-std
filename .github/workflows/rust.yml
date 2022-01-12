@@ -16,4 +16,8 @@ jobs:
     - name: Install tools
       run: make install-tools
     - name: Run integration
-      run: make
+      run: make integration-in-docker
+    - name: Install capsule
+      run: cargo install ckb-capsule
+    - name: Run tests
+      run: make test

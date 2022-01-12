@@ -1,30 +1,18 @@
-#![no_std]
-#![no_main]
-#![feature(asm)]
-#![feature(lang_items)]
-#![feature(alloc_error_handler)]
-#![feature(panic_info_message)]
-
-mod code_hashes;
+// Import from `core` instead of from `std` since we are in no-std mode
 
 use alloc::vec;
 use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
 use ckb_std::dynamic_loading_c_impl;
 use ckb_std::{
-    ckb_constants::*, ckb_types::prelude::*, debug, default_alloc, dynamic_loading, entry,
-    error::SysError, high_level, syscalls,
+    ckb_constants::*, ckb_types::prelude::*, debug, dynamic_loading, error::SysError, high_level,
+    syscalls,
 };
 
-use code_hashes::CODE_HASH_SHARED_LIB;
+use crate::code_hashes::CODE_HASH_SHARED_LIB;
 use core::mem::{size_of, size_of_val};
 
-fn new_blake2b() -> Blake2b {
-    const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
-    Blake2bBuilder::new(32)
-        .personal(CKB_HASH_PERSONALIZATION)
-        .build()
-}
+use crate::error::Error;
 
 fn test_basic() {
     let v = vec![0u8; 42];
@@ -72,6 +60,13 @@ fn test_partial_load_tx_hash() {
     let len = syscalls::load_tx_hash(&mut buf, 16).unwrap();
     assert_eq!(len, buf.len());
     assert_eq!(buf[..], tx_hash[16..]);
+}
+
+fn new_blake2b() -> Blake2b {
+    const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
+    Blake2bBuilder::new(32)
+        .personal(CKB_HASH_PERSONALIZATION)
+        .build()
 }
 
 fn test_high_level_apis() {
@@ -249,8 +244,7 @@ fn test_current_cycles() {
     assert!(cycles > 1000);
 }
 
-#[no_mangle]
-pub fn main() -> i8 {
+pub fn main() -> Result<(), Error> {
     test_basic();
     test_load_data();
     test_load_cell_field();
@@ -267,8 +261,5 @@ pub fn main() -> i8 {
     }
     test_vm_version();
     test_current_cycles();
-    0
+    Ok(())
 }
-
-entry!(main);
-default_alloc!();

@@ -1,0 +1,10 @@
+[workspace]
+members = ["ckb-std-tests", "exec-callee", "exec-caller", "exec-caller-by-code-hash"]
+
+[profile.release]
+overflow-checks = true
+opt-level = 's'
+lto = true
+codegen-units = 1
+panic = 'abort'
+
