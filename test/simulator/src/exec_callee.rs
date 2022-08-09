@@ -1,7 +1,33 @@
 extern crate alloc;
 
-#[path = "../../../contracts/exec_callee/src/entry.rs"]
+#[path = "../../../contracts/exec-callee/src/entry.rs"]
 mod entry;
+
+pub mod error {
+    use ckb_std::error::SysError;
+    /// Error
+    #[repr(i8)]
+    pub enum Error {
+        IndexOutOfBound = 1,
+        ItemMissing,
+        LengthNotEnough,
+        Encoding,
+        // Add customized errors here...
+    }
+
+    impl From<SysError> for Error {
+        fn from(err: SysError) -> Self {
+            use SysError::*;
+            match err {
+                IndexOutOfBound => Self::IndexOutOfBound,
+                ItemMissing => Self::ItemMissing,
+                LengthNotEnough(_) => Self::LengthNotEnough,
+                Encoding => Self::Encoding,
+                Unknown(err_code) => panic!("unexpected sys error {}", err_code),
+            }
+        }
+    }
+}
 
 use std::env;
 use std::ffi::CString;
@@ -20,7 +46,9 @@ fn main() {
         .collect::<Vec<_>>();
     argv.push(std::ptr::null());
     println!("START simulator callee entry");
-    let code = entry::main(argc, argv.as_ptr()) as i32;
+    let code = entry::main(argc, argv.as_ptr())
+        .map(|()| 0i32)
+        .unwrap_or_else(|err| err as i32);
     if code != 0 {
         println!("exit with {}", code);
     } else {
