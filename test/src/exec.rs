@@ -144,6 +144,7 @@ fn test_exec_by_code_hash() {
         buffer.extend_from_slice(&0u32.to_be_bytes()[..]);
         format!("0x{}", faster_hex::hex_string(&buffer))
     };
+    println!("binary key: {}", key_string);
     native_binaries.insert(key_string, "target/debug/exec-callee".to_string());
     let setup = RunningSetup {
         is_lock_script: true,
