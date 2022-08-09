@@ -34,7 +34,6 @@ fn test_exec_by_index() {
         Bytes::from(buf)
     };
     let callee_out_point = context.deploy_cell(callee_bin);
-    
 
     let caller_lock_script_dep = CellDep::new_builder()
         .out_point(caller_out_point.clone())
