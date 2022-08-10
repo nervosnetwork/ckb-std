@@ -9,7 +9,6 @@
 //! * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust
 
 #![no_std]
-#![feature(llvm_asm)]
 
 extern crate alloc;
 
