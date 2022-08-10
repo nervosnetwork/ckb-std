@@ -1,5 +1,5 @@
 TARGET := riscv64imac-unknown-none-elf
-DOCKER_IMAGE := thewawar/ckb-capsule:2021-12-25
+DOCKER_IMAGE := thewawar/ckb-capsule:2022-08-01
 CC := riscv64-unknown-elf-gcc
 
 default: integration-in-docker
@@ -30,7 +30,7 @@ check:
 	cargo check --target ${TARGET} --examples
 
 install-tools:
-	cargo install --git https://github.com/xxuejie/ckb-binary-patcher.git
+	cargo install --git https://github.com/nervosnetwork/ckb-binary-patcher.git
 
 .PHONY: test check
 
