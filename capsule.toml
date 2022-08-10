@@ -1,8 +1,8 @@
 
 # # path of rust contracts workspace directory,
 # # a `Cargo.toml` file is expected under the directory.
-# toolchain = "nightly-2021-12-25"
-# docker_image = "thewawar/ckb-capsule:2021-12-25"
+toolchain = "nightly-2022-08-01"
+docker_image = "thewawar/ckb-capsule:2022-08-01"
 
 # capsule version
 version = "0.7.3 96bf4af"
