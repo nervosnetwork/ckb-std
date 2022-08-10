@@ -1,18 +1,26 @@
-// Import from `core` instead of from `std` since we are in no-std mode
-
 use alloc::vec;
 use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
-use ckb_std::dynamic_loading_c_impl;
 use ckb_std::{
-    ckb_constants::*, ckb_types::prelude::*, debug, dynamic_loading, error::SysError, high_level,
-    syscalls,
+    ckb_constants::*, ckb_types::prelude::*, debug, error::SysError, high_level, syscalls,
 };
+use core::mem::size_of;
 
+#[cfg(target_arch = "riscv64")]
 use crate::code_hashes::CODE_HASH_SHARED_LIB;
-use core::mem::{size_of, size_of_val};
+#[cfg(target_arch = "riscv64")]
+use ckb_std::{dynamic_loading, dynamic_loading_c_impl};
+#[cfg(target_arch = "riscv64")]
+use core::mem::size_of_val;
 
 use crate::error::Error;
+
+fn new_blake2b() -> Blake2b {
+    const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
+    Blake2bBuilder::new(32)
+        .personal(CKB_HASH_PERSONALIZATION)
+        .build()
+}
 
 fn test_basic() {
     let v = vec![0u8; 42];
@@ -60,13 +68,6 @@ fn test_partial_load_tx_hash() {
     let len = syscalls::load_tx_hash(&mut buf, 16).unwrap();
     assert_eq!(len, buf.len());
     assert_eq!(buf[..], tx_hash[16..]);
-}
-
-fn new_blake2b() -> Blake2b {
-    const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
-    Blake2bBuilder::new(32)
-        .personal(CKB_HASH_PERSONALIZATION)
-        .build()
 }
 
 fn test_high_level_apis() {
@@ -137,8 +138,10 @@ fn test_query() {
     assert!(type_scripts.is_none());
 }
 
+#[cfg(target_arch = "riscv64")]
 type ContextTypeOld = dynamic_loading::CKBDLContext<[u8; 64 * 1024]>;
 
+#[cfg(target_arch = "riscv64")]
 fn test_dynamic_loading(context: &mut ContextTypeOld) {
     unsafe {
         let lib = context
@@ -184,8 +187,10 @@ fn test_dynamic_loading(context: &mut ContextTypeOld) {
     }
 }
 
+#[cfg(target_arch = "riscv64")]
 type ContextType = dynamic_loading_c_impl::CKBDLContext<[u8; 64 * 1024]>;
 
+#[cfg(target_arch = "riscv64")]
 fn test_dynamic_loading_c_impl(context: &mut ContextType) {
     unsafe {
         let lib = context
@@ -241,7 +246,7 @@ fn test_vm_version() {
 fn test_current_cycles() {
     let cycles = syscalls::current_cycles();
     debug!("current cycles: {}", cycles);
-    assert!(cycles > 1000);
+    assert!(cycles > 300);
 }
 
 pub fn main() -> Result<(), Error> {
@@ -252,6 +257,8 @@ pub fn main() -> Result<(), Error> {
     test_partial_load_tx_hash();
     test_high_level_apis();
     test_query();
+
+    #[cfg(target_arch = "riscv64")]
     unsafe {
         let mut context = ContextType::new();
         let mut old_context = ContextTypeOld::new();

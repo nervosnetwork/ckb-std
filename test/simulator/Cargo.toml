@@ -1,0 +1,20 @@
+[package]
+name = "simulator"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "contract"
+path = "src/main.rs"
+[[bin]]
+name = "exec-caller-by-code-hash"
+path = "src/exec_caller_by_code_hash.rs"
+[[bin]]
+name = "exec-callee"
+path = "src/exec_callee.rs"
+
+[dependencies]
+ckb-std = { path = "../..", features = ["ckb-types", "simulator"] }
+blake2b-ref = { version = "0.3", default-features = false }

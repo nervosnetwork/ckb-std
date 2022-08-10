@@ -1,5 +1,8 @@
+use super::util::dump_mock_tx;
 use ckb_testtool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
 use ckb_testtool::context::Context;
+use ckb_x64_simulator::RunningSetup;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 
@@ -29,7 +32,7 @@ fn it_works() {
         Bytes::from(buf)
     };
     let shared_lib_out_point = context.deploy_cell(shared_lib_bin);
-    
+
     let shared_lib_dep = CellDep::new_builder()
         .out_point(shared_lib_out_point)
         .build();
@@ -75,6 +78,16 @@ fn it_works() {
         .cell_dep(shared_lib_dep)
         .build();
     let tx = context.complete_tx(tx);
+
+    let test_case_name = "it_works";
+    let setup = RunningSetup {
+        is_lock_script: true,
+        is_output: false,
+        script_index: 0,
+        vm_version: 1,
+        native_binaries: HashMap::default(),
+    };
+    dump_mock_tx(test_case_name, &tx, &context, &setup);
 
     // run
     let cycles = context

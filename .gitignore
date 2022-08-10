@@ -3,8 +3,10 @@
 /build/
 **/*.rs.bk
 Cargo.lock
+!contracts/Cargo.lock
 *.so
 *.debug
+test/simulator/data/*.json
 docs/*
 !docs/riscv64imac-unknown-none-elf/
 docs/riscv64imac-unknown-none-elf/*
