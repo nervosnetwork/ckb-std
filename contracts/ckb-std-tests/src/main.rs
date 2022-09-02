@@ -22,7 +22,7 @@ ckb_std::entry!(program_entry);
 default_alloc!();
 
 /// program entry
-extern "C" fn program_entry() -> i8 {
+fn program_entry() -> i8 {
     // Call main function and return error code
     match entry::main() {
         Ok(_) => 0,

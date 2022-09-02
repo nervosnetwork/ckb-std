@@ -3,22 +3,14 @@ use core::result::Result;
 
 // Import CKB syscalls and structures
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
-use core::ffi::CStr;
-use core::slice::from_raw_parts;
 
 use crate::error::Error;
 
-pub unsafe fn main(
-    argc: core::ffi::c_int,
-    argv: *const *const core::ffi::c_char,
-) -> Result<(), Error> {
-    let args = from_raw_parts(argv, argc as usize);
-
-    let arg1 = CStr::from_ptr(args[0]);
-    let arg2 = CStr::from_ptr(args[1]);
-
-    assert_eq!(argc, 2);
-    assert_eq!(arg1.to_bytes(), b"Hello World");
-    assert_eq!(arg2.to_bytes(), "你好".as_bytes());
+pub fn main() -> Result<(), Error> {
+    let argv = ckb_std::env::argv();
+    ckb_std::debug!("argv: {:?}", argv);
+    assert_eq!(argv.len(), 2);
+    assert_eq!(argv[0].to_bytes(), b"Hello World");
+    assert_eq!(argv[1].to_bytes(), "你好".as_bytes());
     Ok(())
 }

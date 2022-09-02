@@ -7,20 +7,7 @@
 /// ```
 /// entry!(main)
 ///
-/// extern "C" fn main() -> i8 {
-///    0
-/// }
-/// ```
-///
-/// Reading exec args:
-///
-/// ```
-/// entry!(main)
-///
-/// unsafe extern "C" fn main(argc: core::ffi::c_int, argv: *const *const core::ffi::c_char) -> i8 {
-///    let args = core::slice::from_raw_parts(argv, argc as usize);
-///    let args: alloc::vec::Vec<_> = args.iter().map(|arg| CStr::from_ptr(*arg)).collect();
-///    debug!("argc: {}, args: {:?}", argc, args);
+/// fn main() -> i8 {
 ///    0
 /// }
 /// ```
@@ -40,6 +27,20 @@ macro_rules! entry {
             panic!("ckb_std::entry is only valid for riscv64 target")
         }
 
+        #[no_mangle]
+        unsafe extern "C" fn __ckb_std_main(
+            argc: core::ffi::c_int,
+            argv: *const *const core::ffi::c_char,
+        ) -> i8 {
+            let argv = core::slice::from_raw_parts(argv, argc as usize)
+                .iter()
+                .map(|arg| core::ffi::CStr::from_ptr(*arg))
+                .collect::<alloc::vec::Vec<_>>()
+                .leak();
+            $crate::env::set_argv(argv);
+            $main()
+        }
+
         // Use global_asm so the compiler won't insert function prologue in _start.
         #[cfg(target_arch = "riscv64")]
         core::arch::global_asm!(
@@ -51,11 +52,10 @@ macro_rules! entry {
             "addi a1, sp, 8",
             // Envp.
             "li a2, 0",
-            "call {}",
+            "call __ckb_std_main",
             // Exit.
             "li a7, 93",
             "ecall",
-            sym $main
         );
 
         #[lang = "eh_personality"]

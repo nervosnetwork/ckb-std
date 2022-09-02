@@ -21,9 +21,9 @@ ckb_std::entry!(program_entry);
 default_alloc!();
 
 /// program entry
-unsafe extern "C" fn program_entry(argc: core::ffi::c_int, argv: *const *const core::ffi::c_char) -> i8 {
+fn program_entry() -> i8 {
     // Call main function and return error code
-    match entry::main(argc, argv) {
+    match entry::main() {
         Ok(_) => 0,
         Err(err) => err as i8,
     }

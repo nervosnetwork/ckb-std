@@ -3,8 +3,8 @@ use crate::debug;
 use crate::error::SysError;
 use crate::syscalls;
 use alloc::{vec, vec::Vec};
+use core::ffi::CStr;
 use ckb_types::{core::ScriptHashType, packed::*, prelude::*};
-use cstr_core::CStr;
 
 /// Default buffer size
 pub const BUF_SIZE: usize = 1024;

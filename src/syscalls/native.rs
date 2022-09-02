@@ -1,5 +1,5 @@
 use crate::{ckb_constants::*, error::SysError};
-use cstr_core::CStr;
+use core::ffi::CStr;
 
 #[cfg(target_arch = "riscv64")]
 #[link(name = "ckb-syscall")]
