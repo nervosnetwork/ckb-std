@@ -16,15 +16,12 @@ mod entry;
 mod error;
 
 use ckb_std::default_alloc;
-use core::arch::asm;
 
 ckb_std::entry!(program_entry);
 default_alloc!();
 
 /// program entry
-///
-///  Both `argc` and `argv` can be omitted.
-fn program_entry(argc: u64, argv: *const *const u8) -> i8 {
+unsafe extern "C" fn program_entry(argc: core::ffi::c_int, argv: *const *const core::ffi::c_char) -> i8 {
     // Call main function and return error code
     match entry::main(argc, argv) {
         Ok(_) => 0,
