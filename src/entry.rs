@@ -30,13 +30,10 @@ macro_rules! entry {
         #[no_mangle]
         unsafe extern "C" fn __ckb_std_main(
             argc: core::ffi::c_int,
-            argv: *const *const core::ffi::c_char,
+            // Arg is the same as *const c_char ABI wise.
+            argv: *const ckb_std::env::Arg,
         ) -> i8 {
-            let argv = core::slice::from_raw_parts(argv, argc as usize)
-                .iter()
-                .map(|arg| core::ffi::CStr::from_ptr(*arg))
-                .collect::<alloc::vec::Vec<_>>()
-                .leak();
+            let argv = core::slice::from_raw_parts(argv, argc as usize);
             $crate::env::set_argv(argv);
             $main()
         }

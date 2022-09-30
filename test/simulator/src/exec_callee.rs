@@ -42,7 +42,7 @@ fn main() {
         .leak();
     let argv = args
         .iter()
-        .map(|cstring| &**cstring)
+        .map(|cstring| (&**cstring).into())
         .collect::<Vec<_>>()
         .leak();
     println!("START simulator callee entry");
