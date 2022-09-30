@@ -14,8 +14,8 @@ extern crate alloc;
 
 pub mod ckb_constants;
 pub mod debug;
-pub mod env;
 pub mod entry;
+pub mod env;
 pub mod error;
 pub mod global_alloc_macro;
 #[cfg(feature = "ckb-types")]
