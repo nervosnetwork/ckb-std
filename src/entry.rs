@@ -31,7 +31,7 @@ macro_rules! entry {
         unsafe extern "C" fn __ckb_std_main(
             argc: core::ffi::c_int,
             // Arg is the same as *const c_char ABI wise.
-            argv: *const ckb_std::env::Arg,
+            argv: *const $crate::env::Arg,
         ) -> i8 {
             let argv = core::slice::from_raw_parts(argv, argc as usize);
             $crate::env::set_argv(argv);
