@@ -38,15 +38,16 @@ fn main() {
     let args = env::args_os()
         .into_iter()
         .map(|arg| CString::new(arg.into_vec()).unwrap())
-        .collect::<Vec<_>>();
-    let argc = args.len() as u64;
-    let mut argv = args
+        .collect::<Vec<_>>()
+        .leak();
+    let argv = args
         .iter()
-        .map(|cstring| cstring.to_bytes_with_nul().as_ptr())
-        .collect::<Vec<_>>();
-    argv.push(std::ptr::null());
+        .map(|cstring| (&**cstring).into())
+        .collect::<Vec<_>>()
+        .leak();
     println!("START simulator callee entry");
-    let code = entry::main(argc, argv.as_ptr())
+    unsafe { ckb_std::env::set_argv(argv) };
+    let code = entry::main()
         .map(|()| 0i32)
         .unwrap_or_else(|err| err as i32);
     if code != 0 {

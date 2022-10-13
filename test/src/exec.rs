@@ -1,11 +1,14 @@
 use super::util::{blake2b_256, dump_mock_tx};
-use ckb_testtool::ckb_types::{
-    bytes::Bytes,
-    core::{ScriptHashType, TransactionBuilder},
-    packed::*,
-    prelude::*,
+use ckb_testtool::{
+    ckb_traits::CellDataProvider,
+    ckb_types::{
+        bytes::Bytes,
+        core::{ScriptHashType, TransactionBuilder},
+        packed::*,
+        prelude::*,
+    },
+    context::Context,
 };
-use ckb_testtool::context::Context;
 use ckb_x64_simulator::RunningSetup;
 use std::collections::HashMap;
 use std::fs::File;
@@ -97,6 +100,10 @@ fn test_exec_by_code_hash() {
         Bytes::from(buf)
     };
     let callee_out_point = context.deploy_cell(callee_bin.clone());
+    let callee_code_hash = context
+        .get_cell_data_hash(&callee_out_point)
+        .unwrap()
+        .as_bytes();
 
     let caller_lock_script_dep = CellDep::new_builder()
         .out_point(caller_out_point.clone())
@@ -104,7 +111,7 @@ fn test_exec_by_code_hash() {
     let callee_lock_script_dep = CellDep::new_builder().out_point(callee_out_point).build();
 
     let caller_lock_script = context
-        .build_script(&caller_out_point, Bytes::new())
+        .build_script(&caller_out_point, callee_code_hash)
         .unwrap();
 
     let input_out_point = context.create_cell(

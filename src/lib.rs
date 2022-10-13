@@ -15,6 +15,7 @@ extern crate alloc;
 pub mod ckb_constants;
 pub mod debug;
 pub mod entry;
+pub mod env;
 pub mod error;
 pub mod global_alloc_macro;
 #[cfg(feature = "ckb-types")]
@@ -28,4 +29,3 @@ pub mod dynamic_loading;
 pub mod dynamic_loading_c_impl;
 #[cfg(feature = "allocator")]
 pub use buddy_alloc;
-pub use cstr_core;

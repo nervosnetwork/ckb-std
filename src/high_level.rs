@@ -4,7 +4,7 @@ use crate::error::SysError;
 use crate::syscalls;
 use alloc::{vec, vec::Vec};
 use ckb_types::{core::ScriptHashType, packed::*, prelude::*};
-use cstr_core::CStr;
+use core::ffi::CStr;
 
 /// Default buffer size
 pub const BUF_SIZE: usize = 1024;
