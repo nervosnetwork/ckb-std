@@ -18,6 +18,6 @@ jobs:
     - name: Run integration
       run: make integration-in-docker
     - name: Install capsule
-      run: cargo install ckb-capsule
+      run: cargo install ckb-capsule --version 0.8.0
     - name: Run tests
       run: make test

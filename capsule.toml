@@ -5,7 +5,7 @@ toolchain = "nightly-2022-08-01"
 docker_image = "thewawar/ckb-capsule:2022-08-01"
 
 # capsule version
-version = "0.7.3 96bf4af"
+version = "0.8.0"
 # path of deployment config file
 deployment = "deployment.toml"
 
