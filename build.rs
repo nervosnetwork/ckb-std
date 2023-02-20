@@ -29,6 +29,7 @@ fn main() {
             .define("__SHARED_LIBRARY__", None)
             .flag("-Wno-nonnull-compare")
             .flag("-nostartfiles")
+            .flag("-Wno-dangling-pointer")
             .compile("dl-c-impl");
     }
 }
