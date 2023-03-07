@@ -1,10 +1,10 @@
 use crate::{ckb_constants::*, error::SysError};
+use core::arch::asm;
 use core::ffi::CStr;
 
 #[cfg(target_arch = "riscv64")]
-#[naked_function::naked]
 unsafe extern "C" fn syscall(
-    a0: u64,
+    mut a0: u64,
     a1: u64,
     a2: u64,
     a3: u64,
@@ -14,9 +14,17 @@ unsafe extern "C" fn syscall(
     a7: u64,
 ) -> u64 {
     asm!(
-        "ecall",
-        "ret",
+      "ecall",
+      inout("a0") a0,
+      in("a1") a1,
+      in("a2") a2,
+      in("a3") a3,
+      in("a4") a4,
+      in("a5") a5,
+      in("a6") a6,
+      in("a7") a7
     );
+    a0
 }
 
 #[cfg(not(target_arch = "riscv64"))]
