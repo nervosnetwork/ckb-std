@@ -5,10 +5,7 @@ fn main() {
 
     // ckb-std only supports riscv64 target arch
     // but we can still use cargo check under other archs
-    if target_arch == "riscv64" {
-        cc::Build::new()
-            .file("src/asm/syscall.S")
-            .compile("ckb-syscall");
+    if target_arch == "riscv64" && cfg!(feature = "dlopen-c") {
         cc::Build::new()
             .file("dl-c-impl/lib.c")
             .static_flag(true)
