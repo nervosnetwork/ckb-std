@@ -15,6 +15,7 @@ default = ["allocator", "ckb-types", "dlopen-c"]
 allocator = [ "buddy-alloc" ]
 simulator = [ "ckb-x64-simulator" ]
 dlopen-c = []
+link-dummy-libc = []
 
 [build-dependencies]
 cc = "1.0"

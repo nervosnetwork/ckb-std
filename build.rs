@@ -29,4 +29,8 @@ fn main() {
             .flag("-Wno-dangling-pointer")
             .compile("dl-c-impl");
     }
+
+    if target_arch == "riscv64" && cfg!(feature = "link-dummy-libc") {
+        println!("cargo:rustc-link-lib=dummylibc");
+    }
 }
