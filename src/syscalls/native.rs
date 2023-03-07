@@ -3,7 +3,7 @@ use core::arch::asm;
 use core::ffi::CStr;
 
 #[cfg(target_arch = "riscv64")]
-unsafe extern "C" fn syscall(
+unsafe fn syscall(
     mut a0: u64,
     a1: u64,
     a2: u64,
