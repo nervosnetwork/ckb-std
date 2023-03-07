@@ -2,9 +2,21 @@ use crate::{ckb_constants::*, error::SysError};
 use core::ffi::CStr;
 
 #[cfg(target_arch = "riscv64")]
-#[link(name = "ckb-syscall")]
-extern "C" {
-    fn syscall(a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, a6: u64, a7: u64) -> u64;
+#[naked_function::naked]
+unsafe extern "C" fn syscall(
+    a0: u64,
+    a1: u64,
+    a2: u64,
+    a3: u64,
+    a4: u64,
+    a5: u64,
+    a6: u64,
+    a7: u64,
+) -> u64 {
+    asm!(
+        "ecall",
+        "ret",
+    );
 }
 
 #[cfg(not(target_arch = "riscv64"))]

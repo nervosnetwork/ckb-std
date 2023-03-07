@@ -13,6 +13,8 @@ jobs:
       run: git submodule update --init --recursive
     - name: Install Rust target
       run: rustup target add riscv64imac-unknown-none-elf
+    - name: Build without riscv C compiler
+      run: cargo build --target=riscv64imac-unknown-none-elf --no-default-features --features=ckb-types,allocator
     - name: Install tools
       run: make install-tools
     - name: Run integration
