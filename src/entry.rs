@@ -11,6 +11,7 @@
 ///    0
 /// }
 /// ```
+#[cfg(not(feature = "ckb-os"))]
 #[macro_export]
 macro_rules! entry {
     ($main:path) => {
@@ -95,3 +96,15 @@ macro_rules! entry {
         }
     };
 }
+
+#[cfg(feature = "ckb-os")]
+core::arch::global_asm!(
+    ".global _start",
+    "_start:",
+    "lw a0, 0(sp)",
+    "addi a1, sp, 8",
+    "li a2, 0",
+    "call main",
+    "li a7, 93",
+    "ecall",
+);

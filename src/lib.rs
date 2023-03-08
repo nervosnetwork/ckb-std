@@ -10,6 +10,7 @@
 
 #![no_std]
 
+#[cfg(not(feature = "rustc-dep-of-std"))]
 extern crate alloc;
 
 pub mod ckb_constants;
@@ -24,6 +25,7 @@ pub mod since;
 pub mod syscalls;
 #[cfg(feature = "ckb-types")]
 pub use ckb_types;
+#[cfg(feature = "ckb-types")]
 pub mod dynamic_loading;
 #[cfg(all(target_arch = "riscv64", feature = "dlopen-c"))]
 pub mod dynamic_loading_c_impl;
