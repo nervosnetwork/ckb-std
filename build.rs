@@ -2,6 +2,7 @@ use std::env;
 
 fn main() {
     let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
 
     // ckb-std only supports riscv64 target arch
     // but we can still use cargo check under other archs
@@ -30,7 +31,12 @@ fn main() {
             .compile("dl-c-impl");
     }
 
-    if target_arch == "riscv64" && cfg!(feature = "link-dummy-libc") {
+    if cfg!(feature = "ckb-os") {
+        if target_arch != "riscv64" || target_os != "ckb" {
+            panic!(
+                "ckb-os can only be enabled when compiling for riscv64*-unknown-ckb-elf targets!"
+            );
+        }
         println!("cargo:rustc-link-lib=dummylibc");
     }
 }
