@@ -123,6 +123,7 @@ impl<T> CKBDLContext<T> {
         dep_cell_data_hash: &[u8],
         offset: usize,
         size: usize,
+        hash_type: u8,
     ) -> Result<Library, Error> {
         if size_of::<Library>() > RISCV_PGSIZE || size < RISCV_PGSIZE {
             return Err(Error::ContextFailure);
@@ -135,7 +136,6 @@ impl<T> CKBDLContext<T> {
         unsafe {
             let mut handle: *const c_void = null();
             let mut consumed_size: usize = 0;
-            let hash_type: u8 = 0;
             let mut library = Library::new();
             let aligned_size = size;
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
@@ -159,6 +159,9 @@ impl<T> CKBDLContext<T> {
     }
 
     pub fn load<'a>(&'a mut self, dep_cell_data_hash: &[u8]) -> Result<Library, Error> {
-        self.load_with_offset(dep_cell_data_hash, 0, size_of::<CKBDLContext<T>>())
+        self.load_with_offset(dep_cell_data_hash, 0, size_of::<CKBDLContext<T>>(), 0)
+    }
+    pub fn load_by_type_id<'a>(&'a mut self, type_id: &[u8]) -> Result<Library, Error> {
+        self.load_with_offset(type_id, 0, size_of::<CKBDLContext<T>>(), 1)
     }
 }
