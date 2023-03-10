@@ -214,7 +214,7 @@ fn test_dynamic_loading_c_impl(context: &mut ContextType) {
 
         for _i in 0..3 {
             let lib = context
-                .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size)
+                .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size, 0)
                 .expect("load shared lib");
             size -= lib.consumed_size();
             offset += lib.consumed_size();
