@@ -30,6 +30,8 @@ pub enum Error {
     Sys(SysError),
     /// ckb_dlopen2 failed
     OpenFailed(isize),
+    /// Currently, only Data and Data1 are valid in load_by_data
+    InvalidHashTypeData,
 }
 
 impl From<SysError> for Error {
@@ -161,15 +163,36 @@ impl<T> CKBDLContext<T> {
             }
         }
     }
-
+    #[deprecated(
+        since = "0.10.0",
+        note = "Please use load_by_data or load_by_type_id instead"
+    )]
     pub fn load<'a>(&'a mut self, dep_cell_data_hash: &[u8]) -> Result<Library, Error> {
+        self.load_by_data(dep_cell_data_hash, ScriptHashType::Data)
+    }
+    ///
+    /// load library by data hash
+    ///
+    pub fn load_by_data<'a>(
+        &'a mut self,
+        dep_cell_data_hash: &[u8],
+        hash_type: ScriptHashType,
+    ) -> Result<Library, Error> {
+        // currently, we only have Data and Data1 with same logic.
+        // In the future hardfork, we might add more types and restrictions.
+        if hash_type != ScriptHashType::Data && hash_type != ScriptHashType::Data1 {
+            return Err(Error::InvalidHashTypeData);
+        }
         self.load_with_offset(
             dep_cell_data_hash,
             0,
             size_of::<CKBDLContext<T>>(),
-            ScriptHashType::Data,
+            hash_type,
         )
     }
+    ///
+    /// load library by type id
+    ///
     pub fn load_by_type_id<'a>(&'a mut self, type_id: &[u8]) -> Result<Library, Error> {
         self.load_with_offset(
             type_id,

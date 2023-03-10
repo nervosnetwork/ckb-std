@@ -3,7 +3,6 @@ use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
 use ckb_std::{
     ckb_constants::*, ckb_types::prelude::*, debug, error::SysError, high_level, syscalls,
-    ckb_types::core::ScriptHashType
 };
 use core::mem::size_of;
 
