@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
 use ckb_std::{
     ckb_constants::*, ckb_types::prelude::*, debug, error::SysError, high_level, syscalls,
+    ckb_types::core::ScriptHashType
 };
 use core::mem::size_of;
 
@@ -214,7 +215,7 @@ fn test_dynamic_loading_c_impl(context: &mut ContextType) {
 
         for _i in 0..3 {
             let lib = context
-                .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size, 0)
+                .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size, ScriptHashType::Data)
                 .expect("load shared lib");
             size -= lib.consumed_size();
             offset += lib.consumed_size();

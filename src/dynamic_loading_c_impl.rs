@@ -1,5 +1,6 @@
 use crate::debug;
 use crate::error::SysError;
+use ckb_types::core::ScriptHashType;
 use core::ffi::c_void;
 use core::marker::PhantomData;
 use core::mem::{size_of, zeroed};
@@ -123,7 +124,7 @@ impl<T> CKBDLContext<T> {
         dep_cell_data_hash: &[u8],
         offset: usize,
         size: usize,
-        hash_type: u8,
+        hash_type: ScriptHashType,
     ) -> Result<Library, Error> {
         if size_of::<Library>() > RISCV_PGSIZE || size < RISCV_PGSIZE {
             return Err(Error::ContextFailure);
@@ -132,7 +133,10 @@ impl<T> CKBDLContext<T> {
         if ((size >> RISCV_PGSIZE_SHIFT) << RISCV_PGSIZE_SHIFT) != size {
             return Err(Error::InvalidAlign);
         }
-
+        let from_type_id = match hash_type {
+            ScriptHashType::Type => 1,
+            _ => 0,
+        };
         unsafe {
             let mut handle: *const c_void = null();
             let mut consumed_size: usize = 0;
@@ -141,7 +145,7 @@ impl<T> CKBDLContext<T> {
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
             let code = ckb_dlopen2(
                 dep_cell_data_hash.as_ptr(),
-                hash_type,
+                from_type_id,
                 aligned_addr,
                 aligned_size,
                 &mut handle as *mut *const c_void,
@@ -159,9 +163,19 @@ impl<T> CKBDLContext<T> {
     }
 
     pub fn load<'a>(&'a mut self, dep_cell_data_hash: &[u8]) -> Result<Library, Error> {
-        self.load_with_offset(dep_cell_data_hash, 0, size_of::<CKBDLContext<T>>(), 0)
+        self.load_with_offset(
+            dep_cell_data_hash,
+            0,
+            size_of::<CKBDLContext<T>>(),
+            ScriptHashType::Data,
+        )
     }
     pub fn load_by_type_id<'a>(&'a mut self, type_id: &[u8]) -> Result<Library, Error> {
-        self.load_with_offset(type_id, 0, size_of::<CKBDLContext<T>>(), 1)
+        self.load_with_offset(
+            type_id,
+            0,
+            size_of::<CKBDLContext<T>>(),
+            ScriptHashType::Type,
+        )
     }
 }
