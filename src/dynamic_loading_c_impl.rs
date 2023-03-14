@@ -30,8 +30,6 @@ pub enum Error {
     Sys(SysError),
     /// ckb_dlopen2 failed
     OpenFailed(isize),
-    /// Currently, only Data and Data1 are valid in load_by_data
-    InvalidHashTypeData,
 }
 
 impl From<SysError> for Error {
@@ -123,10 +121,10 @@ impl<T> CKBDLContext<T> {
     }
     pub fn load_with_offset<'a>(
         &'a mut self,
-        dep_cell_data_hash: &[u8],
+        code_hash: &[u8],
+        hash_type: ScriptHashType,
         offset: usize,
         size: usize,
-        hash_type: ScriptHashType,
     ) -> Result<Library, Error> {
         if size_of::<Library>() > RISCV_PGSIZE || size < RISCV_PGSIZE {
             return Err(Error::ContextFailure);
@@ -146,7 +144,7 @@ impl<T> CKBDLContext<T> {
             let aligned_size = size;
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
             let code = ckb_dlopen2(
-                dep_cell_data_hash.as_ptr(),
+                code_hash.as_ptr(),
                 from_type_id,
                 aligned_addr,
                 aligned_size,
@@ -163,42 +161,18 @@ impl<T> CKBDLContext<T> {
             }
         }
     }
-    #[deprecated(
-        since = "0.10.0",
-        note = "Please use load_by_data or load_by_type_id instead"
-    )]
+    #[deprecated(since = "0.11.0", note = "Please use load_by instead")]
     pub fn load<'a>(&'a mut self, dep_cell_data_hash: &[u8]) -> Result<Library, Error> {
-        self.load_by_data(dep_cell_data_hash, ScriptHashType::Data)
+        self.load_by(dep_cell_data_hash, ScriptHashType::Data)
     }
     ///
-    /// load library by data hash
+    /// load library via hash type
     ///
-    pub fn load_by_data<'a>(
+    pub fn load_by<'a>(
         &'a mut self,
-        dep_cell_data_hash: &[u8],
+        code_hash: &[u8],
         hash_type: ScriptHashType,
     ) -> Result<Library, Error> {
-        // currently, we only have Data and Data1 with same logic.
-        // In the future hardfork, we might add more types and restrictions.
-        if hash_type != ScriptHashType::Data && hash_type != ScriptHashType::Data1 {
-            return Err(Error::InvalidHashTypeData);
-        }
-        self.load_with_offset(
-            dep_cell_data_hash,
-            0,
-            size_of::<CKBDLContext<T>>(),
-            hash_type,
-        )
-    }
-    ///
-    /// load library by type id
-    ///
-    pub fn load_by_type_id<'a>(&'a mut self, type_id: &[u8]) -> Result<Library, Error> {
-        self.load_with_offset(
-            type_id,
-            0,
-            size_of::<CKBDLContext<T>>(),
-            ScriptHashType::Type,
-        )
+        self.load_with_offset(code_hash, hash_type, 0, size_of::<CKBDLContext<T>>())
     }
 }
