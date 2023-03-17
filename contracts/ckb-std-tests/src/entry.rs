@@ -1,8 +1,10 @@
 use alloc::vec;
 use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
+#[allow(unused_imports)]
 use ckb_std::{
     ckb_constants::*, ckb_types::prelude::*, debug, error::SysError, high_level, syscalls,
+    ckb_types::core::ScriptHashType
 };
 use core::mem::size_of;
 
@@ -144,6 +146,7 @@ type ContextTypeOld = dynamic_loading::CKBDLContext<[u8; 64 * 1024]>;
 #[cfg(target_arch = "riscv64")]
 fn test_dynamic_loading(context: &mut ContextTypeOld) {
     unsafe {
+        #[allow(deprecated)]
         let lib = context
             .load(&CODE_HASH_SHARED_LIB)
             .expect("load shared lib");
@@ -163,6 +166,7 @@ fn test_dynamic_loading(context: &mut ContextTypeOld) {
         let mut libs = Vec::new();
 
         for _i in 0..3 {
+            #[allow(deprecated)]
             let lib = context
                 .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size)
                 .expect("load shared lib");
@@ -193,6 +197,7 @@ type ContextType = dynamic_loading_c_impl::CKBDLContext<[u8; 64 * 1024]>;
 #[cfg(target_arch = "riscv64")]
 fn test_dynamic_loading_c_impl(context: &mut ContextType) {
     unsafe {
+        #[allow(deprecated)]
         let lib = context
             .load(&CODE_HASH_SHARED_LIB)
             .expect("load shared lib");
@@ -214,7 +219,7 @@ fn test_dynamic_loading_c_impl(context: &mut ContextType) {
 
         for _i in 0..3 {
             let lib = context
-                .load_with_offset(&CODE_HASH_SHARED_LIB, offset, size)
+                .load_with_offset(&CODE_HASH_SHARED_LIB, ScriptHashType::Data, offset, size)
                 .expect("load shared lib");
             size -= lib.consumed_size();
             offset += lib.consumed_size();
@@ -261,6 +266,7 @@ pub fn main() -> Result<(), Error> {
     #[cfg(target_arch = "riscv64")]
     unsafe {
         let mut context = ContextType::new();
+        #[allow(deprecated)]
         let mut old_context = ContextTypeOld::new();
 
         test_dynamic_loading(&mut old_context);

@@ -1,5 +1,6 @@
 use crate::debug;
 use crate::error::SysError;
+use ckb_types::core::ScriptHashType;
 use core::ffi::c_void;
 use core::marker::PhantomData;
 use core::mem::{size_of, zeroed};
@@ -120,7 +121,8 @@ impl<T> CKBDLContext<T> {
     }
     pub fn load_with_offset<'a>(
         &'a mut self,
-        dep_cell_data_hash: &[u8],
+        code_hash: &[u8],
+        hash_type: ScriptHashType,
         offset: usize,
         size: usize,
     ) -> Result<Library, Error> {
@@ -131,17 +133,19 @@ impl<T> CKBDLContext<T> {
         if ((size >> RISCV_PGSIZE_SHIFT) << RISCV_PGSIZE_SHIFT) != size {
             return Err(Error::InvalidAlign);
         }
-
+        let from_type_id = match hash_type {
+            ScriptHashType::Type => 1,
+            _ => 0,
+        };
         unsafe {
             let mut handle: *const c_void = null();
             let mut consumed_size: usize = 0;
-            let hash_type: u8 = 0;
             let mut library = Library::new();
             let aligned_size = size;
             let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
             let code = ckb_dlopen2(
-                dep_cell_data_hash.as_ptr(),
-                hash_type,
+                code_hash.as_ptr(),
+                from_type_id,
                 aligned_addr,
                 aligned_size,
                 &mut handle as *mut *const c_void,
@@ -157,8 +161,18 @@ impl<T> CKBDLContext<T> {
             }
         }
     }
-
+    #[deprecated(since = "0.11.0", note = "Please use load_by instead")]
     pub fn load<'a>(&'a mut self, dep_cell_data_hash: &[u8]) -> Result<Library, Error> {
-        self.load_with_offset(dep_cell_data_hash, 0, size_of::<CKBDLContext<T>>())
+        self.load_by(dep_cell_data_hash, ScriptHashType::Data)
+    }
+    ///
+    /// load library via hash type
+    ///
+    pub fn load_by<'a>(
+        &'a mut self,
+        code_hash: &[u8],
+        hash_type: ScriptHashType,
+    ) -> Result<Library, Error> {
+        self.load_with_offset(code_hash, hash_type, 0, size_of::<CKBDLContext<T>>())
     }
 }
