@@ -16,6 +16,7 @@ allocator = [ "buddy-alloc" ]
 simulator = [ "ckb-x64-simulator" ]
 dlopen-c = []
 ckb-os = []
+no-dummy-libc = []
 rustc-dep-of-std = ["alloc", "core", "compiler_builtins/rustc-dep-of-std", "buddy-alloc/rustc-dep-of-std"]
 
 [build-dependencies]

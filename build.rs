@@ -37,6 +37,10 @@ fn main() {
                 "ckb-os can only be enabled when compiling for riscv64*-unknown-ckb-elf targets!"
             );
         }
+    }
+
+    if target_arch == "riscv64" && target_os == "ckb" && (!cfg!(feature = "no-linking-dummy-libc"))
+    {
         println!("cargo:rustc-link-lib=dummylibc");
     }
 }
