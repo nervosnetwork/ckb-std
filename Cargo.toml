@@ -11,11 +11,11 @@ exclude = ["docs"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["allocator", "ckb-types", "dlopen-c"]
+default = ["allocator", "ckb-types", "dlopen-c", "dummy-libc"]
 allocator = [ "buddy-alloc" ]
 simulator = [ "ckb-x64-simulator" ]
 dlopen-c = []
-no-dummy-libc = []
+dummy-libc = []
 rustc-dep-of-std = ["alloc", "core", "compiler_builtins/rustc-dep-of-std", "buddy-alloc/rustc-dep-of-std"]
 
 [build-dependencies]
