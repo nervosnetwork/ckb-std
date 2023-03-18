@@ -31,8 +31,7 @@ fn main() {
             .compile("dl-c-impl");
     }
 
-    if target_arch == "riscv64" && target_os == "ckb" && (!cfg!(feature = "no-linking-dummy-libc"))
-    {
+    if target_arch == "riscv64" && target_os == "ckb" && (!cfg!(feature = "no-dummy-libc")) {
         println!("cargo:rustc-link-lib=dummylibc");
     }
 }
