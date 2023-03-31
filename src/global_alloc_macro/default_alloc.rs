@@ -32,7 +32,7 @@ macro_rules! default_alloc {
                 _FIXED_BLOCK_HEAP.as_ptr(),
                 $fixed_block_heap_size,
             );
-            let buddy_param = $crate::buddy_alloc::BuddyAllocParam::new(
+            let buddy_param = $crate::buddy_alloc::BuddyAllocParam::new_with_zero_filled(
                 _BUDDY_HEAP.as_ptr(),
                 $heap_size,
                 $min_block_size,
