@@ -10,9 +10,9 @@ checksum = "88756126a7634ad9c13ed0a6da9aa3376a6b7000eb5fcdbb89d153196326bbcd"
 
 [[package]]
 name = "buddy-alloc"
-version = "0.4.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3240a4cb09cf0da6a51641bd40ce90e96ea6065e3a1adc46434029254bcc2d09"
+checksum = "c6aa666383df80e31d5e162998ed05880695bb377f2a98210978e586f006aaec"
 
 [[package]]
 name = "cc"
@@ -38,7 +38,7 @@ dependencies = [
 
 [[package]]
 name = "ckb-std"
-version = "0.11.0"
+version = "0.12.1"
 dependencies = [
  "buddy-alloc",
  "cc",
