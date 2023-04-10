@@ -4,6 +4,7 @@ use crate::error::SysError;
 use crate::syscalls;
 use alloc::{vec, vec::Vec};
 use ckb_types::{core::ScriptHashType, packed::*, prelude::*};
+use core::convert::Infallible;
 use core::ffi::CStr;
 
 /// Default buffer size
@@ -604,12 +605,18 @@ pub fn exec_cell(
     offset: u32,
     length: u32,
     argv: &[&CStr],
-) -> Result<u64, SysError> {
+) -> Result<Infallible, SysError> {
     #[cfg(not(feature = "simulator"))]
     {
         let index = look_for_dep_with_hash2(code_hash, hash_type)?;
         let bounds: usize = (offset as usize) << 32 | (length as usize);
-        Ok(syscalls::exec(index, Source::CellDep, 0, bounds, argv))
+        let ret = syscalls::exec(index, Source::CellDep, 0, bounds, argv);
+        let err = match ret {
+            1 => SysError::IndexOutOfBound,
+            2 => SysError::ItemMissing,
+            r => SysError::Unknown(r)
+        };
+        Err(err)
     }
     #[cfg(feature = "simulator")]
     syscalls::exec_cell(code_hash, hash_type, offset, length, argv)

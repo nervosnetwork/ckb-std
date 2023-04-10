@@ -2,6 +2,7 @@ use crate::{ckb_constants::*, error::SysError};
 use ckb_types::core::ScriptHashType;
 use ckb_x64_simulator as sim;
 use core::ffi::{c_void, CStr};
+use core::convert::Infallible;
 
 pub fn exit(code: i8) -> ! {
     sim::ckb_exit(code);
@@ -243,18 +244,19 @@ pub fn exec_cell(
     offset: u32,
     length: u32,
     argv: &[&CStr],
-) -> Result<u64, SysError> {
+) -> Result<Infallible, SysError> {
     let argc = argv.len();
     let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
     for (idx, cstr) in argv.into_iter().enumerate() {
         argv_ptr[idx] = cstr.to_bytes_with_nul().as_ptr();
     }
-    Ok(sim::ckb_exec_cell(
+    let ret = sim::ckb_exec_cell(
         code_hash.as_ptr(),
         hash_type as u8,
         offset,
         length,
         argc as i32,
         argv_ptr.as_ptr(),
-    ) as i64 as u64)
+    );
+    Err(SysError::Unknown(ret as u64))
 }
