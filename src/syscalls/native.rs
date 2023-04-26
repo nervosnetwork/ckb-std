@@ -592,6 +592,7 @@ pub struct SpawnArgs {
 
 /// The Spawn and the latter two syscalls: Get Memory Limit and Set Content
 /// together, implement a way to call another CKB Script in a CKB Script.
+/// Note: available after ckb2023.
 ///
 /// Returns success or a syscall error.
 pub fn spawn(index: usize, source: Source, bounds: usize, argv: &[&CStr], spgs: &SpawnArgs) -> u64 {
@@ -615,6 +616,7 @@ pub fn spawn(index: usize, source: Source, bounds: usize, argv: &[&CStr], spgs: 
 }
 
 /// Get memory limit.
+/// Note: available after ckb2023.
 ///
 /// Returns a number between 1 and 8, representing 0.5 to 4M of memory.
 pub fn get_memory_limit() -> u64 {
@@ -622,6 +624,7 @@ pub fn get_memory_limit() -> u64 {
 }
 
 /// Set content.
+/// Note: available after ckb2023.
 ///
 /// Return the actual written data length or a syscall error.
 pub fn set_content(buf: &[u8]) -> Result<u64, SysError> {
