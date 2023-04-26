@@ -82,3 +82,17 @@ checksum = "edc8276c02a006bddad7d1c28c1a88f30421e1b5f0ba0ca96ceb8077c7d20c01"
 dependencies = [
  "cfg-if",
 ]
+
+[[package]]
+name = "spawn-callee"
+version = "0.1.0"
+dependencies = [
+ "ckb-std",
+]
+
+[[package]]
+name = "spawn-caller"
+version = "0.1.0"
+dependencies = [
+ "ckb-std",
+]

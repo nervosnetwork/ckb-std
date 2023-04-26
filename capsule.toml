@@ -22,3 +22,15 @@ template_type = "Rust"
 [[contracts]]
 name = "exec-caller-by-code-hash"
 template_type = "Rust"
+
+[[contracts]]
+name = "spawn-caller"
+template_type = "Rust"
+
+[[contracts]]
+name = "spawn-caller"
+template_type = "Rust"
+
+[[contracts]]
+name = "spawn-callee"
+template_type = "Rust"
