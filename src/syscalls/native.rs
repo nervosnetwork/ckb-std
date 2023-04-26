@@ -1,4 +1,5 @@
 use crate::{ckb_constants::*, error::SysError};
+#[cfg(target_arch = "riscv64")]
 use core::arch::asm;
 use core::ffi::CStr;
 
@@ -518,10 +519,9 @@ pub fn load_cell_code(
 /// This syscall consumes 500 cycles.
 pub fn vm_version() -> Result<u64, SysError> {
     let ret = unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_VM_VERSION) };
-    if ret == 1 {
-        Ok(1)
-    } else {
-        Err(SysError::Unknown(ret))
+    match ret {
+        1 | 2 => Ok(ret),
+        _ => Err(SysError::Unknown(ret)),
     }
 }
 
@@ -580,4 +580,64 @@ pub fn exec(
             SYS_EXEC,
         )
     }
+}
+
+#[repr(C)]
+pub struct SpawnArgs {
+    pub memory_limit: u64,
+    pub exit_code: *mut i8,
+    pub content: *mut u8,
+    pub content_length: *mut u64,
+}
+
+/// The Spawn and the latter two syscalls: Get Memory Limit and Set Content
+/// together, implement a way to call another CKB Script in a CKB Script.
+///
+/// Returns success or a syscall error.
+pub fn spawn(index: usize, source: Source, bounds: usize, argv: &[&CStr], spgs: &SpawnArgs) -> u64 {
+    let argc = argv.len();
+    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
+    for (idx, cstr) in argv.into_iter().enumerate() {
+        argv_ptr[idx] = cstr.as_ptr();
+    }
+    unsafe {
+        syscall(
+            index as u64,
+            source as u64,
+            bounds as u64,
+            argc as u64,
+            argv_ptr.as_ptr() as u64,
+            spgs as *const SpawnArgs as u64,
+            0,
+            SYS_SPAWN,
+        )
+    }
+}
+
+/// Get memory limit.
+///
+/// Returns a number between 1 and 8, representing 0.5 to 4M of memory.
+pub fn get_memory_limit() -> u64 {
+    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_GET_MEMORY_LIMIT) }
+}
+
+/// Set content.
+///
+/// Return the actual written data length or a syscall error.
+pub fn set_content(buf: &[u8]) -> Result<u64, SysError> {
+    let mut len = buf.len() as u64;
+    let len_ptr: *mut u64 = &mut len;
+    unsafe {
+        syscall(
+            buf.as_ptr() as u64,
+            len_ptr as u64,
+            0,
+            0,
+            0,
+            0,
+            0,
+            SYS_SET_CONTENT,
+        )
+    };
+    Ok(len)
 }

@@ -1,9 +1,8 @@
 [workspace]
-members = ["ckb-std-tests", "exec-callee", "exec-caller", "exec-caller-by-code-hash"]
+members = ["ckb-std-tests", "exec-callee", "exec-caller", "exec-caller-by-code-hash", "spawn-caller", "spawn-callee"]
 
 [profile.release]
 overflow-checks = true
 opt-level = 's'
 lto = true
 codegen-units = 1
-
