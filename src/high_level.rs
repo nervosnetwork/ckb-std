@@ -614,7 +614,7 @@ pub fn exec_cell(
         let err = match ret {
             1 => SysError::IndexOutOfBound,
             2 => SysError::ItemMissing,
-            r => SysError::Unknown(r)
+            r => SysError::Unknown(r),
         };
         Err(err)
     }
