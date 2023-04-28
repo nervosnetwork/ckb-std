@@ -14,10 +14,13 @@
 extern crate alloc;
 
 pub mod ckb_constants;
+#[doc(hidden)]
 pub mod debug;
+#[doc(hidden)]
 pub mod entry;
 pub mod env;
 pub mod error;
+#[doc(hidden)]
 pub mod global_alloc_macro;
 #[cfg(feature = "ckb-types")]
 pub mod high_level;
