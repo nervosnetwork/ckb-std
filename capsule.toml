@@ -1,11 +1,6 @@
-
-# # path of rust contracts workspace directory,
-# # a `Cargo.toml` file is expected under the directory.
-toolchain = "nightly-2022-08-01"
-docker_image = "thewawar/ckb-capsule:2022-08-01"
-
+# We are actually using unreleased features in capsule. Use 0.10 after it's released.
 # capsule version
-version = "0.8.0"
+version = "0.9.1"
 # path of deployment config file
 deployment = "deployment.toml"
 

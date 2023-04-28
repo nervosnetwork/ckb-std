@@ -20,6 +20,6 @@ jobs:
     - name: Run integration
       run: make integration-in-docker
     - name: Install capsule
-      run: cargo install ckb-capsule --version 0.8.0
+      run: cargo install ckb-capsule --git https://github.com/nervosnetwork/capsule --rev ccd6a7c39f0e
     - name: Run tests
       run: make test
