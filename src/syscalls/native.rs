@@ -537,7 +537,7 @@ pub fn current_cycles() -> u64 {
 /// by those of the new program. It's cycles consumption consists of two parts:
 ///
 /// - Fixed 500 cycles
-/// - Initial Loading Cycles (https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0014-vm-cycle-limits/0014-vm-cycle-limits.md)
+/// - Initial Loading Cycles (<https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0014-vm-cycle-limits/0014-vm-cycle-limits.md>)
 ///
 /// The arguments used here are:
 ///

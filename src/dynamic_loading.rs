@@ -61,10 +61,10 @@
 //! ```
 //!
 //! The core part of this module is inspired from
-//! https://github.com/nervosnetwork/ckb-c-stdlib/blob/eae8c4c974ce68ca8062521747a16e8e59de755f/ckb_dlfcn.h
+//! <https://github.com/nervosnetwork/ckb-c-stdlib/blob/eae8c4c974ce68ca8062521747a16e8e59de755f/ckb_dlfcn.h>
 //!
 //! The ELF parsing code is inspired from
-//! https://github.com/riscv/riscv-pk/blob/master/pk/elf.h
+//! <https://github.com/riscv/riscv-pk/blob/master/pk/elf.h>
 //! original code is in BSD license.
 
 use crate::ckb_constants::Source;
