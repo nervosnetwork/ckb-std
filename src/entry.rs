@@ -50,12 +50,6 @@ macro_rules! entry {
             "ecall",
         );
 
-        /// Fix symbol missing
-        #[no_mangle]
-        pub extern "C" fn abort() {
-            panic!("abort!");
-        }
-
         #[panic_handler]
         fn panic_handler(panic_info: &core::panic::PanicInfo) -> ! {
             #[cfg(debug_assertions)]
