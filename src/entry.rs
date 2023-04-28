@@ -1,4 +1,4 @@
-/// Define program entry point (`_start` function) and lang items (panic handler, oom handler, etc.).
+/// Define program entry point (`_start` function) and lang items (panic handler, etc.).
 ///
 /// # Examples
 ///
@@ -15,11 +15,6 @@
 macro_rules! entry {
     ($main:path) => {
         extern crate alloc;
-
-        #[alloc_error_handler]
-        fn oom_handler(_layout: alloc::alloc::Layout) -> ! {
-            panic!("Out of memory")
-        }
 
         #[cfg(not(target_arch = "riscv64"))]
         #[no_mangle]
@@ -55,9 +50,6 @@ macro_rules! entry {
             "ecall",
         );
 
-        #[lang = "eh_personality"]
-        extern "C" fn eh_personality() {}
-
         /// Fix symbol missing
         #[no_mangle]
         pub extern "C" fn abort() {
@@ -72,13 +64,13 @@ macro_rules! entry {
 
                 let mut s = alloc::string::String::new();
                 if let Some(p) = panic_info.payload().downcast_ref::<&str>() {
-                    s.push_str(&format!("panic occurred: {:?}", p));
+                    s.push_str(&format!("panic occurred: {}", p));
                 } else {
                     s.push_str(&format!("panic occurred:"));
                 }
-                if let Some(m) = panic_info.message() {
-                    s.push_str(&format!(" {:?}", m));
-                }
+                // if let Some(m) = panic_info.message() {
+                //     s.push_str(&format!(" {:?}", m));
+                // }
                 if let Some(location) = panic_info.location() {
                     s.push_str(&format!(
                         ", in file {}:{}",
