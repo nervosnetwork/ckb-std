@@ -16,8 +16,11 @@ pub const SYS_LOAD_INPUT_BY_FIELD: u64 = 2083;
 pub const SYS_LOAD_CELL_DATA_AS_CODE: u64 = 2091;
 pub const SYS_LOAD_CELL_DATA: u64 = 2092;
 pub const SYS_DEBUG: u64 = 2177;
+#[cfg(feature = "ckb2023")]
 pub const SYS_SPAWN: u64 = 2101;
+#[cfg(feature = "ckb2023")]
 pub const SYS_GET_MEMORY_LIMIT: u64 = 2102;
+#[cfg(feature = "ckb2023")]
 pub const SYS_SET_CONTENT: u64 = 2103;
 
 pub const CKB_SUCCESS: u64 = 0;
