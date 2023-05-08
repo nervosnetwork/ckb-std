@@ -8,6 +8,9 @@ repository = "https://github.com/nervosnetwork/ckb-std"
 description = "This library contains serveral modules help you write CKB contract with Rust"
 exclude = ["docs"]
 
+[package.metadata.docs.rs]
+all-features = true
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
@@ -17,6 +20,7 @@ simulator = [ "ckb-x64-simulator" ]
 dlopen-c = []
 dummy-libc = []
 rustc-dep-of-std = ["alloc", "core", "compiler_builtins/rustc-dep-of-std", "buddy-alloc/rustc-dep-of-std"]
+ckb2023 = []
 
 [build-dependencies]
 cc = "1.0"

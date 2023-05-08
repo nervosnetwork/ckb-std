@@ -633,7 +633,8 @@ pub fn exec_cell(
 ///        Each tick represents an additional 0.5M of memory.
 /// * `content` - a buffer to saving the output by sub script.
 ///        Note the size of content will be shrinked after call.
-pub fn spawn(
+#[cfg(features = "ckb2023")]
+pub fn spawn_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
     argv: &[&CStr],
