@@ -14,7 +14,7 @@ all-features = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["allocator", "ckb-types", "dlopen-c", "dummy-libc", "ckb2023"]
+default = ["allocator", "ckb-types", "dlopen-c", "dummy-libc"]
 allocator = [ "buddy-alloc" ]
 simulator = [ "ckb-x64-simulator" ]
 dlopen-c = []
