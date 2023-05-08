@@ -587,6 +587,8 @@ pub struct SpawnArgs {
     pub memory_limit: u64,
     pub exit_code: *mut i8,
     pub content: *mut u8,
+    /// Before calling spawn, content_length should be the length of content;
+    /// After calling spawn, content_length will be the real size of the returned data.
     pub content_length: *mut u64,
 }
 
