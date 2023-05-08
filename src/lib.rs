@@ -9,6 +9,7 @@
 //! * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust
 
 #![no_std]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 #[cfg(not(feature = "rustc-dep-of-std"))]
 extern crate alloc;
