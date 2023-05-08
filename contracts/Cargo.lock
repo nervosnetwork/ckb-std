@@ -96,3 +96,10 @@ version = "0.1.0"
 dependencies = [
  "ckb-std",
 ]
+
+[[package]]
+name = "spawn-caller-by-code-hash"
+version = "0.1.0"
+dependencies = [
+ "ckb-std",
+]

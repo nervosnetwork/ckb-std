@@ -621,3 +621,44 @@ pub fn exec_cell(
     #[cfg(feature = "simulator")]
     syscalls::exec_cell(code_hash, hash_type, offset, length, argv)
 }
+
+/// Spawn a cell in cell dep.
+///
+/// # Arguments
+///
+/// * `code_hash` - the code hash to search cell in cell deps.
+/// * `hash_type` - the hash type to search cell in cell deps.
+/// * `argv` - arguments to sub script.
+/// * `memory_limit` - a number between 1 and 8.
+///        Each tick represents an additional 0.5M of memory.
+/// * `content` - a buffer to saving the output by sub script.
+///        Note the size of content will be shrinked after call.
+pub fn spawn(
+    code_hash: &[u8],
+    hash_type: ScriptHashType,
+    argv: &[&CStr],
+    memory_limit: u64,
+    content: &mut Vec<u8>,
+) -> Result<i8, SysError> {
+    let index = look_for_dep_with_hash2(code_hash, hash_type)?;
+    let mut content_length = content.len() as u64;
+    let mut exit_code = 0i8;
+    let spgs = syscalls::SpawnArgs {
+        memory_limit,
+        exit_code: &mut exit_code as *mut i8,
+        content: content.as_mut_ptr(),
+        content_length: &mut content_length as *mut u64,
+    };
+    let ret = syscalls::spawn(index, Source::CellDep, 0, argv, &spgs);
+    match ret {
+        0 => {
+            content.resize(content_length as usize, 0);
+            Ok(exit_code)
+        }
+        1 => Err(SysError::IndexOutOfBound),
+        2 => Err(SysError::ItemMissing),
+        3 => Err(SysError::LengthNotEnough(content.len())),
+        4 => Err(SysError::Encoding),
+        r => Err(SysError::Unknown(r)),
+    }
+}
