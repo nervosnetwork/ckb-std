@@ -28,7 +28,7 @@ name = "spawn-caller"
 template_type = "Rust"
 
 [[contracts]]
-name = "spawn-caller"
+name = "spawn-caller-by-code-hash"
 template_type = "Rust"
 
 [[contracts]]
