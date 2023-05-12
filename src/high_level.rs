@@ -7,8 +7,11 @@ use ckb_types::{core::ScriptHashType, packed::*, prelude::*};
 use core::convert::Infallible;
 use core::ffi::CStr;
 
-/// Default buffer size
-pub const BUF_SIZE: usize = 1024;
+/// Default buffer size, it is used to load data from syscall.
+/// The default value is set to 256, which will be enough for most cases:
+/// * load a `Script`, the typical size is 73 ~ 86
+/// * load a `CellOutput`, the typical size is 97 ~ 195
+pub const BUF_SIZE: usize = 256;
 
 /// Load tx hash
 ///
@@ -103,7 +106,7 @@ pub fn load_input(index: usize, source: Source) -> Result<CellInput, SysError> {
     syscalls::load_input(&mut data, 0, index, source)?;
 
     match CellInputReader::verify(&data, false) {
-        Ok(()) => Ok(CellInput::new_unchecked(data.as_slice().into())),
+        Ok(()) => Ok(CellInput::new_unchecked(data.to_vec().into())),
         Err(_err) => Err(SysError::Encoding),
     }
 }
@@ -127,7 +130,7 @@ pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
     syscalls::load_header(&mut data, 0, index, source)?;
 
     match HeaderReader::verify(&data, false) {
-        Ok(()) => Ok(Header::new_unchecked(data.as_slice().into())),
+        Ok(()) => Ok(Header::new_unchecked(data.to_vec().into())),
         Err(_err) => Err(SysError::Encoding),
     }
 }
@@ -445,11 +448,11 @@ pub fn load_input_since(index: usize, source: Source) -> Result<u64, SysError> {
 /// let out_point = load_input_out_point(index, source).unwrap();
 /// ```
 pub fn load_input_out_point(index: usize, source: Source) -> Result<OutPoint, SysError> {
-    let mut buf = [0u8; 36];
-    let len = syscalls::load_input_by_field(&mut buf, 0, index, source, InputField::OutPoint)?;
-    debug_assert_eq!(len, buf.len());
-    match OutPointReader::verify(&buf, false) {
-        Ok(()) => Ok(OutPoint::new_unchecked(buf.to_vec().into())),
+    let mut data = [0u8; OutPoint::TOTAL_SIZE];
+    syscalls::load_input_by_field(&mut data, 0, index, source, InputField::OutPoint)?;
+
+    match OutPointReader::verify(&data, false) {
+        Ok(()) => Ok(OutPoint::new_unchecked(data.to_vec().into())),
         Err(_err) => Err(SysError::Encoding),
     }
 }
