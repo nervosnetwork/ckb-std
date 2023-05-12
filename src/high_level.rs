@@ -99,10 +99,11 @@ pub fn load_cell(index: usize, source: Source) -> Result<CellOutput, SysError> {
 /// let input = load_input(0, Source::Input).unwrap();
 /// ```
 pub fn load_input(index: usize, source: Source) -> Result<CellInput, SysError> {
-    let data = load_data(|buf, offset| syscalls::load_input(buf, offset, index, source))?;
+    let mut data = [0u8; CellInput::TOTAL_SIZE];
+    syscalls::load_input(&mut data, 0, index, source)?;
 
     match CellInputReader::verify(&data, false) {
-        Ok(()) => Ok(CellInput::new_unchecked(data.into())),
+        Ok(()) => Ok(CellInput::new_unchecked(data.as_slice().into())),
         Err(_err) => Err(SysError::Encoding),
     }
 }
@@ -122,10 +123,11 @@ pub fn load_input(index: usize, source: Source) -> Result<CellInput, SysError> {
 /// let header = load_header(0, Source::HeaderDep).unwrap();
 /// ```
 pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
-    let data = load_data(|buf, offset| syscalls::load_header(buf, offset, index, source))?;
+    let mut data = [0u8; Header::TOTAL_SIZE];
+    syscalls::load_header(&mut data, 0, index, source)?;
 
     match HeaderReader::verify(&data, false) {
-        Ok(()) => Ok(Header::new_unchecked(data.into())),
+        Ok(()) => Ok(Header::new_unchecked(data.as_slice().into())),
         Err(_err) => Err(SysError::Encoding),
     }
 }
