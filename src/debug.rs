@@ -13,7 +13,7 @@
 /// [logger]
 /// filter = "info,ckb-script=debug"
 /// ```
-/// 
+///
 /// See the essay on more [Tips for Debugging CKB Scripts](https://docs.nervos.org/docs/essays/debug).
 ///
 /// # Example
