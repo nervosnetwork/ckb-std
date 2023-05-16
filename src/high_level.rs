@@ -130,6 +130,24 @@ pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
     }
 }
 
+/// Load witness
+///
+/// Return the witness or a syscall error
+///
+/// # Arguments
+///
+/// * `index` - index
+/// * `source` - source
+///
+/// # Example
+///
+/// ```
+/// let witness = load_witness(0, Source::Input).unwrap();
+/// ```
+pub fn load_witness(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
+    load_data(|buf, offset| syscalls::load_witness(buf, offset, index, source))
+}
+
 /// Load witness args
 ///
 /// Return the witness args or a syscall error
