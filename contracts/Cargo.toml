@@ -1,5 +1,5 @@
 [workspace]
-members = ["ckb-std-tests", "exec-callee", "exec-caller", "exec-caller-by-code-hash", "spawn-caller", "spawn-caller-by-code-hash", "spawn-callee"]
+members = ["ckb-std-tests", "exec-callee", "exec-callee-args", "exec-caller", "exec-caller-args", "exec-caller-by-code-hash", "spawn-caller", "spawn-caller-by-code-hash", "spawn-callee"]
 
 [profile.release]
 overflow-checks = true

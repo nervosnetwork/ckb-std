@@ -16,11 +16,19 @@ name = "exec-callee"
 template_type = "Rust"
 
 [[contracts]]
+name = "exec-callee-args"
+template_type = "Rust"
+
+[[contracts]]
 name = "exec-caller"
 template_type = "Rust"
 
 [[contracts]]
 name = "exec-caller-by-code-hash"
+template_type = "Rust"
+
+[[contracts]]
+name = "exec-caller-args"
 template_type = "Rust"
 
 [[contracts]]

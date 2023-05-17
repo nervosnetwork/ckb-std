@@ -61,7 +61,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "exec-callee-args"
+version = "0.1.0"
+dependencies = [
+ "ckb-std",
+]
+
+[[package]]
 name = "exec-caller"
+version = "0.1.0"
+dependencies = [
+ "ckb-std",
+]
+
+[[package]]
+name = "exec-caller-args"
 version = "0.1.0"
 dependencies = [
  "ckb-std",

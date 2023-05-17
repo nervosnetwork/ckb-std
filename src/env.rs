@@ -6,6 +6,8 @@ use core::{
     ops::Deref,
 };
 
+use alloc::vec::Vec;
+
 /// An argument passed to this program.
 #[repr(transparent)]
 pub struct Arg(*const c_char);
@@ -49,4 +51,13 @@ pub fn argv() -> &'static [Arg] {
 #[inline]
 pub unsafe fn set_argv(argv: &'static [Arg]) {
     ARGV = argv
+}
+
+/// A helper function to get the arguments in `Vec<u8>` format, normally passed via `high_level::exec_cell_with_args`
+pub fn args() -> Vec<u8> {
+    argv()
+        .iter()
+        .map(|arg| arg.to_bytes())
+        .collect::<Vec<_>>()
+        .join(&0)
 }

@@ -622,6 +622,47 @@ pub fn exec_cell(
     syscalls::exec_cell(code_hash, hash_type, offset, length, argv)
 }
 
+/// Locate a cell in cell deps and load the cell data for execution.
+///
+/// # Arguments
+///
+/// * `code_hash` - the code hash to search cell in cell deps.
+/// * `hash_type` - the hash type to search cell in cell deps.
+/// * `offset`    - the offset of the cell data to load.
+/// * `length`    - the length of the cell data to load, if the length is 0, load the whole cell data starting from offset.
+/// * `args`      - the arguments to pass to the execution.
+pub fn exec_cell_with_args(
+    code_hash: &[u8],
+    hash_type: ScriptHashType,
+    offset: u32,
+    length: u32,
+    args: &[u8],
+) -> Result<Infallible, SysError> {
+    let args_with_nul: Vec<Vec<u8>> = args
+        .split(|i| *i == 0)
+        .map(|slice| [slice, &[0]].concat().to_vec())
+        .collect();
+    let argv: Vec<&CStr> = args_with_nul
+        .iter()
+        .map(|bytes| CStr::from_bytes_with_nul(bytes).unwrap())
+        .collect();
+
+    #[cfg(not(feature = "simulator"))]
+    {
+        let index = look_for_dep_with_hash2(code_hash, hash_type)?;
+        let bounds: usize = (offset as usize) << 32 | (length as usize);
+        let ret = syscalls::exec(index, Source::CellDep, 0, bounds, &argv);
+        let err = match ret {
+            1 => SysError::IndexOutOfBound,
+            2 => SysError::ItemMissing,
+            r => SysError::Unknown(r),
+        };
+        Err(err)
+    }
+    #[cfg(feature = "simulator")]
+    syscalls::exec_cell(code_hash, hash_type, offset, length, &argv)
+}
+
 /// Spawn a cell in cell dep.
 ///
 /// # Arguments
