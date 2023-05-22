@@ -18,8 +18,6 @@ pub fn main() -> Result<(), Error> {
     let ret = high_level::exec_cell(
         &code_hash[..],
         ScriptHashType::Data1,
-        0,
-        0,
         &[arg1, arg2][..],
     )
     .unwrap();
