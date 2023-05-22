@@ -1,6 +1,5 @@
-# We are actually using unreleased features in capsule. Use 0.10 after it's released.
 # capsule version
-version = "0.9.1"
+version = "0.10.0"
 # path of deployment config file
 deployment = "deployment.toml"
 

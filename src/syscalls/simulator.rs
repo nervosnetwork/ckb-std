@@ -241,8 +241,6 @@ pub fn exec(
 pub fn exec_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
-    offset: u32,
-    length: u32,
     argv: &[&CStr],
 ) -> Result<Infallible, SysError> {
     let argc = argv.len();
@@ -253,8 +251,8 @@ pub fn exec_cell(
     let ret = sim::ckb_exec_cell(
         code_hash.as_ptr(),
         hash_type as u8,
-        offset,
-        length,
+        0,
+        0,
         argc as i32,
         argv_ptr.as_ptr(),
     );

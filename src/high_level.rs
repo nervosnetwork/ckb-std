@@ -625,15 +625,12 @@ pub fn look_for_dep_with_data_hash(data_hash: &[u8]) -> Result<usize, SysError> 
 pub fn exec_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
-    offset: u32,
-    length: u32,
     argv: &[&CStr],
 ) -> Result<Infallible, SysError> {
     #[cfg(not(feature = "simulator"))]
     {
         let index = look_for_dep_with_hash2(code_hash, hash_type)?;
-        let bounds: usize = (offset as usize) << 32 | (length as usize);
-        let ret = syscalls::exec(index, Source::CellDep, 0, bounds, argv);
+        let ret = syscalls::exec(index, Source::CellDep, 0, 0, argv);
         let err = match ret {
             1 => SysError::IndexOutOfBound,
             2 => SysError::ItemMissing,
@@ -642,7 +639,7 @@ pub fn exec_cell(
         Err(err)
     }
     #[cfg(feature = "simulator")]
-    syscalls::exec_cell(code_hash, hash_type, offset, length, argv)
+    syscalls::exec_cell(code_hash, hash_type, argv)
 }
 
 /// Spawn a cell in cell dep.
