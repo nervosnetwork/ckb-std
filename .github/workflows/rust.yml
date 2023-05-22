@@ -20,6 +20,6 @@ jobs:
     - name: Check example
       run: cross check --examples
     - name: Install capsule
-      run: cargo install ckb-capsule --git https://github.com/nervosnetwork/capsule --rev ccd6a7c39f0e
+      run: cargo install ckb-capsule --git https://github.com/nervosnetwork/capsule --rev 5c1b2ce
     - name: Run tests
       run: make test
