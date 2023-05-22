@@ -2,10 +2,11 @@ use crate::ckb_constants::*;
 use crate::debug;
 use crate::error::SysError;
 use crate::syscalls;
-use alloc::{vec, vec::Vec};
+use alloc::{ffi::CString, string::String, vec, vec::Vec};
 use ckb_types::{core::ScriptHashType, packed::*, prelude::*};
 use core::convert::Infallible;
 use core::ffi::CStr;
+use core::fmt::Write;
 
 /// Default buffer size, it is used to load data from syscall.
 /// The default value is set to 256, which will be enough for most cases:
@@ -616,12 +617,34 @@ pub fn look_for_dep_with_data_hash(data_hash: &[u8]) -> Result<usize, SysError> 
     look_for_dep_with_hash2(data_hash, ScriptHashType::Data)
 }
 
+pub fn encode_hex(data: &[u8]) -> CString {
+    let mut s = String::with_capacity(data.len() * 2);
+    for &b in data {
+        write!(&mut s, "{:02x}", b).unwrap();
+    }
+    CString::new(s).unwrap()
+}
+
+pub fn decode_hex(data: &CStr) -> Vec<u8> {
+    let data = data.to_str().unwrap();
+    (0..data.len())
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&data[i..i + 2], 16).unwrap())
+        .collect()
+}
+
 /// Exec a cell in cell dep.
 ///
 /// # Arguments
 ///
 /// * `code_hash` - the code hash to search cell in cell deps.
 /// * `hash_type` - the hash type to search cell in cell deps.
+/// * `argv` - subprocess arguments. In most cases two types of parameters can be accepted:
+///            - if the parameter you want to pass can be represented by a string:
+///              - CStr::from_bytes_with_nul(b"arg0\0").unwrap();
+///              - CString::new("arg0").unwrap().as_c_str();
+///            - if you want to pass a piece of bytes data:
+///              - high_level::encode_hex(&vec![0xff, 0xfe, 0xfd]);
 pub fn exec_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
@@ -648,11 +671,16 @@ pub fn exec_cell(
 ///
 /// * `code_hash` - the code hash to search cell in cell deps.
 /// * `hash_type` - the hash type to search cell in cell deps.
-/// * `argv` - arguments to sub script.
+/// * `argv` - subprocess arguments. In most cases two types of parameters can be accepted:
+///            - if the parameter you want to pass can be represented by a string:
+///              - CStr::from_bytes_with_nul(b"arg0\0").unwrap();
+///              - CString::new("arg0").unwrap().as_c_str();
+///            - if you want to pass a piece of bytes data:
+///              - high_level::encode_hex(&vec![0xff, 0xfe, 0xfd]);
 /// * `memory_limit` - a number between 1 and 8.
-///        Each tick represents an additional 0.5M of memory.
+///                  - note each tick represents an additional 0.5M of memory.
 /// * `content` - a buffer to saving the output by sub script.
-///        Note the size of content will be shrinked after call.
+///             - note the size of content will be shrinked after call.
 #[cfg(feature = "ckb2023")]
 pub fn spawn_cell(
     code_hash: &[u8],
