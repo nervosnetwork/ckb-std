@@ -625,11 +625,14 @@ pub fn encode_hex(data: &[u8]) -> CString {
     CString::new(s).unwrap()
 }
 
-pub fn decode_hex(data: &CStr) -> Vec<u8> {
+pub fn decode_hex(data: &CStr) -> Result<Vec<u8>, SysError> {
     let data = data.to_str().unwrap();
+    if data.len() & 1 != 0 {
+        return Err(SysError::Encoding);
+    }
     (0..data.len())
         .step_by(2)
-        .map(|i| u8::from_str_radix(&data[i..i + 2], 16).unwrap())
+        .map(|i| u8::from_str_radix(&data[i..i + 2], 16).map_err(|_| SysError::Encoding))
         .collect()
 }
 
@@ -643,7 +646,7 @@ pub fn decode_hex(data: &CStr) -> Vec<u8> {
 ///            - if the parameter you want to pass can be represented by a string:
 ///              - CStr::from_bytes_with_nul(b"arg0\0").unwrap();
 ///              - CString::new("arg0").unwrap().as_c_str();
-///            - if you want to pass a piece of bytes data:
+///            - if you want to pass a piece of bytes data, you may encode it to hexadecimal string or other format:
 ///              - high_level::encode_hex(&vec![0xff, 0xfe, 0xfd]);
 pub fn exec_cell(
     code_hash: &[u8],
@@ -675,7 +678,7 @@ pub fn exec_cell(
 ///            - if the parameter you want to pass can be represented by a string:
 ///              - CStr::from_bytes_with_nul(b"arg0\0").unwrap();
 ///              - CString::new("arg0").unwrap().as_c_str();
-///            - if you want to pass a piece of bytes data:
+///            - if you want to pass a piece of bytes data, you may encode it to hexadecimal string or other format:
 ///              - high_level::encode_hex(&vec![0xff, 0xfe, 0xfd]);
 /// * `memory_limit` - a number between 1 and 8.
 ///                  - note each tick represents an additional 0.5M of memory.
