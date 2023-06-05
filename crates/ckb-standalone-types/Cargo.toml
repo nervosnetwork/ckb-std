@@ -1,0 +1,19 @@
+[package]
+name = "ckb-standalone-types"
+version = "0.1.2"
+authors = ["Nervos network"]
+edition = "2021"
+license = "MIT"
+description = "A standalone version of ckb-types"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["std"]
+std = ["molecule/std"]
+calc-hash = ["blake2b-ref"]
+
+[dependencies]
+cfg-if = "1.0"
+molecule = { version = "0.7", default-features = false }
+blake2b-ref = { version = "0.3.1", default-features = false, optional = true }

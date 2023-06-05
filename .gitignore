@@ -1,6 +1,7 @@
 /target
 /contracts/target
 /build/
+.vscode/
 **/*.rs.bk
 Cargo.lock
 !contracts/Cargo.lock
@@ -11,4 +12,3 @@ docs/*
 !docs/riscv64imac-unknown-none-elf/
 docs/riscv64imac-unknown-none-elf/*
 !docs/riscv64imac-unknown-none-elf/doc/
-
