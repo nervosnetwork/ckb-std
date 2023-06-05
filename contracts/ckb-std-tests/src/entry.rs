@@ -3,8 +3,8 @@ use alloc::vec::Vec;
 use blake2b_ref::{Blake2b, Blake2bBuilder};
 #[allow(unused_imports)]
 use ckb_std::{
-    ckb_constants::*, ckb_types::core::ScriptHashType, ckb_types::prelude::*, debug,
-    error::SysError, high_level, syscalls,
+    ckb_constants::*, ckb_types::core::ScriptHashType, ckb_types::packed, ckb_types::prelude::*,
+    debug, error::SysError, high_level, syscalls,
 };
 use core::mem::size_of;
 
@@ -140,6 +140,12 @@ fn test_query() {
     assert!(type_scripts.is_none());
 }
 
+fn test_calc_data_hash() {
+    let data = high_level::load_cell_data(0, Source::Output).unwrap();
+    let data_hash = packed::CellOutput::calc_data_hash(&data);
+    debug!("data hash {:?}", data_hash);
+}
+
 #[cfg(target_arch = "riscv64")]
 type ContextTypeOld = dynamic_loading::CKBDLContext<[u8; 64 * 1024]>;
 
@@ -262,6 +268,7 @@ pub fn main() -> Result<(), Error> {
     test_partial_load_tx_hash();
     test_high_level_apis();
     test_query();
+    test_calc_data_hash();
 
     #[cfg(target_arch = "riscv64")]
     unsafe {

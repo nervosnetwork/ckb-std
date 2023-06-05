@@ -37,6 +37,6 @@ default_alloc!(4 * 1024, 516 * 1024, 64)
 
 ### Examples
 
-Check `examples` and [tests](https://github.com/jjyr/ckb-std/blob/master/test/contract/src/main.rs) to learn how to use.
+Check `examples` and [tests](https://github.com/nervosnetwork/ckb-std/blob/master/contracts/ckb-std-tests) to learn how to use.
 
-See also [ckb-tool](https://github.com/jjyr/ckb-tool) which helps you write tests.
+See also [ckb-tool](https://github.com/nervosnetwork/capsule/tree/develop/crates/testtool) which helps you write tests.
