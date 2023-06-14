@@ -4,7 +4,7 @@ CC := riscv64-unknown-elf-gcc
 default: integration
 
 publish-crate:
-	cross publish --target ${TARGET}
+	cross publish -p ckb-standalone-types && cross publish -p ckb-std
 
 publish: publish-crate
 
