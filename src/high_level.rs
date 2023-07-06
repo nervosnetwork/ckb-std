@@ -704,7 +704,7 @@ pub fn spawn_cell(
     let ret = syscalls::spawn(index, Source::CellDep, 0, argv, &spgs);
     match ret {
         0 => {
-            content.resize(content_length as usize, 0);
+            content.truncate(content_length as usize);
             Ok(exit_code)
         }
         1 => Err(SysError::IndexOutOfBound),
