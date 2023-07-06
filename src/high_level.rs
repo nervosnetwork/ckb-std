@@ -711,6 +711,9 @@ pub fn spawn_cell(
         2 => Err(SysError::ItemMissing),
         3 => Err(SysError::LengthNotEnough(content.len())),
         4 => Err(SysError::Encoding),
+        5 => Err(SysError::SpawnExceededMaxContentLength),
+        6 => Err(SysError::SpawnWrongMemoryLimit),
+        7 => Err(SysError::SpawnExceededMaxPeakMemory),
         r => Err(SysError::Unknown(r)),
     }
 }
