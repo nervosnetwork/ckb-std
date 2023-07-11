@@ -9,6 +9,17 @@ pub enum SysError {
     LengthNotEnough(usize),
     /// Data encoding error
     Encoding,
+
+    #[cfg(feature = "ckb2023")]
+    /// Content Length must be less than 256K.
+    SpawnExceededMaxContentLength,
+    #[cfg(feature = "ckb2023")]
+    /// MemoryLimit is between 1 and 8.
+    SpawnWrongMemoryLimit,
+    #[cfg(feature = "ckb2023")]
+    /// There is a maximum call depth limit by peak memory.
+    SpawnExceededMaxPeakMemory,
+
     /// Unknown syscall error number
     Unknown(u64),
 }
