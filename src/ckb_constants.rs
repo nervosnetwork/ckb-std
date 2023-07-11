@@ -22,6 +22,8 @@ pub const SYS_SPAWN: u64 = 2101;
 pub const SYS_GET_MEMORY_LIMIT: u64 = 2102;
 #[cfg(feature = "ckb2023")]
 pub const SYS_SET_CONTENT: u64 = 2103;
+#[cfg(feature = "ckb2023")]
+pub const SYS_CURRENT_MEMORY: u64 = 2105;
 
 pub const CKB_SUCCESS: u64 = 0;
 #[derive(Eq, PartialEq, Debug, Clone, Copy)]

@@ -650,3 +650,12 @@ pub fn set_content(buf: &[u8]) -> Result<u64, SysError> {
     };
     Ok(len)
 }
+
+/// Get current memory.
+/// Note: available after ckb2023.
+///
+/// Returns the sum of the memory of all living vm instances.
+#[cfg(feature = "ckb2023")]
+pub fn current_memory() -> u64 {
+    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_CURRENT_MEMORY) }
+}
