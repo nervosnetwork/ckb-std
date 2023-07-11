@@ -659,3 +659,33 @@ pub fn set_content(buf: &[u8]) -> Result<u64, SysError> {
 pub fn current_memory() -> u64 {
     unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_CURRENT_MEMORY) }
 }
+
+/// Load extension field associated either with an input cell, a dep cell, or
+/// a header dep based on source and index value.
+///
+/// # Arguments
+///
+/// * `buf` - a writable buf used to receive the data
+/// * `offset` - offset
+/// * `index` - index of cell
+/// * `source` - source of cell
+///
+/// Note: available after ckb2023.
+#[cfg(feature = "ckb2023")]
+pub fn load_extension(
+    buf: &mut [u8],
+    offset: usize,
+    index: usize,
+    source: Source,
+) -> Result<usize, SysError> {
+    syscall_load(
+        buf.as_mut_ptr(),
+        buf.len(),
+        offset,
+        index as u64,
+        source as u64,
+        0,
+        0,
+        SYS_LOAD_EXTENSION,
+    )
+}
