@@ -27,8 +27,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "ckb-standalone-types"
-version = "0.1.5"
+name = "ckb-gen-types"
+version = "0.112.0-pre"
+source = "git+https://github.com/EthanYuan/ckb.git?branch=refactor-ckb-types#cb8d900ae3e13f408c5bd1ff47be93cb82b29a5d"
 dependencies = [
  "blake2b-ref",
  "cfg-if",
@@ -41,7 +42,7 @@ version = "0.14.3"
 dependencies = [
  "buddy-alloc",
  "cc",
- "ckb-standalone-types",
+ "ckb-gen-types",
 ]
 
 [[package]]
@@ -75,9 +76,9 @@ dependencies = [
 
 [[package]]
 name = "molecule"
-version = "0.7.3"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edc8276c02a006bddad7d1c28c1a88f30421e1b5f0ba0ca96ceb8077c7d20c01"
+checksum = "d4fd9767ab5e5f2ea40f71ff4c8bdb633c50509052e093c2fdd0e390a749dfa3"
 dependencies = [
  "cfg-if",
 ]

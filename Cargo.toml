@@ -43,5 +43,4 @@ core = { version = "1.0.0", optional = true, package = "rustc-std-workspace-core
 compiler_builtins = { version = "0.1.0", optional = true }
 
 [workspace]
-members = ["crates/ckb-standalone-types"]
 exclude = ["test"]
