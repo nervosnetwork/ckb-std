@@ -15,10 +15,6 @@ pub fn main() -> Result<(), Error> {
     let arg2 = CStr::from_bytes_with_nul("你好\0".as_bytes()).unwrap();
     let code_hash = load_script().unwrap().args().raw_data();
     ckb_std::debug!("code_hash: {:?}", code_hash);
-    high_level::exec_cell(
-        &code_hash[..],
-        ScriptHashType::Data1,
-        &[arg1, arg2][..],
-    )?;
+    high_level::exec_cell(&code_hash[..], ScriptHashType::Data1, &[arg1, arg2][..])?;
     unreachable!()
 }
