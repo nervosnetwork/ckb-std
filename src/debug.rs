@@ -3,8 +3,15 @@
 /// Output a debug message.
 ///
 /// This macro only compiled under debug build and does nothing in release build. To debug the release build,
-/// append the `--cfg debug_assertions` arguments to `cargo build`. For users of Capsule, the debug macro can
-/// be enabled in the release build by running `capsule build --release --debug-output`.
+/// include `--cfg debug_assertions` in the environment variable `RUSTFLAGS` before calling `cargo build`.
+/// For example:
+///
+/// ```
+/// RUSTFLAGS="--cfg debug_assertions" cargo build --release --target=riscv64imac-unknown-none-elf
+/// ```
+///
+/// For users of Capsule, the debug macro can be enabled in the release build by running
+/// `capsule build --release --debug-output`.
 ///
 /// Notice: to see the debug output, you must turn on `ckb_script` debugging log in the CKB node configuration
 /// like this:
