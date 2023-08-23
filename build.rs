@@ -7,7 +7,8 @@ fn main() {
     // ckb-std only supports riscv64 target arch
     // but we can still use cargo check under other archs
     if target_arch == "riscv64" && cfg!(feature = "dlopen-c") {
-        cc::Build::new()
+        let mut build = cc::Build::new();
+        build
             .file("dl-c-impl/lib.c")
             .static_flag(true)
             .flag("-O3")
@@ -24,11 +25,26 @@ fn main() {
             .flag("-Werror")
             .flag("-Wno-unused-parameter")
             .flag("-Wno-nonnull")
-            .define("__SHARED_LIBRARY__", None)
-            .flag("-Wno-nonnull-compare")
-            .flag("-nostartfiles")
-            .flag("-Wno-dangling-pointer")
-            .compile("dl-c-impl");
+            .define("__SHARED_LIBRARY__", None);
+
+        if cfg!(feature = "build-with-clang") {
+            let clang = match std::env::var_os("CLANG") {
+                Some(val) => val,
+                None => "clang-16".into(),
+            };
+
+            build
+                .compiler(clang)
+                .no_default_flags(true)
+                .flag("--target=riscv64")
+                .flag("-march=rv64imc_zba_zbb_zbc_zbs");
+        } else {
+            build
+                .flag("-nostartfiles")
+                .flag("-Wno-dangling-pointer")
+                .flag("-Wno-nonnull-compare");
+        }
+        build.compile("dl-c-impl");
     }
 
     if target_arch == "riscv64" && target_os == "ckb" && cfg!(feature = "dummy-libc") {

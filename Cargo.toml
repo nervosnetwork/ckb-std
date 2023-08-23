@@ -21,6 +21,7 @@ calc-hash = ["ckb-types/calc-hash"]
 allocator = ["buddy-alloc"]
 simulator = ["ckb-x64-simulator"]
 dlopen-c = []
+build-with-clang = []
 dummy-libc = []
 rustc-dep-of-std = [
     "alloc",
