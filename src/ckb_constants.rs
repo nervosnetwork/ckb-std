@@ -23,7 +23,7 @@ pub const SYS_GET_MEMORY_LIMIT: u64 = 2102;
 #[cfg(feature = "ckb2023")]
 pub const SYS_SET_CONTENT: u64 = 2103;
 #[cfg(feature = "ckb2023")]
-pub const SYS_LOAD_EXTENSION: u64 = 2104;
+pub const SYS_LOAD_BLOCK_EXTENSION: u64 = 2104;
 #[cfg(feature = "ckb2023")]
 pub const SYS_CURRENT_MEMORY: u64 = 2105;
 
