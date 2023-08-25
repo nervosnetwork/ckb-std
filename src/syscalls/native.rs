@@ -672,7 +672,7 @@ pub fn current_memory() -> u64 {
 ///
 /// Note: available after ckb2023.
 #[cfg(feature = "ckb2023")]
-pub fn load_extension(
+pub fn load_block_extension(
     buf: &mut [u8],
     offset: usize,
     index: usize,
@@ -686,6 +686,6 @@ pub fn load_extension(
         source as u64,
         0,
         0,
-        SYS_LOAD_EXTENSION,
+        SYS_LOAD_BLOCK_EXTENSION,
     )
 }
