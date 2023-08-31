@@ -33,17 +33,22 @@ fn main() {
                 None => "clang-16".into(),
             };
 
+            build.compiler(clang);
+        }
+
+        let compiler = build.get_compiler();
+        if compiler.is_like_clang() {
             build
-                .compiler(clang)
                 .no_default_flags(true)
                 .flag("--target=riscv64")
                 .flag("-march=rv64imc_zba_zbb_zbc_zbs");
-        } else {
+        } else if compiler.is_like_gnu() {
             build
                 .flag("-nostartfiles")
                 .flag("-Wno-dangling-pointer")
                 .flag("-Wno-nonnull-compare");
         }
+
         build.compile("dl-c-impl");
     }
 
