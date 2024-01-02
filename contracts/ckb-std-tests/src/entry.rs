@@ -105,10 +105,16 @@ fn test_high_level_apis() {
     assert_eq!(tx_hash, tx_hash2);
 
     let inputs_capacity = QueryIter::new(load_cell, Source::Input)
-        .map(|cell| cell.capacity().unpack())
+        .map(|cell| {
+            let capacity: u64 = cell.capacity().unpack();
+            capacity
+        })
         .sum::<u64>();
     let outputs_capacity = QueryIter::new(load_cell, Source::Output)
-        .map(|cell| cell.capacity().unpack())
+        .map(|cell| {
+            let capacity: u64 = cell.capacity().unpack();
+            capacity
+        })
         .sum::<u64>();
     assert_eq!(inputs_capacity, outputs_capacity);
 }
