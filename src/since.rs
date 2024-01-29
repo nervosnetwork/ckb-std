@@ -1,3 +1,5 @@
+use core::cmp::Ordering;
+
 /// Transaction input's since field
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Since(u64);
@@ -11,6 +13,37 @@ impl Since {
     const LOCK_BY_BLOCK_NUMBER_MASK: u64 = 0x0000_0000_0000_0000;
     const LOCK_BY_EPOCH_MASK: u64 = 0x2000_0000_0000_0000;
     const LOCK_BY_TIMESTAMP_MASK: u64 = 0x4000_0000_0000_0000;
+
+    pub fn from_block_number(number: u64, absolute: bool) -> Option<Self> {
+        if number & Self::FLAGS_MASK != 0 {
+            return None;
+        }
+        Some(Self::new(
+            number
+                | Self::LOCK_BY_BLOCK_NUMBER_MASK
+                | (if absolute { 0 } else { Self::LOCK_TYPE_FLAG }),
+        ))
+    }
+
+    pub fn from_timestamp(timestamp: u64, absolute: bool) -> Option<Self> {
+        if timestamp & Self::FLAGS_MASK != 0 {
+            return None;
+        }
+        Some(Self::new(
+            timestamp
+                | Self::LOCK_BY_TIMESTAMP_MASK
+                | (if absolute { 0 } else { Self::LOCK_TYPE_FLAG }),
+        ))
+    }
+
+    pub fn from_epoch(epoch: EpochNumberWithFraction, absolute: bool) -> Self {
+        debug_assert!(epoch.full_value() & Self::FLAGS_MASK == 0);
+        Self::new(
+            epoch.full_value()
+                | Self::LOCK_BY_EPOCH_MASK
+                | (if absolute { 0 } else { Self::LOCK_TYPE_FLAG }),
+        )
+    }
 
     pub fn new(v: u64) -> Self {
         Since(v)
@@ -49,6 +82,56 @@ impl Since {
             )),
             //0b0100_0000
             Self::LOCK_BY_TIMESTAMP_MASK => Some(LockValue::Timestamp(value * 1000)),
+            _ => None,
+        }
+    }
+
+    /// Given the base commitment block, this method converts a relative since
+    /// value to an absolute since value for later comparison.
+    #[cfg(feature = "ckb-types")]
+    pub fn to_absolute_value(self, base_block: ckb_types::packed::Header) -> Option<Self> {
+        debug_assert!(self.is_relative());
+
+        let to_le_u64 = |v: &ckb_types::packed::Uint64| {
+            let mut tmp = [0u8; 8];
+            tmp.copy_from_slice(&v.raw_data());
+            u64::from_le_bytes(tmp)
+        };
+
+        match self.extract_lock_value() {
+            Some(LockValue::BlockNumber(number)) => to_le_u64(&base_block.raw().number())
+                .checked_add(number)
+                .and_then(|block_number| Self::from_block_number(block_number, true)),
+            Some(LockValue::Timestamp(timestamp)) => to_le_u64(&base_block.raw().timestamp())
+                .checked_add(timestamp)
+                .and_then(|timestamp| Self::from_timestamp(timestamp, true)),
+            Some(LockValue::EpochNumberWithFraction(epoch)) => {
+                let base_epoch = EpochNumberWithFraction::from_full_value(
+                    to_le_u64(&base_block.raw().epoch()) & Self::VALUE_MASK,
+                );
+                Some(Self::from_epoch((epoch + base_epoch)?, true))
+            }
+            _ => None,
+        }
+    }
+}
+
+impl PartialOrd for Since {
+    fn partial_cmp(&self, other: &Since) -> Option<Ordering> {
+        // Given 2 since values alone, there is no way to compare an absolute value
+        // to a relative value. However, a higher level method can convert a relative
+        // value to an absolute value.
+        if self.is_absolute() != other.is_absolute() {
+            return None;
+        }
+
+        match (self.extract_lock_value(), other.extract_lock_value()) {
+            (Some(LockValue::BlockNumber(a)), Some(LockValue::BlockNumber(b))) => a.partial_cmp(&b),
+            (
+                Some(LockValue::EpochNumberWithFraction(a)),
+                Some(LockValue::EpochNumberWithFraction(b)),
+            ) => a.partial_cmp(&b),
+            (Some(LockValue::Timestamp(a)), Some(LockValue::Timestamp(b))) => a.partial_cmp(&b),
             _ => None,
         }
     }
@@ -103,6 +186,18 @@ impl EpochNumberWithFraction {
     pub const LENGTH_MAXIMUM_VALUE: u64 = (1u64 << Self::LENGTH_BITS);
     pub const LENGTH_MASK: u64 = (Self::LENGTH_MAXIMUM_VALUE - 1);
 
+    pub fn create(number: u64, index: u64, length: u64) -> Option<EpochNumberWithFraction> {
+        if number < Self::NUMBER_MAXIMUM_VALUE
+            && index < Self::INDEX_MAXIMUM_VALUE
+            && length < Self::LENGTH_MAXIMUM_VALUE
+            && length > 0
+        {
+            Some(Self::new_unchecked(number, index, length))
+        } else {
+            None
+        }
+    }
+
     pub fn new(number: u64, index: u64, length: u64) -> EpochNumberWithFraction {
         debug_assert!(number < Self::NUMBER_MAXIMUM_VALUE);
         debug_assert!(index < Self::INDEX_MAXIMUM_VALUE);
@@ -147,5 +242,45 @@ impl EpochNumberWithFraction {
         } else {
             epoch
         }
+    }
+}
+
+impl PartialOrd for EpochNumberWithFraction {
+    fn partial_cmp(&self, other: &EpochNumberWithFraction) -> Option<Ordering> {
+        if self.number() < other.number() {
+            Some(Ordering::Less)
+        } else if self.number() > other.number() {
+            Some(Ordering::Greater)
+        } else {
+            let block_a = (self.index() as u128) * (other.length() as u128);
+            let block_b = (other.index() as u128) * (self.length() as u128);
+            block_a.partial_cmp(&block_b)
+        }
+    }
+}
+
+impl core::ops::Add for EpochNumberWithFraction {
+    type Output = Option<EpochNumberWithFraction>;
+
+    fn add(self, rhs: EpochNumberWithFraction) -> Self::Output {
+        let mut number = self.number().checked_add(rhs.number())?;
+
+        let mut numerator = ((self.index() as u128) * (rhs.length() as u128))
+            .checked_add((rhs.index() as u128) * (self.length() as u128))?;
+        let mut denominator = (self.length() as u128) * (rhs.length() as u128);
+        let divisor = gcd::binary_u128(numerator, denominator);
+        debug_assert!(numerator % divisor == 0);
+        debug_assert!(denominator % divisor == 0);
+        numerator /= divisor;
+        denominator /= divisor;
+
+        let full_epoches = u64::try_from(numerator / denominator).ok()?;
+        number = number.checked_add(full_epoches)?;
+        numerator %= denominator;
+
+        let numerator = u64::try_from(numerator).ok()?;
+        let denominator = u64::try_from(denominator).ok()?;
+
+        EpochNumberWithFraction::create(number, numerator, denominator)
     }
 }

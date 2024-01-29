@@ -10,6 +10,7 @@ use core::mem::size_of;
 
 #[cfg(target_arch = "riscv64")]
 use crate::code_hashes::CODE_HASH_SHARED_LIB;
+use ckb_std::since::{EpochNumberWithFraction, Since};
 #[cfg(target_arch = "riscv64")]
 use ckb_std::{dynamic_loading, dynamic_loading_c_impl};
 #[cfg(target_arch = "riscv64")]
@@ -266,6 +267,139 @@ fn test_current_cycles() {
     assert!(cycles > 300);
 }
 
+fn test_since() {
+    assert_eq!(
+        Since::from_block_number(0x12300, true),
+        Some(Since::new(0x12300))
+    );
+    assert_eq!(
+        Since::from_block_number(0x12300, false),
+        Some(Since::new(0x8000_0000_0001_2300))
+    );
+    assert_eq!(Since::from_block_number(0x1100_0000_0000_2300, true), None);
+    assert_eq!(
+        Since::from_timestamp(0xffaa_1122, true),
+        Some(Since::new(0x4000_0000_ffaa_1122))
+    );
+    assert_eq!(
+        Since::from_timestamp(0xffaa_1122, false),
+        Some(Since::new(0xc000_0000_ffaa_1122))
+    );
+    assert_eq!(Since::from_timestamp(0x0100_0000_ffaa_1122, false), None);
+    assert_eq!(
+        Since::from_epoch(EpochNumberWithFraction::from_full_value(1), true),
+        Since::new(0x2000_0100_0000_0001)
+    );
+    assert_eq!(
+        Since::from_epoch(EpochNumberWithFraction::from_full_value(1), false),
+        Since::new(0xa000_0100_0000_0001)
+    );
+    assert_eq!(EpochNumberWithFraction::create(16777216, 1, 1000), None,);
+    assert_eq!(EpochNumberWithFraction::create(10000, 0, 0), None,);
+    assert_eq!(EpochNumberWithFraction::create(10000, 0, 65536), None,);
+    assert_eq!(EpochNumberWithFraction::create(10000, 65536, 65535), None,);
+    assert_eq!(
+        EpochNumberWithFraction::create(16777215, 65535, 65535)
+            .unwrap()
+            .full_value(),
+        0xFF_FFFF_FFFF_FFFF,
+    );
+    assert_eq!(
+        EpochNumberWithFraction::create(1000, 1, 7).unwrap()
+            + EpochNumberWithFraction::create(2000, 1, 5).unwrap(),
+        Some(EpochNumberWithFraction::create(3000, 12, 35).unwrap()),
+    );
+    assert_eq!(
+        EpochNumberWithFraction::create(100, 7, 13).unwrap()
+            + EpochNumberWithFraction::create(50, 3, 5).unwrap(),
+        Some(EpochNumberWithFraction::create(151, 9, 65).unwrap()),
+    );
+    assert_eq!(
+        EpochNumberWithFraction::create(30, 3, 8).unwrap()
+            + EpochNumberWithFraction::create(500, 5, 6).unwrap(),
+        Some(EpochNumberWithFraction::create(531, 5, 24).unwrap()),
+    );
+    assert_eq!(
+        EpochNumberWithFraction::create(1000, 1, 1001).unwrap()
+            + EpochNumberWithFraction::create(2000, 7, 1003).unwrap(),
+        None,
+    );
+
+    assert!(
+        Since::from_block_number(1234, true).unwrap()
+            < Since::from_block_number(2000, true).unwrap(),
+    );
+    assert!(
+        Since::from_block_number(2001, false).unwrap()
+            > Since::from_block_number(2000, false).unwrap(),
+    );
+    assert!(
+        Since::from_timestamp(3111, true).unwrap() > Since::from_timestamp(2000, true).unwrap(),
+    );
+    assert!(
+        Since::from_timestamp(1999, false).unwrap() < Since::from_timestamp(2000, false).unwrap(),
+    );
+    assert!(
+        Since::from_epoch(
+            EpochNumberWithFraction::create(100, 999, 1000).unwrap(),
+            true
+        ) < Since::from_epoch(EpochNumberWithFraction::create(101, 1, 1000).unwrap(), true),
+    );
+    assert!(
+        Since::from_epoch(
+            EpochNumberWithFraction::create(100, 600, 1000).unwrap(),
+            true
+        ) < Since::from_epoch(EpochNumberWithFraction::create(100, 8, 10).unwrap(), true),
+    );
+    assert_eq!(
+        Since::from_block_number(1234, true)
+            .unwrap()
+            .partial_cmp(&Since::from_block_number(2000, false).unwrap()),
+        None,
+    );
+    assert_eq!(
+        Since::from_epoch(
+            EpochNumberWithFraction::create(100, 999, 1000).unwrap(),
+            false
+        )
+        .partial_cmp(&Since::from_epoch(
+            EpochNumberWithFraction::create(101, 1, 1000).unwrap(),
+            true
+        )),
+        None,
+    );
+    assert_eq!(
+        Since::from_timestamp(1234, true)
+            .unwrap()
+            .partial_cmp(&Since::from_timestamp(2000, false).unwrap()),
+        None,
+    );
+    assert_eq!(
+        Since::from_block_number(1234, true)
+            .unwrap()
+            .partial_cmp(&Since::from_timestamp(2000, true).unwrap()),
+        None,
+    );
+    assert_eq!(
+        Since::from_block_number(1234, true)
+            .unwrap()
+            .partial_cmp(&Since::from_epoch(
+                EpochNumberWithFraction::create(101, 1, 1000).unwrap(),
+                true
+            )),
+        None,
+    );
+    assert_eq!(
+        Since::from_timestamp(1234, true)
+            .unwrap()
+            .partial_cmp(&Since::from_epoch(
+                EpochNumberWithFraction::create(101, 1, 1000).unwrap(),
+                true
+            )),
+        None,
+    );
+}
+
 pub fn main() -> Result<(), Error> {
     test_basic();
     test_load_data();
@@ -287,5 +421,6 @@ pub fn main() -> Result<(), Error> {
     }
     test_vm_version();
     test_current_cycles();
+    test_since();
     Ok(())
 }
