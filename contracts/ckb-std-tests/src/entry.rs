@@ -298,11 +298,13 @@ fn test_since() {
     assert_eq!(EpochNumberWithFraction::create(10000, 0, 0), None,);
     assert_eq!(EpochNumberWithFraction::create(10000, 0, 65536), None,);
     assert_eq!(EpochNumberWithFraction::create(10000, 65536, 65535), None,);
+    assert_eq!(EpochNumberWithFraction::create(10000, 1000, 1000), None,);
+    assert_eq!(EpochNumberWithFraction::create(10000, 1001, 1000), None,);
     assert_eq!(
-        EpochNumberWithFraction::create(16777215, 65535, 65535)
+        EpochNumberWithFraction::create(16777215, 65534, 65535)
             .unwrap()
             .full_value(),
-        0xFF_FFFF_FFFF_FFFF,
+        0xFF_FFFF_FEFF_FFFF,
     );
     assert_eq!(
         EpochNumberWithFraction::create(1000, 1, 7).unwrap()

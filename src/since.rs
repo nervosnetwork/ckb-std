@@ -191,6 +191,7 @@ impl EpochNumberWithFraction {
             && index < Self::INDEX_MAXIMUM_VALUE
             && length < Self::LENGTH_MAXIMUM_VALUE
             && length > 0
+            && index < length
         {
             Some(Self::new_unchecked(number, index, length))
         } else {
@@ -203,6 +204,7 @@ impl EpochNumberWithFraction {
         debug_assert!(index < Self::INDEX_MAXIMUM_VALUE);
         debug_assert!(length < Self::LENGTH_MAXIMUM_VALUE);
         debug_assert!(length > 0);
+        debug_assert!(index < length);
         Self::new_unchecked(number, index, length)
     }
 
