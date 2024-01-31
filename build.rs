@@ -14,6 +14,7 @@ fn main() {
             .file("c/dlopen.c")
             .define("CKB_DECLARATION_ONLY", None);
         setup_compiler_flags(&mut build);
+        build.include("c/ckb-c-stdlib");
         build.compile("dl-c-impl");
     }
 
@@ -35,12 +36,11 @@ fn setup_compiler_flags(build: &mut cc::Build) {
         .flag("-fvisibility=hidden")
         .flag("-fdata-sections")
         .flag("-ffunction-sections")
-        .include("c/ckb-c-stdlib")
-        .include("c/ckb-c-stdlib/libc")
         .flag("-Wall")
         .flag("-Werror")
         .flag("-Wno-unused-parameter")
-        .flag("-Wno-nonnull");
+        .flag("-Wno-nonnull")
+        .include("c/ckb-c-stdlib/libc");
 
     let clang = match std::env::var_os("CLANG") {
         Some(val) => val,

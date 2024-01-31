@@ -10,7 +10,7 @@ exclude = ["docs"]
 
 [package.metadata.docs.rs]
 # All features except simulator and rustc-dep-of-std.
-features = ["allocator", "ckb-types", "calc-hash", "dlopen-c", "ckb2023"]
+features = ["allocator", "ckb-types", "libc", "calc-hash", "build-with-clang", "dlopen-c", "ckb2023"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
