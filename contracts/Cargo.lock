@@ -51,11 +51,12 @@ dependencies = [
 
 [[package]]
 name = "ckb-std"
-version = "0.14.3"
+version = "0.15.0"
 dependencies = [
  "buddy-alloc",
  "cc",
  "ckb-gen-types",
+ "gcd",
 ]
 
 [[package]]
@@ -86,6 +87,12 @@ version = "0.1.0"
 dependencies = [
  "ckb-std",
 ]
+
+[[package]]
+name = "gcd"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d758ba1b47b00caf47f24925c0074ecb20d6dfcffe7f6d53395c0465674841a"
 
 [[package]]
 name = "libc"
