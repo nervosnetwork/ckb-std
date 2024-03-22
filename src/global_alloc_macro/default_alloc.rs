@@ -20,7 +20,7 @@
 #[macro_export]
 macro_rules! default_alloc {
     () => {
-        default_alloc!(4 * 1024, 516 * 1024, 64);
+        $crate::default_alloc!(4 * 1024, 516 * 1024, 64);
     };
     ($fixed_block_heap_size:expr, $heap_size:expr, $min_block_size:expr) => {
         static mut _BUDDY_HEAP: [u8; $heap_size] = [0u8; $heap_size];
