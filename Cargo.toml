@@ -36,3 +36,4 @@ gcd = "2.3.0"
 
 [workspace]
 exclude = ["test"]
+resolver = "2"
