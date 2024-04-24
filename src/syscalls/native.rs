@@ -607,7 +607,7 @@ pub fn spawn(
     bounds: usize,
     place: usize,
     spgs: &mut SpawnArgs,
-) -> Result<(), SysError> {
+) -> Result<u64, SysError> {
     let ret = unsafe {
         syscall(
             index as u64,
@@ -621,7 +621,7 @@ pub fn spawn(
         )
     };
     match ret {
-        0 => Ok(()),
+        0 => Ok(unsafe { *spgs.process_id }),
         1 => Err(SysError::IndexOutOfBound),
         2 => Err(SysError::ItemMissing),
         3 => Err(SysError::Encoding),

@@ -680,17 +680,14 @@ pub fn exec_cell(
 ///              - CString::new("arg0").unwrap().as_c_str();
 ///            - if you want to pass a piece of bytes data, you may encode it to hexadecimal string or other format:
 ///              - high_level::encode_hex(&vec![0xff, 0xfe, 0xfd]);
-/// * `memory_limit` - a number between 1 and 8.
-///                  - note each tick represents an additional 0.5M of memory.
-/// * `content` - a buffer to saving the output by sub script.
-///             - note the size of content will be shrinked after call.
+/// * `inherited_fds` - the fd list to be passed to the child process.
 #[cfg(feature = "ckb2023")]
 pub fn spawn_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
     argv: &[&CStr],
     inherited_fds: &[u64],
-) -> Result<(), SysError> {
+) -> Result<u64, SysError> {
     let index = look_for_dep_with_hash2(code_hash, hash_type)?;
     let argc = argv.len();
     let mut process_id: u64 = 0;
@@ -704,5 +701,6 @@ pub fn spawn_cell(
         process_id: &mut process_id as *mut u64,
         inherited_fds: inherited_fds.as_ptr(),
     };
-    syscalls::spawn(index, Source::CellDep, 0, 0, &mut spgs)
+    syscalls::spawn(index, Source::CellDep, 0, 0, &mut spgs)?;
+    Ok(process_id)
 }
