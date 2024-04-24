@@ -537,7 +537,8 @@ pub fn current_cycles() -> u64 {
 /// by those of the new program. It's cycles consumption consists of two parts:
 ///
 /// - Fixed 500 cycles
-/// - Initial Loading Cycles (<https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0014-vm-cycle-limits/0014-vm-cycle-limits.md>)
+/// - Initial Loading Cycles (<https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0014-vm-cycle-limits/0014-vm-
+///   cycle-limits.md>)
 ///
 /// The arguments used here are:
 ///
@@ -551,17 +552,10 @@ pub fn current_cycles() -> u64 {
 ///   * `place`: A value of 0 or 1:
 ///       + 0: read from cell data
 ///       + 1: read from witness
-///   * `bounds`: high 32 bits means `offset`, low 32 bits means `length`. if `length` equals to zero, it read to end instead of reading 0 bytes.
-///   * `argc`: argc contains the number of arguments passed to the program
+///   * `bounds`: high 32 bits means `offset`, low 32 bits means `length`. if `length` equals to zero, it read to end
+///               instead of reading 0 bytes.
 ///   * `argv`: argv is a one-dimensional array of strings
-pub fn exec(
-    index: usize,
-    source: Source,
-    place: usize,
-    bounds: usize,
-    // argc: i32,
-    argv: &[&CStr],
-) -> u64 {
+pub fn exec(index: usize, source: Source, place: usize, bounds: usize, argv: &[&CStr]) -> u64 {
     // https://www.gnu.org/software/libc/manual/html_node/Program-Arguments.html
     let argc = argv.len();
     let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
@@ -585,79 +579,182 @@ pub fn exec(
 #[cfg(feature = "ckb2023")]
 #[repr(C)]
 pub struct SpawnArgs {
-    pub memory_limit: u64,
-    pub exit_code: *mut i8,
-    pub content: *mut u8,
-    /// Before calling spawn, content_length should be the length of content;
-    /// After calling spawn, content_length will be the real size of the returned data.
-    pub content_length: *mut u64,
+    /// argc contains the number of arguments passed to the program.
+    pub argc: u64,
+    /// argv is a one-dimensional array of strings.
+    pub argv: *const *const i8,
+    /// a pointer used to save the process_id of the child process.
+    pub process_id: *mut u64,
+    /// an array representing the file descriptors passed to the child process. It must end with zero.
+    pub inherited_fds: *const u64,
 }
 
-/// The Spawn and the latter two syscalls: Get Memory Limit and Set Content
-/// together, implement a way to call another CKB Script in a CKB Script.
+/// The parent process calls the Spawn system call, which creates a new process (a child process) that is an
+/// independent ckb-vm instance. It's important to note that the parent process will not be blocked by the child
+/// process as a result of this syscall.
 /// Note: available after ckb2023.
+///
+/// # Arguments
+///
+/// * `index`, `source`, `bounds` and `place` - same as exec.
+/// * `spgs` - spawn arguments.
 ///
 /// Returns success or a syscall error.
 #[cfg(feature = "ckb2023")]
-pub fn spawn(index: usize, source: Source, bounds: usize, argv: &[&CStr], spgs: &SpawnArgs) -> u64 {
-    let argc = argv.len();
-    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
-    for (idx, cstr) in argv.into_iter().enumerate() {
-        argv_ptr[idx] = cstr.as_ptr();
-    }
-    unsafe {
+pub fn spawn(
+    index: usize,
+    source: Source,
+    bounds: usize,
+    place: usize,
+    spgs: &mut SpawnArgs,
+) -> Result<(), SysError> {
+    let ret = unsafe {
         syscall(
             index as u64,
             source as u64,
             bounds as u64,
-            argc as u64,
-            argv_ptr.as_ptr() as u64,
-            spgs as *const SpawnArgs as u64,
+            place as u64,
+            spgs as *mut SpawnArgs as u64,
+            0,
             0,
             SYS_SPAWN,
         )
+    };
+    match ret {
+        0 => Ok(()),
+        1 => Err(SysError::IndexOutOfBound),
+        2 => Err(SysError::ItemMissing),
+        3 => Err(SysError::Encoding),
+        8 => Err(SysError::MaxVmsSpawned),
+        x => Err(SysError::Unknown(x)),
     }
 }
 
-/// Get memory limit.
+/// The syscall pauses until the execution of a process specified by pid has ended.
 /// Note: available after ckb2023.
 ///
-/// Returns a number between 1 and 8, representing 0.5 to 4M of memory.
+/// # Arguments
+///
+/// * `pid` - process id
+///
+/// Returns exit code.
 #[cfg(feature = "ckb2023")]
-pub fn get_memory_limit() -> u64 {
-    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_GET_MEMORY_LIMIT) }
+pub fn wait(pid: u64) -> Result<i8, SysError> {
+    let mut code: u64 = 0;
+    let ret = unsafe { syscall(pid, &mut code as *mut u64 as u64, 0, 0, 0, 0, 0, SYS_WAIT) };
+    match ret {
+        0 => Ok(code as i8),
+        5 => Err(SysError::WaitFailure),
+        x => Err(SysError::Unknown(x)),
+    }
 }
 
-/// Set content.
+/// This syscall is used to get the current process id. Root process ID is 0.
 /// Note: available after ckb2023.
-///
-/// Return the actual written data length or a syscall error.
 #[cfg(feature = "ckb2023")]
-pub fn set_content(buf: &[u8]) -> Result<u64, SysError> {
-    let mut len = buf.len() as u64;
-    let len_ptr: *mut u64 = &mut len;
-    unsafe {
+pub fn process_id() -> u64 {
+    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_PROCESS_ID) }
+}
+
+/// This syscall create a pipe with read-write pair of file descriptions. The file descriptor with read permission is
+/// located at fds[0], and the corresponding file descriptor with write permission is located at fds[1].
+/// Note: available after ckb2023.
+#[cfg(feature = "ckb2023")]
+pub fn pipe() -> Result<(u64, u64), SysError> {
+    let mut fds: [u64; 2] = [0, 0];
+    let ret = unsafe { syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_PIPE) };
+    match ret {
+        0 => Ok((fds[0], fds[1])),
+        9 => Err(SysError::MaxFdsCreated),
+        x => Err(SysError::Unknown(x)),
+    }
+}
+
+/// This syscall reads data from a pipe via a file descriptor. The syscall Read attempts to read up to value pointed by
+/// length bytes from file descriptor fd into the buffer, and the actual length of data read is returned.
+/// Note: available after ckb2023.
+#[cfg(feature = "ckb2023")]
+pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
+    let mut l: u64 = buffer.len() as u64;
+    let ret = unsafe {
         syscall(
-            buf.as_ptr() as u64,
-            len_ptr as u64,
+            fd,
+            buffer.as_mut_ptr() as u64,
+            &mut l as *mut u64 as u64,
             0,
             0,
             0,
             0,
-            0,
-            SYS_SET_CONTENT,
+            SYS_READ,
         )
     };
-    Ok(len)
+    match ret {
+        0 => Ok(l as usize),
+        1 => Err(SysError::IndexOutOfBound),
+        6 => Err(SysError::InvalidFd),
+        7 => Err(SysError::OtherEndClosed),
+        x => Err(SysError::Unknown(x)),
+    }
 }
 
-/// Get current memory.
+/// This syscall writes data to a pipe via a file descriptor. The syscall Write writes up to value pointed by length
+/// bytes from the buffer, and the actual length of data written is returned.
 /// Note: available after ckb2023.
-///
-/// Returns the sum of the memory of all living vm instances.
 #[cfg(feature = "ckb2023")]
-pub fn current_memory() -> u64 {
-    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_CURRENT_MEMORY) }
+pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
+    let mut l: u64 = buffer.len() as u64;
+    let ret = unsafe {
+        syscall(
+            fd,
+            buffer.as_ptr() as u64,
+            &mut l as *mut u64 as u64,
+            0,
+            0,
+            0,
+            0,
+            SYS_WRITE,
+        )
+    };
+    match ret {
+        0 => Ok(l as usize),
+        1 => Err(SysError::IndexOutOfBound),
+        6 => Err(SysError::InvalidFd),
+        7 => Err(SysError::OtherEndClosed),
+        x => Err(SysError::Unknown(x)),
+    }
+}
+
+/// This syscall retrieves the file descriptors available to the current process, which are passed in from the parent
+/// process. These results are copied from the inherited_fds parameter of the Spawn syscall.
+/// Note: available after ckb2023.
+#[cfg(feature = "ckb2023")]
+pub fn inherited_file_descriptors(fds: &mut [u64]) {
+    let mut l: u64 = fds.len() as u64;
+    unsafe {
+        syscall(
+            fds.as_mut_ptr() as u64,
+            &mut l as *mut u64 as u64,
+            0,
+            0,
+            0,
+            0,
+            0,
+            SYS_INHERITED_FD,
+        )
+    };
+}
+
+/// This syscall manually closes a file descriptor. After calling this, any attempt to read/write the file descriptor
+/// pointed to the other end would fail.
+/// Note: available after ckb2023.
+#[cfg(feature = "ckb2023")]
+pub fn close(fd: u64) -> Result<(), SysError> {
+    let ret = unsafe { syscall(fd, 0, 0, 0, 0, 0, 0, SYS_CLOSE) };
+    match ret {
+        0 => Ok(()),
+        6 => Err(SysError::InvalidFd),
+        x => Err(SysError::Unknown(x)),
+    }
 }
 
 /// Load extension field associated either with an input cell, a dep cell, or

@@ -689,31 +689,20 @@ pub fn spawn_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
     argv: &[&CStr],
-    memory_limit: u64,
-    content: &mut Vec<u8>,
-) -> Result<i8, SysError> {
+    inherited_fds: &[u64],
+) -> Result<(), SysError> {
     let index = look_for_dep_with_hash2(code_hash, hash_type)?;
-    let mut content_length = content.len() as u64;
-    let mut exit_code = 0i8;
-    let spgs = syscalls::SpawnArgs {
-        memory_limit,
-        exit_code: &mut exit_code as *mut i8,
-        content: content.as_mut_ptr(),
-        content_length: &mut content_length as *mut u64,
-    };
-    let ret = syscalls::spawn(index, Source::CellDep, 0, argv, &spgs);
-    match ret {
-        0 => {
-            content.truncate(content_length as usize);
-            Ok(exit_code)
-        }
-        1 => Err(SysError::IndexOutOfBound),
-        2 => Err(SysError::ItemMissing),
-        3 => Err(SysError::LengthNotEnough(content.len())),
-        4 => Err(SysError::Encoding),
-        5 => Err(SysError::SpawnExceededMaxContentLength),
-        6 => Err(SysError::SpawnWrongMemoryLimit),
-        7 => Err(SysError::SpawnExceededMaxPeakMemory),
-        r => Err(SysError::Unknown(r)),
+    let argc = argv.len();
+    let mut process_id: u64 = 0;
+    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
+    for (idx, cstr) in argv.into_iter().enumerate() {
+        argv_ptr[idx] = cstr.as_ptr();
     }
+    let mut spgs = syscalls::SpawnArgs {
+        argc: argc as u64,
+        argv: argv_ptr.as_ptr(),
+        process_id: &mut process_id as *mut u64,
+        inherited_fds: inherited_fds.as_ptr(),
+    };
+    syscalls::spawn(index, Source::CellDep, 0, 0, &mut spgs)
 }

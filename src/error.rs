@@ -10,15 +10,21 @@ pub enum SysError {
     /// Data encoding error
     Encoding,
 
+    /// Failed to wait. Its value is 5.
     #[cfg(feature = "ckb2023")]
-    /// Content Length must be less than 256K.
-    SpawnExceededMaxContentLength,
+    WaitFailure,
+    /// Invalid file descriptor. Its value is 6.
     #[cfg(feature = "ckb2023")]
-    /// MemoryLimit is between 1 and 8.
-    SpawnWrongMemoryLimit,
+    InvalidFd,
+    /// Reading from or writing to file descriptor failed due to other end closed. Its value is 7.
     #[cfg(feature = "ckb2023")]
-    /// There is a maximum call depth limit by peak memory.
-    SpawnExceededMaxPeakMemory,
+    OtherEndClosed,
+    /// Max vms has been spawned. Its value is 8.
+    #[cfg(feature = "ckb2023")]
+    MaxVmsSpawned,
+    /// Max fds has been spawned. Its value is 9.
+    #[cfg(feature = "ckb2023")]
+    MaxFdsCreated,
 
     /// Unknown syscall error number
     Unknown(u64),
