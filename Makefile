@@ -4,7 +4,7 @@ CC := riscv64-unknown-elf-gcc
 default: integration
 
 publish-crate:
-	cross publish -p ckb-standalone-types && cross publish -p ckb-std
+	cross publish -p ckb-std
 
 publish: publish-crate
 
@@ -23,4 +23,3 @@ check:
 	cross check --target ${TARGET} --examples
 
 .PHONY: test check
-
