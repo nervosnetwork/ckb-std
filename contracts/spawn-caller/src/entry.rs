@@ -6,22 +6,36 @@ use core::ffi::CStr;
 use core::result::Result;
 
 pub fn main() -> Result<(), Error> {
-    let arg1 = CStr::from_bytes_with_nul(b"hello\0").unwrap();
-    let arg2 = CStr::from_bytes_with_nul(b"world\0").unwrap();
-
-    let mut spgs_exit_code: i8 = 0;
-    let mut spgs_content = [0u8; 80];
-    let mut spgs_content_length: u64 = 80;
-    let spgs = syscalls::SpawnArgs {
-        memory_limit: 8,
-        exit_code: &mut spgs_exit_code as *mut i8,
-        content: &mut spgs_content as *mut u8,
-        content_length: &mut spgs_content_length as *mut u64,
+    let argc: u64 = 2;
+    let argv = {
+        let mut argv = alloc::vec![core::ptr::null(); argc as usize + 1];
+        argv[0] = CStr::from_bytes_with_nul(b"hello\0").unwrap().as_ptr();
+        argv[1] = CStr::from_bytes_with_nul(b"world\0").unwrap().as_ptr();
+        argv
     };
-    let ret = syscalls::spawn(1, Source::CellDep, 0, &[arg1, arg2][..], &spgs);
-    assert!(ret == 0);
-    assert!(spgs_exit_code == 0);
-    let c_str = CStr::from_bytes_until_nul(&spgs_content).unwrap();
-    assert_eq!(c_str.to_str().unwrap(), "helloworld");
+    let mut std_fds: [u64; 2] = [0, 0];
+    let mut son_fds: [u64; 3] = [0, 0, 0];
+    let (r0, w0) = syscalls::pipe()?;
+    std_fds[0] = r0;
+    son_fds[1] = w0;
+    let (r1, w1) = syscalls::pipe()?;
+    std_fds[1] = w1;
+    son_fds[0] = r1;
+    let mut pid: u64 = 0;
+    let mut spgs = syscalls::SpawnArgs {
+        argc: argc,
+        argv: argv.as_ptr(),
+        process_id: &mut pid as *mut u64,
+        inherited_fds: son_fds.as_ptr(),
+    };
+    syscalls::spawn(1, Source::CellDep, 0, 0, &mut spgs)?;
+    let mut buf: [u8; 256] = [0; 256];
+    let len = syscalls::read(std_fds[0], &mut buf)?;
+    assert_eq!(len, 10);
+    buf[len] = 0;
+    assert_eq!(
+        CStr::from_bytes_until_nul(&buf).unwrap().to_str().unwrap(),
+        "helloworld"
+    );
     Ok(())
 }

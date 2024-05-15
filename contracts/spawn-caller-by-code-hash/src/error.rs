@@ -7,9 +7,11 @@ pub enum Error {
     ItemMissing,
     LengthNotEnough,
     Encoding,
-    SpawnExceededMaxContentLength,
-    SpawnWrongMemoryLimit,
-    SpawnExceededMaxPeakMemory,
+    WaitFailure,
+    InvalidFd,
+    OtherEndClosed,
+    MaxVmsSpawned,
+    MaxFdsCreated,
 }
 
 impl From<SysError> for Error {
@@ -20,9 +22,11 @@ impl From<SysError> for Error {
             ItemMissing => Self::ItemMissing,
             LengthNotEnough(_) => Self::LengthNotEnough,
             Encoding => Self::Encoding,
-            SpawnExceededMaxContentLength => Self::SpawnExceededMaxContentLength,
-            SpawnWrongMemoryLimit => Self::SpawnWrongMemoryLimit,
-            SpawnExceededMaxPeakMemory => Self::SpawnExceededMaxPeakMemory,
+            WaitFailure => Self::WaitFailure,
+            InvalidFd => Self::InvalidFd,
+            OtherEndClosed => Self::OtherEndClosed,
+            MaxVmsSpawned => Self::MaxVmsSpawned,
+            MaxFdsCreated => Self::MaxFdsCreated,
             Unknown(err_code) => panic!("unexpected sys error {}", err_code),
         }
     }
