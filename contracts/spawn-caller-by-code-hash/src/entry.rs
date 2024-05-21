@@ -1,6 +1,5 @@
 // Import from `core` instead of from `std` since we are in no-std mode
 use crate::error::Error;
-use ckb_std::ckb_constants::Source;
 use ckb_std::ckb_types::core::ScriptHashType;
 use ckb_std::high_level::{load_script, spawn_cell};
 use ckb_std::syscalls;
