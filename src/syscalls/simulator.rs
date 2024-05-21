@@ -253,7 +253,7 @@ pub fn exec_cell(
         0,
         0,
         argc as i32,
-        argv_ptr.as_ptr(),
+        argv_vec.as_ptr(),
     );
     Err(SysError::Unknown(ret as u64))
 }
