@@ -244,17 +244,16 @@ pub fn exec_cell(
     argv: &[&CStr],
 ) -> Result<Infallible, SysError> {
     let argc = argv.len();
-    let mut argv_ptr = alloc::vec![core::ptr::null(); argc + 1];
-    for (idx, cstr) in argv.into_iter().enumerate() {
-        argv_ptr[idx] = cstr.to_bytes_with_nul().as_ptr();
-    }
+    let mut argv_vec: alloc::vec::Vec<*const u8> =
+        argv.iter().map(|e| e.as_ptr() as *const u8).collect();
+    argv_vec.push(core::ptr::null());
     let ret = sim::ckb_exec_cell(
         code_hash.as_ptr(),
         hash_type as u8,
         0,
         0,
         argc as i32,
-        argv_ptr.as_ptr(),
+        argv_vec.as_ptr(),
     );
     Err(SysError::Unknown(ret as u64))
 }
