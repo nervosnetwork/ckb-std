@@ -244,7 +244,9 @@ pub fn exec_cell(
     argv: &[&CStr],
 ) -> Result<Infallible, SysError> {
     let argc = argv.len();
-    let argv_ptr: alloc::vec::Vec<*const i8> = argv.into_iter().map(|e| e.as_ptr()).collect();
+    let mut argv_vec: alloc::vec::Vec<*const u8> =
+        argv.iter().map(|e| e.as_ptr() as *const u8).collect();
+    argv_vec.push(core::ptr::null());
     let ret = sim::ckb_exec_cell(
         code_hash.as_ptr(),
         hash_type as u8,

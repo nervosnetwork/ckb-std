@@ -691,7 +691,7 @@ pub fn spawn_cell(
     let index = look_for_dep_with_hash2(code_hash, hash_type)?;
     let argc = argv.len();
     let mut process_id: u64 = 0;
-    let argv_ptr: Vec<*const i8> = argv.into_iter().map(|e| e.as_ptr()).collect();
+    let argv_ptr: Vec<*const i8> = argv.iter().map(|e| e.as_ptr()).collect();
     let mut spgs = syscalls::SpawnArgs {
         argc: argc as u64,
         argv: argv_ptr.as_ptr(),

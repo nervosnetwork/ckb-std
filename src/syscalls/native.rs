@@ -558,7 +558,7 @@ pub fn current_cycles() -> u64 {
 pub fn exec(index: usize, source: Source, place: usize, bounds: usize, argv: &[&CStr]) -> u64 {
     // https://www.gnu.org/software/libc/manual/html_node/Program-Arguments.html
     let argc = argv.len();
-    let argv_ptr: alloc::vec::Vec<*const i8> = argv.into_iter().map(|e| e.as_ptr()).collect();
+    let argv_ptr: alloc::vec::Vec<*const i8> = argv.iter().map(|e| e.as_ptr()).collect();
     unsafe {
         syscall(
             index as u64,
