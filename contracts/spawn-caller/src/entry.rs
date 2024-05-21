@@ -7,12 +7,10 @@ use core::result::Result;
 
 pub fn main() -> Result<(), Error> {
     let argc: u64 = 2;
-    let argv = {
-        let mut argv = alloc::vec![core::ptr::null(); argc as usize + 1];
-        argv[0] = CStr::from_bytes_with_nul(b"hello\0").unwrap().as_ptr();
-        argv[1] = CStr::from_bytes_with_nul(b"world\0").unwrap().as_ptr();
-        argv
-    };
+    let argv = [
+        CStr::from_bytes_with_nul(b"hello\0").unwrap().as_ptr(),
+        CStr::from_bytes_with_nul(b"world\0").unwrap().as_ptr(),
+    ];
     let mut std_fds: [u64; 2] = [0, 0];
     let mut son_fds: [u64; 3] = [0, 0, 0];
     let (r0, w0) = syscalls::pipe()?;
