@@ -601,16 +601,16 @@ pub struct SpawnArgs {
 pub fn spawn(
     index: usize,
     source: Source,
-    bounds: usize,
     place: usize,
+    bounds: usize,
     spgs: &mut SpawnArgs,
 ) -> Result<u64, SysError> {
     let ret = unsafe {
         syscall(
             index as u64,
             source as u64,
-            bounds as u64,
             place as u64,
+            bounds as u64,
             spgs as *mut SpawnArgs as u64,
             0,
             0,
