@@ -622,6 +622,7 @@ pub fn spawn(
         1 => Err(SysError::IndexOutOfBound),
         2 => Err(SysError::ItemMissing),
         3 => Err(SysError::Encoding),
+        6 => Err(SysError::InvalidFd),
         8 => Err(SysError::MaxVmsSpawned),
         x => Err(SysError::Unknown(x)),
     }
