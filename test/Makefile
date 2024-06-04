@@ -1,4 +1,4 @@
-test: clean build
+test: build
 	RUST_LOG=debug cargo test -- --nocapture
 	make -C simulator build
 	make -C simulator run
@@ -6,6 +6,7 @@ test: clean build
 build:
 	make -C shared-lib all-via-docker
 	cd .. && capsule build
+	cd .. && RUSTFLAGS="-C target-feature=-a" capsule build -n ckb-std-tests
 
 clean:
 	rm -rf ../build

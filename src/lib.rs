@@ -14,6 +14,8 @@
 #[cfg(not(feature = "rustc-dep-of-std"))]
 extern crate alloc;
 
+#[cfg(feature = "atomic")]
+pub mod atomic;
 pub mod ckb_constants;
 #[doc(hidden)]
 pub mod debug;
@@ -27,6 +29,7 @@ pub mod global_alloc_macro;
 pub mod high_level;
 pub mod since;
 pub mod syscalls;
+
 #[cfg(feature = "ckb-types")]
 pub use ckb_types;
 #[cfg(feature = "ckb-types")]

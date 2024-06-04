@@ -24,6 +24,7 @@ dlopen-c = ["libc"]
 build-with-clang = []
 libc = []
 ckb2023 = []
+atomic = []
 
 [build-dependencies]
 cc = "1.0"
