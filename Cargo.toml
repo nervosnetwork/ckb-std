@@ -24,6 +24,7 @@ dlopen-c = ["libc"]
 build-with-clang = []
 libc = []
 ckb2023 = []
+# work with `target-feature=-a` Cargo flag
 atomic = []
 
 [build-dependencies]

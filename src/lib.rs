@@ -14,8 +14,6 @@
 #[cfg(not(feature = "rustc-dep-of-std"))]
 extern crate alloc;
 
-#[cfg(feature = "atomic")]
-pub mod atomic;
 pub mod ckb_constants;
 #[doc(hidden)]
 pub mod debug;
@@ -38,3 +36,5 @@ pub mod dynamic_loading;
 pub mod dynamic_loading_c_impl;
 #[cfg(feature = "allocator")]
 pub use buddy_alloc;
+#[cfg(feature = "atomic")]
+pub mod atomic;

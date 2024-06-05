@@ -1,10 +1,15 @@
+///
+/// Some Rust code can be compiled into atomic instructions for the RISC-V
+/// target. However, these atomic instructions are not supported on ckb-vm. To
+/// address this issue, this module has been introduced.
+///
 /// This library provides a Rust dummy atomic implementation inspired by
 /// [xxuejie/lib-dummy-atomics](https://github.com/xxuejie/lib-dummy-atomics).
 ///
 /// When the RISC-V atomic extension is disabled by specifying the
 /// `target-feature=-a` flag, LLVM will attempt to link the atomic operations to
-/// functions prefixed with `__atomic`. For more details, refer to the [LLVM
-/// Atomics Documentation](https://llvm.org/docs/Atomics.html).
+/// functions prefixed with `__atomic` in this module. For more details, refer
+/// to the [LLVM Atomics Documentation](https://llvm.org/docs/Atomics.html).
 ///
 /// On the CKB-VM, only a single thread is present, making dummy atomic
 /// operations sufficient for its purposes.
@@ -228,7 +233,7 @@ pub extern "C" fn __atomic_compare_exchange_8(
 }
 
 #[no_mangle]
-pub extern "C" fn __atomic_load_1(ptr: *mut c_void, _memorder: isize) -> u8 {
+pub extern "C" fn __atomic_load_1(ptr: *const c_void, _memorder: isize) -> u8 {
     unsafe {
         let p = ptr as *mut u8;
         p.read_unaligned()
@@ -236,7 +241,7 @@ pub extern "C" fn __atomic_load_1(ptr: *mut c_void, _memorder: isize) -> u8 {
 }
 
 #[no_mangle]
-pub extern "C" fn __atomic_load_2(ptr: *mut c_void, _memorder: isize) -> u16 {
+pub extern "C" fn __atomic_load_2(ptr: *const c_void, _memorder: isize) -> u16 {
     unsafe {
         let p = ptr as *mut u16;
         p.read_unaligned()
@@ -244,7 +249,7 @@ pub extern "C" fn __atomic_load_2(ptr: *mut c_void, _memorder: isize) -> u16 {
 }
 
 #[no_mangle]
-pub extern "C" fn __atomic_load_4(ptr: *mut c_void, _memorder: isize) -> u32 {
+pub extern "C" fn __atomic_load_4(ptr: *const c_void, _memorder: isize) -> u32 {
     unsafe {
         let p = ptr as *mut u32;
         p.read_unaligned()
@@ -252,7 +257,7 @@ pub extern "C" fn __atomic_load_4(ptr: *mut c_void, _memorder: isize) -> u32 {
 }
 
 #[no_mangle]
-pub extern "C" fn __atomic_load_8(ptr: *mut c_void, _memorder: isize) -> u64 {
+pub extern "C" fn __atomic_load_8(ptr: *const c_void, _memorder: isize) -> u64 {
     unsafe {
         let p = ptr as *mut u64;
         p.read_unaligned()
