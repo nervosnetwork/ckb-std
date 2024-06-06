@@ -11,13 +11,18 @@ use core::mem::size_of;
 #[cfg(target_arch = "riscv64")]
 use crate::code_hashes::CODE_HASH_SHARED_LIB;
 use crate::error::Error;
+#[cfg(target_arch = "riscv64")]
 use bytes;
-use ckb_std::atomic;
+#[cfg(target_arch = "riscv64")]
+use ckb_std::dummy_atomic;
 use ckb_std::since::{EpochNumberWithFraction, Since};
 #[cfg(target_arch = "riscv64")]
 use ckb_std::{dynamic_loading, dynamic_loading_c_impl};
+#[cfg(target_arch = "riscv64")]
 use core::ffi::c_void;
+#[cfg(target_arch = "riscv64")]
 use core::mem::size_of_val;
+#[cfg(target_arch = "riscv64")]
 use log::{info, warn};
 
 fn new_blake2b() -> Blake2b {
@@ -404,6 +409,7 @@ fn test_since() {
     );
 }
 
+#[cfg(target_arch = "riscv64")]
 fn test_atomic() {
     // The bytes crate uses atomic operations.
     let b = bytes::Bytes::copy_from_slice(&[0, 1, 2, 3]);
@@ -421,10 +427,11 @@ fn test_atomic() {
     warn!("atomic warn");
 }
 
+#[cfg(target_arch = "riscv64")]
 fn test_compare_exchange<T>(data: &mut T, expected: &mut T, desired: u64, same: bool) {
     let size = size_of_val(data);
     let res = match size {
-        1 => atomic::__atomic_compare_exchange_1(
+        1 => dummy_atomic::__atomic_compare_exchange_1(
             data as *mut T as *mut c_void,
             expected as *mut T as *mut c_void,
             desired as u8,
@@ -432,7 +439,7 @@ fn test_compare_exchange<T>(data: &mut T, expected: &mut T, desired: u64, same: 
             0,
             0,
         ),
-        2 => atomic::__atomic_compare_exchange_2(
+        2 => dummy_atomic::__atomic_compare_exchange_2(
             data as *mut T as *mut c_void,
             expected as *mut T as *mut c_void,
             desired as u16,
@@ -440,7 +447,7 @@ fn test_compare_exchange<T>(data: &mut T, expected: &mut T, desired: u64, same: 
             0,
             0,
         ),
-        4 => atomic::__atomic_compare_exchange_4(
+        4 => dummy_atomic::__atomic_compare_exchange_4(
             data as *mut T as *mut c_void,
             expected as *mut T as *mut c_void,
             desired as u32,
@@ -448,7 +455,7 @@ fn test_compare_exchange<T>(data: &mut T, expected: &mut T, desired: u64, same: 
             0,
             0,
         ),
-        8 => atomic::__atomic_compare_exchange_8(
+        8 => dummy_atomic::__atomic_compare_exchange_8(
             data as *mut T as *mut c_void,
             expected as *mut T as *mut c_void,
             desired as u64,
@@ -463,18 +470,19 @@ fn test_compare_exchange<T>(data: &mut T, expected: &mut T, desired: u64, same: 
     assert_eq!(res, same);
 }
 
+#[cfg(target_arch = "riscv64")]
 fn test_atomic2() {
     let mut data1: u8 = 42;
-    let old = atomic::__atomic_exchange_1(&mut data1 as *mut u8 as *mut c_void, 0, 0);
+    let old = dummy_atomic::__atomic_exchange_1(&mut data1 as *mut u8 as *mut c_void, 0, 0);
     assert_eq!(old, 42);
     let mut data2: u16 = 42;
-    let old = atomic::__atomic_exchange_2(&mut data2 as *mut u16 as *mut c_void, 0, 0);
+    let old = dummy_atomic::__atomic_exchange_2(&mut data2 as *mut u16 as *mut c_void, 0, 0);
     assert_eq!(old, 42);
     let mut data4: u32 = 42;
-    let old = atomic::__atomic_exchange_4(&mut data4 as *mut u32 as *mut c_void, 0, 0);
+    let old = dummy_atomic::__atomic_exchange_4(&mut data4 as *mut u32 as *mut c_void, 0, 0);
     assert_eq!(old, 42);
     let mut data8: u64 = 42;
-    let old = atomic::__atomic_exchange_8(&mut data8 as *mut u64 as *mut c_void, 0, 0);
+    let old = dummy_atomic::__atomic_exchange_8(&mut data8 as *mut u64 as *mut c_void, 0, 0);
     assert_eq!(old, 42);
 
     let mut data: u8 = 42;
@@ -506,274 +514,274 @@ fn test_atomic2() {
     assert_eq!(expected, 0);
 
     let data: u8 = 42;
-    let expected = atomic::__atomic_load_1(&data as *const u8 as *const c_void, 0);
+    let expected = dummy_atomic::__atomic_load_1(&data as *const u8 as *const c_void, 0);
     assert_eq!(expected, data);
 
     let data: u16 = 42;
-    let expected = atomic::__atomic_load_2(&data as *const u16 as *const c_void, 0);
+    let expected = dummy_atomic::__atomic_load_2(&data as *const u16 as *const c_void, 0);
     assert_eq!(expected, data);
 
     let data: u32 = 42;
-    let expected = atomic::__atomic_load_4(&data as *const u32 as *const c_void, 0);
+    let expected = dummy_atomic::__atomic_load_4(&data as *const u32 as *const c_void, 0);
     assert_eq!(expected, data);
 
     let data: u64 = 42;
-    let expected = atomic::__atomic_load_8(&data as *const u64 as *const c_void, 0);
+    let expected = dummy_atomic::__atomic_load_8(&data as *const u64 as *const c_void, 0);
     assert_eq!(expected, data);
 
     let mut data: u8 = 42;
-    atomic::__atomic_store_1(&mut data as *mut u8 as *mut c_void, 0, 0);
+    dummy_atomic::__atomic_store_1(&mut data as *mut u8 as *mut c_void, 0, 0);
     assert_eq!(data, 0);
 
     let mut data: u16 = 42;
-    atomic::__atomic_store_2(&mut data as *mut u16 as *mut c_void, 0, 0);
+    dummy_atomic::__atomic_store_2(&mut data as *mut u16 as *mut c_void, 0, 0);
     assert_eq!(data, 0);
 
     let mut data: u32 = 42;
-    atomic::__atomic_store_4(&mut data as *mut u32 as *mut c_void, 0, 0);
+    dummy_atomic::__atomic_store_4(&mut data as *mut u32 as *mut c_void, 0, 0);
     assert_eq!(data, 0);
 
     let mut data: u64 = 42;
-    atomic::__atomic_store_8(&mut data as *mut u64 as *mut c_void, 0, 0);
+    dummy_atomic::__atomic_store_8(&mut data as *mut u64 as *mut c_void, 0, 0);
     assert_eq!(data, 0);
 
     let mut data: u8 = 42;
-    let res = atomic::__atomic_fetch_add_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_add_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u16 = 42;
-    let res = atomic::__atomic_fetch_add_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_add_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u32 = 42;
-    let res = atomic::__atomic_fetch_add_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_add_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u64 = 42;
-    let res = atomic::__atomic_fetch_add_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_add_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u8 = 42;
-    let res = atomic::__atomic_fetch_sub_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_sub_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 41);
 
     let mut data: u16 = 42;
-    let res = atomic::__atomic_fetch_sub_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_sub_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 41);
 
     let mut data: u32 = 42;
-    let res = atomic::__atomic_fetch_sub_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_sub_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 41);
 
     let mut data: u64 = 42;
-    let res = atomic::__atomic_fetch_sub_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_sub_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 41);
 
     let mut data: u8 = 43;
-    let res = atomic::__atomic_fetch_and_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_and_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 1);
 
     let mut data: u16 = 43;
-    let res = atomic::__atomic_fetch_and_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_and_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 1);
 
     let mut data: u32 = 43;
-    let res = atomic::__atomic_fetch_and_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_and_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 1);
 
     let mut data: u64 = 43;
-    let res = atomic::__atomic_fetch_and_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_and_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 1);
 
     let mut data: u8 = 43;
-    let res = atomic::__atomic_fetch_xor_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_xor_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 42);
 
     let mut data: u16 = 43;
-    let res = atomic::__atomic_fetch_xor_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_xor_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 42);
 
     let mut data: u32 = 43;
-    let res = atomic::__atomic_fetch_xor_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_xor_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 42);
 
     let mut data: u64 = 43;
-    let res = atomic::__atomic_fetch_xor_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_xor_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 42);
 
     let mut data: u8 = 42;
-    let res = atomic::__atomic_fetch_or_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_or_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u16 = 42;
-    let res = atomic::__atomic_fetch_or_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_or_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u32 = 42;
-    let res = atomic::__atomic_fetch_or_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_or_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u64 = 42;
-    let res = atomic::__atomic_fetch_or_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_or_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 43);
 
     let mut data: u8 = 1;
-    let res = atomic::__atomic_fetch_nand_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_nand_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 0xFE);
 
     let mut data: u16 = 1;
-    let res = atomic::__atomic_fetch_nand_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_nand_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 0xFFFE);
 
     let mut data: u32 = 1;
-    let res = atomic::__atomic_fetch_nand_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_nand_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 0xFFFFFFFE);
 
     let mut data: u64 = 1;
-    let res = atomic::__atomic_fetch_nand_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_fetch_nand_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 0xFFFFFFFFFFFFFFFE);
 
     let mut data: u8 = 42;
-    let res = atomic::__atomic_add_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_add_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u16 = 42;
-    let res = atomic::__atomic_add_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_add_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u32 = 42;
-    let res = atomic::__atomic_add_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_add_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u64 = 42;
-    let res = atomic::__atomic_add_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_add_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u8 = 42;
-    let res = atomic::__atomic_sub_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_sub_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 41);
     assert_eq!(data, 41);
 
     let mut data: u16 = 42;
-    let res = atomic::__atomic_sub_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_sub_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 41);
     assert_eq!(data, 41);
 
     let mut data: u32 = 42;
-    let res = atomic::__atomic_sub_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_sub_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 41);
     assert_eq!(data, 41);
 
     let mut data: u64 = 42;
-    let res = atomic::__atomic_sub_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_sub_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 41);
     assert_eq!(data, 41);
 
     let mut data: u8 = 43;
-    let res = atomic::__atomic_and_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_and_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 1);
 
     let mut data: u16 = 43;
-    let res = atomic::__atomic_and_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_and_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 1);
 
     let mut data: u32 = 43;
-    let res = atomic::__atomic_and_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_and_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 1);
 
     let mut data: u64 = 43;
-    let res = atomic::__atomic_and_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_and_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 1);
     assert_eq!(data, 1);
 
     let mut data: u8 = 43;
-    let res = atomic::__atomic_xor_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_xor_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 42);
 
     let mut data: u16 = 43;
-    let res = atomic::__atomic_xor_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_xor_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 42);
 
     let mut data: u32 = 43;
-    let res = atomic::__atomic_xor_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_xor_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 42);
 
     let mut data: u64 = 43;
-    let res = atomic::__atomic_xor_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_xor_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 42);
     assert_eq!(data, 42);
 
     let mut data: u8 = 42;
-    let res = atomic::__atomic_or_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_or_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u16 = 42;
-    let res = atomic::__atomic_or_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_or_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u32 = 42;
-    let res = atomic::__atomic_or_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_or_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u64 = 42;
-    let res = atomic::__atomic_or_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_or_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 43);
     assert_eq!(data, 43);
 
     let mut data: u8 = 1;
-    let res = atomic::__atomic_nand_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_nand_fetch_1(&mut data as *mut u8 as *mut c_void, 1, 0);
     assert_eq!(res, 0xFE);
     assert_eq!(data, 0xFE);
 
     let mut data: u16 = 1;
-    let res = atomic::__atomic_nand_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_nand_fetch_2(&mut data as *mut u16 as *mut c_void, 1, 0);
     assert_eq!(res, 0xFFFE);
     assert_eq!(data, 0xFFFE);
 
     let mut data: u32 = 1;
-    let res = atomic::__atomic_nand_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_nand_fetch_4(&mut data as *mut u32 as *mut c_void, 1, 0);
     assert_eq!(res, 0xFFFFFFFE);
     assert_eq!(data, 0xFFFFFFFE);
 
     let mut data: u64 = 1;
-    let res = atomic::__atomic_nand_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
+    let res = dummy_atomic::__atomic_nand_fetch_8(&mut data as *mut u64 as *mut c_void, 1, 0);
     assert_eq!(res, 0xFFFFFFFFFFFFFFFE);
     assert_eq!(data, 0xFFFFFFFFFFFFFFFE);
 }
@@ -800,7 +808,10 @@ pub fn main() -> Result<(), Error> {
     test_vm_version();
     test_current_cycles();
     test_since();
-    test_atomic();
-    test_atomic2();
+    #[cfg(target_arch = "riscv64")]
+    {
+        test_atomic();
+        test_atomic2();
+    }
     Ok(())
 }

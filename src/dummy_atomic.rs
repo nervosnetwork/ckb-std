@@ -33,12 +33,12 @@ fn atomic_compare_exchange<T: PartialEq>(
     unsafe {
         let dst = ptr as *mut T;
         let old = expected as *mut T;
-        let dst_val: T = dst.read_unaligned();
-        if dst_val == old.read_unaligned() {
-            dst.write_unaligned(desired);
+        let dst_val: T = dst.read();
+        if dst_val == old.read() {
+            dst.write(desired);
             true
         } else {
-            old.write_unaligned(dst_val);
+            old.write(dst_val);
             false
         }
     }
@@ -47,8 +47,8 @@ fn atomic_compare_exchange<T: PartialEq>(
 fn atomic_fetch_add<T: Add<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
-        dst.write_unaligned(old + val);
+        let old: T = dst.read();
+        dst.write(old + val);
         old
     }
 }
@@ -56,8 +56,8 @@ fn atomic_fetch_add<T: Add<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
 fn atomic_fetch_sub<T: Sub<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
-        dst.write_unaligned(old - val);
+        let old: T = dst.read();
+        dst.write(old - val);
         old
     }
 }
@@ -65,8 +65,8 @@ fn atomic_fetch_sub<T: Sub<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
 fn atomic_fetch_xor<T: BitXor<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
-        dst.write_unaligned(old ^ val);
+        let old: T = dst.read();
+        dst.write(old ^ val);
         old
     }
 }
@@ -74,8 +74,8 @@ fn atomic_fetch_xor<T: BitXor<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T
 fn atomic_fetch_and<T: BitAnd<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
-        dst.write_unaligned(old & val);
+        let old: T = dst.read();
+        dst.write(old & val);
         old
     }
 }
@@ -83,8 +83,8 @@ fn atomic_fetch_and<T: BitAnd<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T
 fn atomic_fetch_or<T: BitOr<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
-        dst.write_unaligned(old | val);
+        let old: T = dst.read();
+        dst.write(old | val);
         old
     }
 }
@@ -95,8 +95,8 @@ fn atomic_fetch_nand<T: BitAnd<Output = T> + Not<Output = T> + Copy>(
 ) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
-        dst.write_unaligned(!(old & val));
+        let old: T = dst.read();
+        dst.write(!(old & val));
         old
     }
 }
@@ -104,9 +104,9 @@ fn atomic_fetch_nand<T: BitAnd<Output = T> + Not<Output = T> + Copy>(
 fn atomic_add_fetch<T: Add<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
+        let old: T = dst.read();
         let val2 = old + val;
-        dst.write_unaligned(val2);
+        dst.write(val2);
         val2
     }
 }
@@ -114,9 +114,9 @@ fn atomic_add_fetch<T: Add<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
 fn atomic_sub_fetch<T: Sub<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
+        let old: T = dst.read();
         let val2 = old - val;
-        dst.write_unaligned(val2);
+        dst.write(val2);
         val2
     }
 }
@@ -124,9 +124,9 @@ fn atomic_sub_fetch<T: Sub<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
 fn atomic_xor_fetch<T: BitXor<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
+        let old: T = dst.read();
         let val2 = old ^ val;
-        dst.write_unaligned(val2);
+        dst.write(val2);
         val2
     }
 }
@@ -134,9 +134,9 @@ fn atomic_xor_fetch<T: BitXor<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T
 fn atomic_and_fetch<T: BitAnd<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
+        let old: T = dst.read();
         let val2 = old & val;
-        dst.write_unaligned(val2);
+        dst.write(val2);
         val2
     }
 }
@@ -144,9 +144,9 @@ fn atomic_and_fetch<T: BitAnd<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T
 fn atomic_or_fetch<T: BitOr<Output = T> + Copy>(ptr: *mut c_void, val: T) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
+        let old: T = dst.read();
         let val2 = old | val;
-        dst.write_unaligned(val2);
+        dst.write(val2);
         val2
     }
 }
@@ -157,9 +157,9 @@ fn atomic_nand_fetch<T: BitAnd<Output = T> + Not<Output = T> + Copy>(
 ) -> T {
     unsafe {
         let dst = ptr as *mut T;
-        let old: T = dst.read_unaligned();
+        let old: T = dst.read();
         let val2 = !(old & val);
-        dst.write_unaligned(val2);
+        dst.write(val2);
         val2
     }
 }
@@ -236,7 +236,7 @@ pub extern "C" fn __atomic_compare_exchange_8(
 pub extern "C" fn __atomic_load_1(ptr: *const c_void, _memorder: isize) -> u8 {
     unsafe {
         let p = ptr as *mut u8;
-        p.read_unaligned()
+        p.read()
     }
 }
 
@@ -244,7 +244,7 @@ pub extern "C" fn __atomic_load_1(ptr: *const c_void, _memorder: isize) -> u8 {
 pub extern "C" fn __atomic_load_2(ptr: *const c_void, _memorder: isize) -> u16 {
     unsafe {
         let p = ptr as *mut u16;
-        p.read_unaligned()
+        p.read()
     }
 }
 
@@ -252,7 +252,7 @@ pub extern "C" fn __atomic_load_2(ptr: *const c_void, _memorder: isize) -> u16 {
 pub extern "C" fn __atomic_load_4(ptr: *const c_void, _memorder: isize) -> u32 {
     unsafe {
         let p = ptr as *mut u32;
-        p.read_unaligned()
+        p.read()
     }
 }
 
@@ -260,7 +260,7 @@ pub extern "C" fn __atomic_load_4(ptr: *const c_void, _memorder: isize) -> u32 {
 pub extern "C" fn __atomic_load_8(ptr: *const c_void, _memorder: isize) -> u64 {
     unsafe {
         let p = ptr as *mut u64;
-        p.read_unaligned()
+        p.read()
     }
 }
 
@@ -268,7 +268,7 @@ pub extern "C" fn __atomic_load_8(ptr: *const c_void, _memorder: isize) -> u64 {
 pub extern "C" fn __atomic_store_1(ptr: *mut c_void, val: u8, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u8;
-        p.write_unaligned(val);
+        p.write(val);
     }
 }
 
@@ -276,7 +276,7 @@ pub extern "C" fn __atomic_store_1(ptr: *mut c_void, val: u8, _memorder: isize) 
 pub extern "C" fn __atomic_store_2(ptr: *mut c_void, val: u16, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u16;
-        p.write_unaligned(val);
+        p.write(val);
     }
 }
 
@@ -284,7 +284,7 @@ pub extern "C" fn __atomic_store_2(ptr: *mut c_void, val: u16, _memorder: isize)
 pub extern "C" fn __atomic_store_4(ptr: *mut c_void, val: u32, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u32;
-        p.write_unaligned(val);
+        p.write(val);
     }
 }
 
@@ -292,7 +292,7 @@ pub extern "C" fn __atomic_store_4(ptr: *mut c_void, val: u32, _memorder: isize)
 pub extern "C" fn __atomic_store_8(ptr: *mut c_void, val: u64, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u64;
-        p.write_unaligned(val);
+        p.write(val);
     }
 }
 

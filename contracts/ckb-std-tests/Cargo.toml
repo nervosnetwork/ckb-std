@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ckb-std = { path = "../../", features = [ "dlopen-c", "atomic" ] }
+ckb-std = { path = "../../", features = [ "dlopen-c", "dummy-atomic" ] }
 blake2b-ref = { version = "0.3", default-features = false }
 bytes = { version = "1.6.0", default-features = false }
 log = { version = "0.4.17", default-features = false }
