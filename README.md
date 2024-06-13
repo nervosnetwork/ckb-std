@@ -16,6 +16,7 @@ This library contains several modules that help you write CKB contract with Rust
 * `entry!` macro: defines contract entry point
 * `default_alloc!` macro: defines global allocator for no-std rust
 * `dummy_atomic` module: dummy atomic operations
+* `log` module: colored log
 ### Memory allocator
 
 Default allocator uses a mixed allocation strategy:

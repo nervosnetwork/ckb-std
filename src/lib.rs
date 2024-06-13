@@ -38,3 +38,5 @@ pub mod dynamic_loading_c_impl;
 pub use buddy_alloc;
 #[cfg(feature = "dummy-atomic")]
 pub mod dummy_atomic;
+#[cfg(feature = "log")]
+pub mod log;
