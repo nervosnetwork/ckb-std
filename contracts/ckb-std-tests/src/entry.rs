@@ -421,8 +421,8 @@ fn test_atomic() {
     assert_eq!(v.len(), 4);
 
     // The log crate uses atomic operations.
-    log::info!("atomic info");
-    log::warn!("atomic warn");
+    ckb_std::log::info!("atomic info");
+    ckb_std::log::warn!("atomic warn");
 }
 
 #[cfg(target_arch = "riscv64")]
@@ -786,12 +786,12 @@ fn test_atomic2() {
 
 #[cfg(target_arch = "riscv64")]
 fn test_log() {
-    drop(ckb_std::log::init());
-    log::trace!("this is trace");
-    log::debug!("this is debug");
-    log::info!("this is info");
-    log::warn!("this is warn");
-    log::error!("this is error");
+    drop(ckb_std::logger::init());
+    ckb_std::log::trace!("this is trace");
+    ckb_std::log::debug!("this is debug");
+    ckb_std::log::info!("this is info");
+    ckb_std::log::warn!("this is warn");
+    ckb_std::log::error!("this is error");
 }
 
 pub fn main() -> Result<(), Error> {
