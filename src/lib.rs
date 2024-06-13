@@ -27,6 +27,7 @@ pub mod global_alloc_macro;
 pub mod high_level;
 pub mod since;
 pub mod syscalls;
+
 #[cfg(feature = "ckb-types")]
 pub use ckb_types;
 #[cfg(feature = "ckb-types")]
@@ -35,3 +36,5 @@ pub mod dynamic_loading;
 pub mod dynamic_loading_c_impl;
 #[cfg(feature = "allocator")]
 pub use buddy_alloc;
+#[cfg(feature = "dummy-atomic")]
+pub mod dummy_atomic;

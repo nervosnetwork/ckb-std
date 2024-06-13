@@ -24,6 +24,10 @@ fn main() {
         setup_compiler_flags(&mut build);
         build.compile("libc");
     }
+    if target_arch != "riscv64" && cfg!(feature = "dummy-atomic") {
+        println!("cargo:warning=This build script intentionally failed: feature `dummy-atomic` can't be used in non risc-v target");
+        std::process::exit(1);
+    }
 }
 
 fn setup_compiler_flags(build: &mut cc::Build) {
