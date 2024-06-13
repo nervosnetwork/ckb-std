@@ -63,6 +63,7 @@ dependencies = [
  "cc",
  "ckb-gen-types",
  "gcd",
+ "log",
 ]
 
 [[package]]
