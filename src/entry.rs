@@ -58,3 +58,24 @@ macro_rules! entry {
         }
     };
 }
+
+#[cfg(feature = "simulator")]
+#[macro_export]
+macro_rules! entry_simulator {
+    ($main:path) => {
+        extern crate alloc;
+
+        #[no_mangle]
+        unsafe extern "C" fn __ckb_std_main(
+            argc: core::ffi::c_int,
+            // Arg is the same as *const c_char ABI wise.
+            argv: *const $crate::env::Arg,
+            tx: *const core::ffi::c_char,
+            tx_len: core::ffi::c_int,
+        ) -> i8 {
+            let argv = core::slice::from_raw_parts(argv, argc as usize);
+            $crate::env::set_argv(argv);
+            $main()
+        }
+    };
+}
