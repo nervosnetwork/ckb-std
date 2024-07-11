@@ -70,8 +70,6 @@ macro_rules! entry_simulator {
             argc: core::ffi::c_int,
             // Arg is the same as *const c_char ABI wise.
             argv: *const $crate::env::Arg,
-            tx: *const core::ffi::c_char,
-            tx_len: core::ffi::c_int,
         ) -> i8 {
             let argv = core::slice::from_raw_parts(argv, argc as usize);
             $crate::env::set_argv(argv);

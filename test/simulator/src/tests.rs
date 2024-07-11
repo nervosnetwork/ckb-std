@@ -15,6 +15,9 @@ fn get_dylib_path(name: &str) -> String {
     #[cfg(target_os = "macos")]
     let lib_name = format!("lib{}_dbg.dylib", name);
 
+    #[cfg(target_os = "linux")]
+    let lib_name =  format!("lib{}_dbg.so", name);
+
     format!(
         "../../contracts/{0}/{0}-dbg/target/debug/{1}",
         lib_dir, lib_name
