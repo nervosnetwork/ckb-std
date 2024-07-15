@@ -1,5 +1,4 @@
 ckb_std::entry_simulator!(program_entry);
-ckb_std::default_alloc!();
 
 /// program entry
 fn program_entry() -> i8 {
