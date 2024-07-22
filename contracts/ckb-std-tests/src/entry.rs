@@ -22,8 +22,6 @@ use ckb_std::{dynamic_loading, dynamic_loading_c_impl};
 use core::ffi::c_void;
 #[cfg(target_arch = "riscv64")]
 use core::mem::size_of_val;
-#[cfg(target_arch = "riscv64")]
-use log::{info, warn};
 
 fn new_blake2b() -> Blake2b {
     const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
@@ -423,8 +421,8 @@ fn test_atomic() {
     assert_eq!(v.len(), 4);
 
     // The log crate uses atomic operations.
-    info!("atomic info");
-    warn!("atomic warn");
+    ckb_std::log::info!("atomic info");
+    ckb_std::log::warn!("atomic warn");
 }
 
 #[cfg(target_arch = "riscv64")]
@@ -786,6 +784,16 @@ fn test_atomic2() {
     assert_eq!(data, 0xFFFFFFFFFFFFFFFE);
 }
 
+#[cfg(target_arch = "riscv64")]
+fn test_log() {
+    drop(ckb_std::logger::init());
+    ckb_std::log::trace!("this is trace");
+    ckb_std::log::debug!("this is debug");
+    ckb_std::log::info!("this is info");
+    ckb_std::log::warn!("this is warn");
+    ckb_std::log::error!("this is error");
+}
+
 pub fn main() -> Result<(), Error> {
     test_basic();
     test_load_data();
@@ -812,6 +820,7 @@ pub fn main() -> Result<(), Error> {
     {
         test_atomic();
         test_atomic2();
+        test_log();
     }
     Ok(())
 }
