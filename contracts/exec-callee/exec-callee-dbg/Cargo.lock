@@ -47,12 +47,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.83"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1174fb0b6ec23863f8b971027804a42614e347eafb0a95bf0b12cdae21fc4d0"
-dependencies = [
- "libc",
-]
+checksum = "eaff6f8ce506b9773fa786672d63fc7a191ffea1be33f72bbd4aeacefca9ffc8"
 
 [[package]]
 name = "cfg-if"
@@ -247,17 +244,6 @@ dependencies = [
  "ckb-gen-types 0.116.1",
  "ckb-x64-simulator",
  "gcd",
- "log",
-]
-
-[[package]]
-name = "ckb-std-tests"
-version = "0.1.0"
-dependencies = [
- "blake2b-ref",
- "bytes",
- "ckb-std",
- "log",
 ]
 
 [[package]]
@@ -352,17 +338,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "exec-caller"
+name = "exec-callee-dbg"
 version = "0.1.0"
 dependencies = [
  "ckb-std",
-]
-
-[[package]]
-name = "exec-caller-by-code-hash"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
+ "exec-callee",
 ]
 
 [[package]]
@@ -420,15 +400,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
-version = "0.2.151"
+version = "0.2.155"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "302d7ab3130588088d277783b1e2d2e10c9e9e4a16dd9050e6ec93fb3e7048f4"
-
-[[package]]
-name = "log"
-version = "0.4.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
+checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
 name = "merkle-cbt"
@@ -615,27 +589,6 @@ name = "siphasher"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38b58827f4464d87d377d175e90bf58eb00fd8716ff0a62f80356b5e61555d0d"
-
-[[package]]
-name = "spawn-callee"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
-
-[[package]]
-name = "spawn-caller"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
-
-[[package]]
-name = "spawn-caller-by-code-hash"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
 
 [[package]]
 name = "syn"

@@ -29,6 +29,7 @@
 /// debug!("hello world");
 /// debug!("there is a universal error caused by {}", 42);
 /// ```
+#[cfg(not(feature = "simulator"))]
 #[macro_export]
 macro_rules! debug {
     ($fmt:literal) => {
@@ -41,5 +42,16 @@ macro_rules! debug {
         // Avoid unused warnings.
         #[cfg(not(debug_assertions))]
         core::mem::drop(($(&$args),+));
+    };
+}
+
+#[cfg(feature = "simulator")]
+#[macro_export]
+macro_rules! debug {
+    ($fmt:literal) => {
+        println!("{}", format!($fmt));
+    };
+    ($fmt:literal, $($args:expr),+) => {
+        println!("{}", format!($fmt, $($args), +));
     };
 }

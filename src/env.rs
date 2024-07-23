@@ -32,6 +32,15 @@ impl Deref for Arg {
     }
 }
 
+#[cfg(feature = "simulator")]
+impl Arg {
+    pub fn new(arg: &str) -> Self {
+        Self {
+            0: (arg.as_ptr()) as *const c_char,
+        }
+    }
+}
+
 static mut ARGV: &'static [Arg] = &[];
 
 /// Returns the arguments that this program was started with (normally passed

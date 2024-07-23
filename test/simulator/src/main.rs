@@ -3,6 +3,9 @@ extern crate alloc;
 #[path = "../../../contracts/ckb-std-tests/src/entry.rs"]
 mod entry;
 
+#[cfg(test)]
+mod tests;
+
 pub mod error {
     use ckb_std::error::SysError;
     /// Error
