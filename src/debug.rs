@@ -48,10 +48,15 @@ macro_rules! debug {
 #[cfg(feature = "simulator")]
 #[macro_export]
 macro_rules! debug {
+    
     ($fmt:literal) => {
+        #[cfg(std)]
         println!("{}", format!($fmt));
     };
     ($fmt:literal, $($args:expr),+) => {
+        #[cfg(not(std))]
+        let _ = ($(&$args),+);
+        #[cfg(std)]
         println!("{}", format!($fmt, $($args), +));
     };
 }
