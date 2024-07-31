@@ -279,9 +279,9 @@ dependencies = [
 
 [[package]]
 name = "ckb-x64-simulator"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b89831d96c208b56236462abf23a41956f1cc3135d66d299ddc0672335f70c7c"
+checksum = "16e41e0658c6bf54a48ecabf195ee5d8bb9ce3b71f7d633ed08604620607b769"
 dependencies = [
  "cc",
  "ckb-mock-tx-types",
