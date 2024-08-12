@@ -39,16 +39,13 @@ macro_rules! debug {
     ($fmt:literal, $($args:expr),+) => {
         #[cfg(debug_assertions)]
         $crate::syscalls::debug(alloc::format!($fmt, $($args), +));
-        // Avoid unused warnings.
-        #[cfg(not(debug_assertions))]
-        core::mem::drop(($(&$args),+));
     };
 }
 
 #[cfg(feature = "simulator")]
 #[macro_export]
 macro_rules! debug {
-    
+
     ($fmt:literal) => {
         #[cfg(std)]
         println!("{}", format!($fmt));
