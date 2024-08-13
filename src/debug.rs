@@ -51,8 +51,6 @@ macro_rules! debug {
         println!("{}", format!($fmt));
     };
     ($fmt:literal, $($args:expr),+) => {
-        #[cfg(not(std))]
-        let _ = ($(&$args),+);
         #[cfg(std)]
         println!("{}", format!($fmt, $($args), +));
     };
