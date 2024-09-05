@@ -653,7 +653,7 @@ pub fn exec_cell(
     hash_type: ScriptHashType,
     argv: &[&CStr],
 ) -> Result<Infallible, SysError> {
-    #[cfg(not(feature = "simulator"))]
+    #[cfg(not(feature = "native-simulator"))]
     {
         let index = look_for_dep_with_hash2(code_hash, hash_type)?;
         let ret = syscalls::exec(index, Source::CellDep, 0, 0, argv);
@@ -664,7 +664,7 @@ pub fn exec_cell(
         };
         Err(err)
     }
-    #[cfg(feature = "simulator")]
+    #[cfg(feature = "native-simulator")]
     syscalls::exec_cell(code_hash, hash_type, argv)
 }
 

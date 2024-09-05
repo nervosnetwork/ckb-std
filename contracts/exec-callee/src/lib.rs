@@ -1,6 +1,6 @@
-#![cfg_attr(not(feature = "simulator"), no_std)]
+#![cfg_attr(not(feature = "native-simulator"), no_std)]
 
-#[cfg(feature = "simulator")]
+#[cfg(feature = "native-simulator")]
 pub mod entry;
-#[cfg(feature = "simulator")]
+#[cfg(feature = "native-simulator")]
 pub mod error;

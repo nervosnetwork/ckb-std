@@ -59,7 +59,7 @@ macro_rules! entry {
     };
 }
 
-#[cfg(feature = "simulator")]
+#[cfg(feature = "native-simulator")]
 #[macro_export]
 macro_rules! entry_simulator {
     ($main:path) => {
