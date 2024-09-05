@@ -71,7 +71,11 @@ macro_rules! entry_simulator {
             // Arg is the same as *const c_char ABI wise.
             argv: *const $crate::env::Arg,
         ) -> i8 {
-            let argv = core::slice::from_raw_parts(argv, argc as usize);
+            let argv = if argc == 0 {
+                &[]
+            } else {
+                core::slice::from_raw_parts(argv, argc as usize)
+            };
             $crate::env::set_argv(argv);
             $main()
         }
