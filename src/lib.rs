@@ -8,10 +8,9 @@
 //! * `entry!` macro: defines contract entry point
 //! * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust
 
-#![cfg_attr(not(feature = "simulator"), no_std)]
+#![cfg_attr(not(feature = "native-simulator"), no_std)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-#[cfg(not(feature = "rustc-dep-of-std"))]
 extern crate alloc;
 
 pub mod ckb_constants;

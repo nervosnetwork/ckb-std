@@ -32,7 +32,7 @@ impl Deref for Arg {
     }
 }
 
-#[cfg(feature = "simulator")]
+#[cfg(feature = "native-simulator")]
 impl Arg {
     pub fn new(arg: &str) -> Self {
         Self {
@@ -53,7 +53,7 @@ pub fn argv() -> &'static [Arg] {
     unsafe { ARGV }
 }
 
-// For simulator and entry!.
+// For native-simulator and entry!.
 #[doc(hidden)]
 #[inline]
 pub unsafe fn set_argv(argv: &'static [Arg]) {

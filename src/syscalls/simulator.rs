@@ -211,7 +211,7 @@ pub fn load_cell_code(
     _index: usize,
     _source: Source,
 ) -> Result<usize, SysError> {
-    panic!("This is not supported in the simulator!");
+    panic!("This is not supported in the native-simulator!");
 }
 
 pub fn vm_version() -> Result<u64, SysError> {

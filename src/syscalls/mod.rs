@@ -1,12 +1,12 @@
 // re-export to maintain compatible with old versions
 pub use crate::error::SysError;
 
-#[cfg(not(feature = "simulator"))]
+#[cfg(not(feature = "native-simulator"))]
 mod native;
-#[cfg(not(feature = "simulator"))]
+#[cfg(not(feature = "native-simulator"))]
 pub use native::*;
 
-#[cfg(feature = "simulator")]
+#[cfg(feature = "native-simulator")]
 mod simulator;
-#[cfg(feature = "simulator")]
+#[cfg(feature = "native-simulator")]
 pub use simulator::*;
