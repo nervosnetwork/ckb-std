@@ -7,6 +7,11 @@ pub enum Error {
     ItemMissing,
     LengthNotEnough,
     Encoding,
+    WaitFailure,
+    InvalidFd,
+    OtherEndClosed,
+    MaxVmsSpawned,
+    MaxFdsCreated,
     // Add customized errors here...
 }
 
@@ -18,6 +23,11 @@ impl From<SysError> for Error {
             ItemMissing => Self::ItemMissing,
             LengthNotEnough(_) => Self::LengthNotEnough,
             Encoding => Self::Encoding,
+            WaitFailure => Self::WaitFailure,
+            InvalidFd => Self::InvalidFd,
+            OtherEndClosed => Self::OtherEndClosed,
+            MaxVmsSpawned => Self::MaxVmsSpawned,
+            MaxFdsCreated => Self::MaxFdsCreated,
             Unknown(err_code) => panic!("unexpected sys error {}", err_code),
         }
     }

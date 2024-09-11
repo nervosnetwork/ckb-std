@@ -11,19 +11,14 @@ pub enum SysError {
     Encoding,
 
     /// Failed to wait. Its value is 5.
-    #[cfg(feature = "ckb2023")]
     WaitFailure,
     /// Invalid file descriptor. Its value is 6.
-    #[cfg(feature = "ckb2023")]
     InvalidFd,
     /// Reading from or writing to file descriptor failed due to other end closed. Its value is 7.
-    #[cfg(feature = "ckb2023")]
     OtherEndClosed,
     /// Max vms has been spawned. Its value is 8.
-    #[cfg(feature = "ckb2023")]
     MaxVmsSpawned,
     /// Max fds has been spawned. Its value is 9.
-    #[cfg(feature = "ckb2023")]
     MaxFdsCreated,
 
     /// Unknown syscall error number

@@ -573,7 +573,6 @@ pub fn exec(index: usize, source: Source, place: usize, bounds: usize, argv: &[&
     }
 }
 
-#[cfg(feature = "ckb2023")]
 #[repr(C)]
 pub struct SpawnArgs {
     /// argc contains the number of arguments passed to the program.
@@ -597,7 +596,6 @@ pub struct SpawnArgs {
 /// * `spgs` - spawn arguments.
 ///
 /// Returns success or a syscall error.
-#[cfg(feature = "ckb2023")]
 pub fn spawn(
     index: usize,
     source: Source,
@@ -636,7 +634,6 @@ pub fn spawn(
 /// * `pid` - process id
 ///
 /// Returns exit code.
-#[cfg(feature = "ckb2023")]
 pub fn wait(pid: u64) -> Result<i8, SysError> {
     let mut code: u64 = 0;
     let ret = unsafe { syscall(pid, &mut code as *mut u64 as u64, 0, 0, 0, 0, 0, SYS_WAIT) };
@@ -649,7 +646,6 @@ pub fn wait(pid: u64) -> Result<i8, SysError> {
 
 /// This syscall is used to get the current process id. Root process ID is 0.
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
 pub fn process_id() -> u64 {
     unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_PROCESS_ID) }
 }
@@ -657,7 +653,6 @@ pub fn process_id() -> u64 {
 /// This syscall create a pipe with read-write pair of file descriptions. The file descriptor with read permission is
 /// located at fds[0], and the corresponding file descriptor with write permission is located at fds[1].
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
 pub fn pipe() -> Result<(u64, u64), SysError> {
     let mut fds: [u64; 2] = [0, 0];
     let ret = unsafe { syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_PIPE) };
@@ -671,7 +666,6 @@ pub fn pipe() -> Result<(u64, u64), SysError> {
 /// This syscall reads data from a pipe via a file descriptor. The syscall Read attempts to read up to value pointed by
 /// length bytes from file descriptor fd into the buffer, and the actual length of data read is returned.
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
 pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
     let mut l: u64 = buffer.len() as u64;
     let ret = unsafe {
@@ -698,7 +692,6 @@ pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
 /// This syscall writes data to a pipe via a file descriptor. The syscall Write writes up to value pointed by length
 /// bytes from the buffer, and the actual length of data written is returned.
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
 pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
     let mut l: u64 = buffer.len() as u64;
     let ret = unsafe {
@@ -725,8 +718,7 @@ pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
 /// This syscall retrieves the file descriptors available to the current process, which are passed in from the parent
 /// process. These results are copied from the inherited_fds parameter of the Spawn syscall.
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
-pub fn inherited_file_descriptors(fds: &mut [u64]) {
+pub fn inherited_fds(fds: &mut [u64]) {
     let mut l: u64 = fds.len() as u64;
     unsafe {
         syscall(
@@ -737,7 +729,7 @@ pub fn inherited_file_descriptors(fds: &mut [u64]) {
             0,
             0,
             0,
-            SYS_INHERITED_FD,
+            SYS_INHERITED_FDS,
         )
     };
 }
@@ -745,7 +737,6 @@ pub fn inherited_file_descriptors(fds: &mut [u64]) {
 /// This syscall manually closes a file descriptor. After calling this, any attempt to read/write the file descriptor
 /// pointed to the other end would fail.
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
 pub fn close(fd: u64) -> Result<(), SysError> {
     let ret = unsafe { syscall(fd, 0, 0, 0, 0, 0, 0, SYS_CLOSE) };
     match ret {
@@ -766,7 +757,6 @@ pub fn close(fd: u64) -> Result<(), SysError> {
 /// * `source` - source of cell
 ///
 /// Note: available after ckb2023.
-#[cfg(feature = "ckb2023")]
 pub fn load_block_extension(
     buf: &mut [u8],
     offset: usize,

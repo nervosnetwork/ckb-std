@@ -12,6 +12,11 @@ pub mod error {
         ItemMissing,
         LengthNotEnough,
         Encoding,
+        WaitFailure,
+        InvalidFd,
+        OtherEndClosed,
+        MaxVmsSpawned,
+        MaxFdsCreated,
         // Add customized errors here...
     }
 
@@ -23,6 +28,11 @@ pub mod error {
                 ItemMissing => Self::ItemMissing,
                 LengthNotEnough(_) => Self::LengthNotEnough,
                 Encoding => Self::Encoding,
+                WaitFailure => Self::WaitFailure,
+                InvalidFd => Self::InvalidFd,
+                OtherEndClosed => Self::OtherEndClosed,
+                MaxVmsSpawned => Self::MaxVmsSpawned,
+                MaxFdsCreated => Self::MaxFdsCreated,
                 Unknown(err_code) => panic!("unexpected sys error {}", err_code),
             }
         }

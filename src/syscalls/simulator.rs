@@ -257,3 +257,62 @@ pub fn exec_cell(
     );
     Err(SysError::Unknown(ret as u64))
 }
+
+#[repr(C)]
+pub struct SpawnArgs {
+    /// argc contains the number of arguments passed to the program.
+    pub argc: u64,
+    /// argv is a one-dimensional array of strings.
+    pub argv: *const *const i8,
+    /// a pointer used to save the process_id of the child process.
+    pub process_id: *mut u64,
+    /// an array representing the file descriptors passed to the child process. It must end with zero.
+    pub inherited_fds: *const u64,
+}
+
+pub fn spawn(
+    index: usize,
+    source: Source,
+    place: usize,
+    bounds: usize,
+    spgs: &mut SpawnArgs,
+) -> Result<u64, SysError> {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn wait(pid: u64) -> Result<i8, SysError> {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn process_id() -> u64 {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn pipe() -> Result<(u64, u64), SysError> {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn inherited_fds(fds: &mut [u64]) {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn close(fd: u64) -> Result<(), SysError> {
+    panic!("This is not supported in the native-simulator!");
+}
+
+pub fn load_block_extension(
+    buf: &mut [u8],
+    offset: usize,
+    index: usize,
+    source: Source,
+) -> Result<usize, SysError> {
+    panic!("This is not supported in the native-simulator!");
+}

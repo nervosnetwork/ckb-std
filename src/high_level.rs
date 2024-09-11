@@ -681,7 +681,6 @@ pub fn exec_cell(
 ///            - if you want to pass a piece of bytes data, you may encode it to hexadecimal string or other format:
 ///              - high_level::encode_hex(&vec![0xff, 0xfe, 0xfd]);
 /// * `inherited_fds` - the fd list to be passed to the child process.
-#[cfg(feature = "ckb2023")]
 pub fn spawn_cell(
     code_hash: &[u8],
     hash_type: ScriptHashType,
