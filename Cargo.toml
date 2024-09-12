@@ -10,7 +10,7 @@ exclude = ["docs"]
 
 [package.metadata.docs.rs]
 # All features except simulator and rustc-dep-of-std.
-features = ["allocator", "ckb-types", "libc", "calc-hash", "build-with-clang", "dlopen-c", "ckb2023"]
+features = ["allocator", "ckb-types", "libc", "calc-hash", "build-with-clang", "dlopen-c"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -23,7 +23,6 @@ native-simulator = ["ckb-x64-simulator"]
 dlopen-c = ["libc"]
 build-with-clang = []
 libc = []
-ckb2023 = []
 # work with `target-feature=-a` Cargo flag
 dummy-atomic = []
 log = ["dep:log", "dummy-atomic"]
