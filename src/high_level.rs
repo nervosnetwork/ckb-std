@@ -79,6 +79,9 @@ fn load_data<F: Fn(&mut [u8], usize) -> Result<usize, SysError>>(
 /// ```
 /// let cell_output = load_cell(0, Source::Input).unwrap();
 /// ```
+///
+/// **Note:** This function can panic if the underlying data is too large,
+/// potentially causing an out-of-memory error.
 pub fn load_cell(index: usize, source: Source) -> Result<CellOutput, SysError> {
     let data = load_data(|buf, offset| syscalls::load_cell(buf, offset, index, source))?;
 
@@ -150,6 +153,9 @@ pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
 /// ```
 /// let witness = load_witness(0, Source::Input).unwrap();
 /// ```
+///
+/// **Note:** This function can panic if the underlying data is too large,
+/// potentially causing an out-of-memory error.
 pub fn load_witness(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
     load_data(|buf, offset| syscalls::load_witness(buf, offset, index, source))
 }
@@ -168,6 +174,9 @@ pub fn load_witness(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
 /// ```
 /// let witness_args = load_witness_args(0, Source::Input).unwrap();
 /// ```
+///
+/// **Note:** This function can panic if the underlying data is too large,
+/// potentially causing an out-of-memory error.
 pub fn load_witness_args(index: usize, source: Source) -> Result<WitnessArgs, SysError> {
     let data = load_data(|buf, offset| syscalls::load_witness(buf, offset, index, source))?;
 
@@ -186,6 +195,9 @@ pub fn load_witness_args(index: usize, source: Source) -> Result<WitnessArgs, Sy
 /// ```
 /// let tx = load_transaction().unwrap();
 /// ```
+///
+/// **Note:** This function can panic if the underlying data is too large,
+/// potentially causing an out-of-memory error.
 pub fn load_transaction() -> Result<Transaction, SysError> {
     let data = load_data(|buf, offset| syscalls::load_transaction(buf, offset))?;
 
@@ -470,6 +482,9 @@ pub fn load_input_out_point(index: usize, source: Source) -> Result<OutPoint, Sy
 /// ```
 /// let data = load_cell_data(index, source).unwrap();
 /// ```
+///
+/// **Note:** This function can panic if the underlying data is too large,
+/// potentially causing an out-of-memory error.
 pub fn load_cell_data(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
     load_data(|buf, offset| syscalls::load_cell_data(buf, offset, index, source))
 }
