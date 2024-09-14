@@ -2,4 +2,4 @@
 default-target = "riscv64imac-unknown-none-elf"
 
 [target.riscv64imac-unknown-none-elf]
-image = "nervos/ckb-riscv-gnu-toolchain:focal-20230214"
+image = "nervos/ckb-riscv-gnu-toolchain:jammy-20230214"
