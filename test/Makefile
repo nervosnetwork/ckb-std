@@ -8,6 +8,8 @@ build:
 	make -C shared-lib all-via-docker
 	cd .. && capsule build
 	cd .. && RUSTFLAGS="-C target-feature=-a" capsule build -n ckb-std-tests
+	cd .. && RUSTFLAGS="-C target-feature=-a" capsule build -n exec-caller-by-code-hash
+	cd .. && RUSTFLAGS="-C target-feature=-a" capsule build -n spawn-caller-by-code-hash
 
 clean:
 	rm -rf ../build
