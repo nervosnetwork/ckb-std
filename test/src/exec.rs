@@ -30,7 +30,7 @@ fn test_exec_by_index() {
     let caller_out_point = context.deploy_cell(caller_bin);
     let callee_bin = {
         let mut buf = Vec::new();
-        File::open("../build/debug/exec-callee")
+        File::open("../target/riscv64imac-unknown-none-elf/debug/examples/exec_callee")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
@@ -93,7 +93,7 @@ fn test_exec_by_code_hash() {
     let caller_out_point = context.deploy_cell(caller_bin);
     let callee_bin = {
         let mut buf = Vec::new();
-        File::open("../build/debug/exec-callee")
+        File::open("../target/riscv64imac-unknown-none-elf/debug/examples/exec_callee")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");

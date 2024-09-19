@@ -3,6 +3,7 @@ CC := riscv64-unknown-elf-gcc
 
 all: \
 	target/riscv64imac-unknown-none-elf/debug/examples/demo \
+	target/riscv64imac-unknown-none-elf/debug/examples/exec_callee \
 	target/riscv64imac-unknown-none-elf/debug/examples/exec_caller_by_code_hash \
 	target/riscv64imac-unknown-none-elf/debug/examples/exec_caller \
 	target/riscv64imac-unknown-none-elf/debug/examples/spawn_callee \
@@ -11,6 +12,9 @@ all: \
 
 target/riscv64imac-unknown-none-elf/debug/examples/demo:
 	cargo build --target riscv64imac-unknown-none-elf --example demo
+
+target/riscv64imac-unknown-none-elf/debug/examples/exec_callee:
+	cargo build --target riscv64imac-unknown-none-elf --example exec_callee
 
 target/riscv64imac-unknown-none-elf/debug/examples/exec_caller_by_code_hash:
 	RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf --features="dummy-atomic" --example exec_caller_by_code_hash
