@@ -17,6 +17,7 @@ jobs:
       - name: Deps
         run: |
           rustup target add riscv64imac-unknown-none-elf
+          wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18 && rm llvm.sh
       - name: Push
         run: |
           cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
