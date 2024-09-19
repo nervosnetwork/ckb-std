@@ -48,7 +48,7 @@ fn setup_compiler_flags(build: &mut cc::Build) {
 
     let clang = match std::env::var_os("CLANG") {
         Some(val) => val,
-        None => "clang-16".into(),
+        None => "clang-18".into(),
     };
 
     if cfg!(feature = "build-with-clang") {

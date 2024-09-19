@@ -14,10 +14,7 @@ jobs:
     - name: Deps
       run: |
         rustup target add riscv64imac-unknown-none-elf
-        cargo install cross --git https://github.com/cross-rs/cross --rev=6982b6c
-        cargo install ckb-capsule --git https://github.com/nervosnetwork/capsule --rev 5c1b2ce
     - name: Test
       run: |
-        cargo build --target=riscv64imac-unknown-none-elf --no-default-features --features=ckb-types,allocator
-        cross check --examples
+        make
         make test

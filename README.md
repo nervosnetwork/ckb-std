@@ -1,5 +1,5 @@
 # ckb-std
-[![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std) 
+[![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std)
 
 This library contains several modules that help you write CKB contract with Rust.
 
@@ -35,9 +35,3 @@ default_alloc!(4 * 1024, 516 * 1024, 64)
 ```
 
 > Beware, use difference heap size or memory block size may affect the verification result of the contract, some runtime errors such as **out of memory** may occur; you should always test the contract after customizing.
-
-### Examples
-
-Check `examples` and [tests](https://github.com/nervosnetwork/ckb-std/blob/master/contracts/ckb-std-tests) to learn how to use.
-
-See also [ckb-tool](https://github.com/nervosnetwork/capsule/tree/develop/crates/testtool) which helps you write tests.
