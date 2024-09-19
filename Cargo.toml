@@ -37,6 +37,9 @@ ckb-x64-simulator = { version = "0.9", optional = true }
 gcd = "2.3"
 log = { version = "0.4", optional = true, default-features = false }
 
+[dev-dependencies]
+blake2b-ref = { version = "0.3", default-features = false }
+
 [workspace]
 exclude = ["test"]
 resolver = "2"

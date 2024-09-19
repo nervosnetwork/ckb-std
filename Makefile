@@ -8,7 +8,8 @@ all: \
 	target/riscv64imac-unknown-none-elf/debug/examples/exec_caller \
 	target/riscv64imac-unknown-none-elf/debug/examples/spawn_callee \
 	target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller_by_code_hash \
-	target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller
+	target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller \
+	target/riscv64imac-unknown-none-elf/debug/examples/std_test
 
 target/riscv64imac-unknown-none-elf/debug/examples/demo:
 	cargo build --target riscv64imac-unknown-none-elf --example demo
@@ -30,6 +31,9 @@ target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller_by_code_hash:
 
 target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller:
 	cargo build --target riscv64imac-unknown-none-elf --example spawn_caller
+
+target/riscv64imac-unknown-none-elf/debug/examples/std_test:
+	RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf --features="dlopen-c,dummy-atomic,log" --example std_test
 
 default: integration
 
