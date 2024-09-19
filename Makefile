@@ -1,6 +1,32 @@
 TARGET := riscv64imac-unknown-none-elf
 CC := riscv64-unknown-elf-gcc
 
+all: \
+	target/riscv64imac-unknown-none-elf/debug/examples/demo \
+	target/riscv64imac-unknown-none-elf/debug/examples/exec_caller_by_code_hash \
+	target/riscv64imac-unknown-none-elf/debug/examples/exec_caller \
+	target/riscv64imac-unknown-none-elf/debug/examples/spawn_callee \
+	target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller_by_code_hash \
+	target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller
+
+target/riscv64imac-unknown-none-elf/debug/examples/demo:
+	cargo build --target riscv64imac-unknown-none-elf --example demo
+
+target/riscv64imac-unknown-none-elf/debug/examples/exec_caller_by_code_hash:
+	RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf --features="dummy-atomic" --example exec_caller_by_code_hash
+
+target/riscv64imac-unknown-none-elf/debug/examples/exec_caller:
+	cargo build --target riscv64imac-unknown-none-elf --example exec_caller
+
+target/riscv64imac-unknown-none-elf/debug/examples/spawn_callee:
+	cargo build --target riscv64imac-unknown-none-elf --example spawn_callee
+
+target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller_by_code_hash:
+	RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf --features="dummy-atomic" --example spawn_caller_by_code_hash
+
+target/riscv64imac-unknown-none-elf/debug/examples/spawn_caller:
+	cargo build --target riscv64imac-unknown-none-elf --example spawn_caller
+
 default: integration
 
 publish-crate:

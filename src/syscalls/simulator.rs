@@ -271,16 +271,16 @@ pub struct SpawnArgs {
 }
 
 pub fn spawn(
-    index: usize,
-    source: Source,
-    place: usize,
-    bounds: usize,
-    spgs: &mut SpawnArgs,
+    _index: usize,
+    _source: Source,
+    _place: usize,
+    _bounds: usize,
+    _spgs: &mut SpawnArgs,
 ) -> Result<u64, SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
-pub fn wait(pid: u64) -> Result<i8, SysError> {
+pub fn wait(_pid: u64) -> Result<i8, SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
@@ -292,27 +292,27 @@ pub fn pipe() -> Result<(u64, u64), SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
-pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
+pub fn read(_fd: u64, _buffer: &mut [u8]) -> Result<usize, SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
-pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
+pub fn write(_fd: u64, _buffer: &[u8]) -> Result<usize, SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
-pub fn inherited_fds(fds: &mut [u64]) {
+pub fn inherited_fds(_fds: &mut [u64]) {
     panic!("This is not supported in the native-simulator!");
 }
 
-pub fn close(fd: u64) -> Result<(), SysError> {
+pub fn close(_fd: u64) -> Result<(), SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
 pub fn load_block_extension(
-    buf: &mut [u8],
-    offset: usize,
-    index: usize,
-    source: Source,
+    _buf: &mut [u8],
+    _offset: usize,
+    _index: usize,
+    _source: Source,
 ) -> Result<usize, SysError> {
     panic!("This is not supported in the native-simulator!");
 }

@@ -365,20 +365,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "exec-caller"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
-
-[[package]]
-name = "exec-caller-by-code-hash"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
-
-[[package]]
 name = "faster-hex"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -649,27 +635,6 @@ name = "siphasher"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38b58827f4464d87d377d175e90bf58eb00fd8716ff0a62f80356b5e61555d0d"
-
-[[package]]
-name = "spawn-callee"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
-
-[[package]]
-name = "spawn-caller"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
-
-[[package]]
-name = "spawn-caller-by-code-hash"
-version = "0.1.0"
-dependencies = [
- "ckb-std",
-]
 
 [[package]]
 name = "syn"
