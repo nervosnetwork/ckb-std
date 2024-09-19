@@ -19,7 +19,7 @@ fn get_dylib_path(name: &str) -> String {
     let lib_name =  format!("lib{}_dbg.so", name);
 
     format!(
-        "../../contracts/{0}/{0}-dbg/target/debug/{1}",
+        "../../test/{0}-dbg/target/debug/{1}",
         lib_dir, lib_name
     )
 }

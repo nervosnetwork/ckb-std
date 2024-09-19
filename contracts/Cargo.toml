@@ -1,5 +1,5 @@
 [workspace]
-members = ["ckb-std-tests", "exec-callee"]
+members = ["ckb-std-tests"]
 resolver = "2"
 
 [profile.release]

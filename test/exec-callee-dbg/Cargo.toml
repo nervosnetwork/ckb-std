@@ -5,8 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-exec-callee = { path = "../", features = ["native-simulator"] }
-ckb-std = { path = "../../../", features = ["native-simulator"] }
+ckb-std = { path = "../../", features = ["native-simulator"] }
 
 [lib]
 crate-type = ["cdylib"]
