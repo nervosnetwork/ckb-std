@@ -9,8 +9,4 @@ edition = "2018"
 native-simulator = ["ckb-std/native-simulator"]
 
 [dependencies]
-<<<<<<< HEAD
 ckb-std = { path = "../../", default-features=false, features=["allocator", "build-with-clang", "calc-hash", "ckb-types", "libc"] }
-=======
-ckb-std = { path = "../../", features=["build-with-clang"] }
->>>>>>> b5ef88b (Preserve most of the directory structure)
