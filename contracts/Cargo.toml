@@ -1,9 +1,0 @@
-[workspace]
-members = ["ckb-std-tests"]
-resolver = "2"
-
-[profile.release]
-overflow-checks = true
-opt-level = 's'
-lto = true
-codegen-units = 1
