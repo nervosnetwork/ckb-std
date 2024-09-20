@@ -4,12 +4,12 @@ CC := riscv64-unknown-elf-gcc
 default: integration
 
 publish-crate:
-	cross publish -p ckb-std
+	cargo publish -p ckb-std
 
 publish: publish-crate
 
 clean:
-	cross clean && make -C test clean
+	cargo clean && make -C test clean
 
 test-shared-lib:
 	make -C test/shared-lib all-via-docker
@@ -20,6 +20,6 @@ test:
 	make -C test test
 
 check:
-	cross check --target ${TARGET} --examples
+	cargo check --target ${TARGET} --examples
 
 .PHONY: test check

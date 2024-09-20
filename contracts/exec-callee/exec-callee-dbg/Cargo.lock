@@ -127,10 +127,21 @@ dependencies = [
  "cfg-if",
  "ckb-error",
  "ckb-fixed-hash",
- "ckb-hash",
+ "ckb-hash 0.116.1",
  "ckb-occupied-capacity",
- "molecule",
+ "molecule 0.7.5",
  "numext-fixed-uint",
+]
+
+[[package]]
+name = "ckb-gen-types"
+version = "0.118.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0a7891f62f4ae4f018bfde91a46178c78491a1dfee740a20b994003a23f10af"
+dependencies = [
+ "cfg-if",
+ "ckb-hash 0.118.0",
+ "molecule 0.8.0",
 ]
 
 [[package]]
@@ -141,6 +152,15 @@ checksum = "d5754bc49cf76a7e8829fe6a7cf1eea1284cbca9777b521f072c76d6ae28d303"
 dependencies = [
  "blake2b-ref",
  "blake2b-rs",
+]
+
+[[package]]
+name = "ckb-hash"
+version = "0.118.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d96b7aec74956ae5e79d0fc68e5903dc2b133c2c64644514485bbc9feb5367eb"
+dependencies = [
+ "blake2b-ref",
 ]
 
 [[package]]
@@ -223,7 +243,7 @@ version = "0.15.3"
 dependencies = [
  "buddy-alloc",
  "cc",
- "ckb-gen-types",
+ "ckb-gen-types 0.118.0",
  "ckb-x64-simulator",
  "gcd",
 ]
@@ -249,15 +269,15 @@ dependencies = [
  "ckb-constant",
  "ckb-error",
  "ckb-fixed-hash",
- "ckb-gen-types",
- "ckb-hash",
+ "ckb-gen-types 0.116.1",
+ "ckb-hash 0.116.1",
  "ckb-merkle-mountain-range",
  "ckb-occupied-capacity",
  "ckb-rational",
  "derive_more",
  "golomb-coded-set",
  "merkle-cbt",
- "molecule",
+ "molecule 0.7.5",
  "numext-fixed-uint",
  "once_cell",
  "paste",
@@ -445,6 +465,16 @@ dependencies = [
  "bytes",
  "cfg-if",
  "faster-hex",
+]
+
+[[package]]
+name = "molecule"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6efe1c7efcd0bdf4ca590e104bcb13087d9968956ae4ae98e92fb8c1da0f3730"
+dependencies = [
+ "bytes",
+ "cfg-if",
 ]
 
 [[package]]

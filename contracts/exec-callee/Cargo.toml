@@ -9,4 +9,4 @@ edition = "2018"
 native-simulator = ["ckb-std/native-simulator"]
 
 [dependencies]
-ckb-std = { path = "../../" }
+ckb-std = { path = "../../", features=["build-with-clang"] }
