@@ -16,7 +16,7 @@ name = "exec-callee"
 path = "src/exec_callee.rs"
 
 [dependencies]
-ckb-std = { path = "../..", features = ["ckb-types", "native-simulator"] }
+ckb-std = { path = "../..", default-features=false, features = ["allocator", "calc-hash", "ckb-types", "libc", "native-simulator"] }
 blake2b-ref = { version = "0.3", default-features = false }
 bytes = { version = "1.6.0", default-features = false }
 log = { version = "0.4.17", default-features = false }
