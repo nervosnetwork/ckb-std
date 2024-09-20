@@ -239,7 +239,7 @@ dependencies = [
 
 [[package]]
 name = "ckb-std"
-version = "0.15.3"
+version = "0.16.0"
 dependencies = [
  "buddy-alloc",
  "cc",
