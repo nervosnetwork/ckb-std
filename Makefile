@@ -4,7 +4,10 @@ CC := riscv64-unknown-elf-gcc
 default: integration
 
 publish-crate:
-	cargo publish -p ckb-std
+	cargo publish --target ${TARGET} -p ckb-std
+
+publish-crate-dryrun:
+	cargo publish --dry-run --target ${TARGET} -p ckb-std --allow-dirty
 
 publish: publish-crate
 
@@ -16,7 +19,7 @@ test-shared-lib:
 
 integration: check
 
-test:
+test: publish-crate-dryrun
 	make -C test test
 
 check:

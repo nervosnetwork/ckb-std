@@ -34,6 +34,7 @@ pub mod error {
                 MaxVmsSpawned => Self::MaxVmsSpawned,
                 MaxFdsCreated => Self::MaxFdsCreated,
                 Unknown(err_code) => panic!("unexpected sys error {}", err_code),
+                _ => panic!("other sys error"),
             }
         }
     }

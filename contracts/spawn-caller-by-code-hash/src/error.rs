@@ -28,6 +28,7 @@ impl From<SysError> for Error {
             MaxVmsSpawned => Self::MaxVmsSpawned,
             MaxFdsCreated => Self::MaxFdsCreated,
             Unknown(err_code) => panic!("unexpected sys error {}", err_code),
+            _ => panic!("other sys error"),
         }
     }
 }

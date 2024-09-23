@@ -84,10 +84,12 @@ fn test_exec_by_code_hash() {
     let mut context = Context::default();
     let caller_bin = {
         let mut buf = Vec::new();
-        File::open("../contracts/target/riscv64imac-unknown-none-elf/debug/exec-caller-by-code-hash")
-            .unwrap()
-            .read_to_end(&mut buf)
-            .expect("read code");
+        File::open(
+            "../contracts/target/riscv64imac-unknown-none-elf/debug/exec-caller-by-code-hash",
+        )
+        .unwrap()
+        .read_to_end(&mut buf)
+        .expect("read code");
         Bytes::from(buf)
     };
     let caller_out_point = context.deploy_cell(caller_bin);

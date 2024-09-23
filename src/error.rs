@@ -20,7 +20,8 @@ pub enum SysError {
     MaxVmsSpawned,
     /// Max fds has been spawned. Its value is 9.
     MaxFdsCreated,
-
+    /// Type ID Error
+    TypeIDError,
     /// Unknown syscall error number
     Unknown(u64),
 }

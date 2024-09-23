@@ -26,12 +26,17 @@ libc = []
 # work with `target-feature=-a` Cargo flag
 dummy-atomic = []
 log = ["dep:log", "dummy-atomic"]
+# require `ckb-hash`
+type-id = ["ckb-hash", "ckb-types"]
+
 
 [build-dependencies]
 cc = "1.0"
 
 [dependencies]
 ckb-types = { package = "ckb-gen-types", version = "0.118", default-features = false, optional = true }
+ckb-hash = { version = "0.118", default-features = false, features = ["ckb-contract"], optional = true }
+
 buddy-alloc = { version = "0.5", optional = true }
 ckb-x64-simulator = { version = "0.9", optional = true }
 gcd = "2.3"
