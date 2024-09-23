@@ -65,11 +65,15 @@ fn locate_index() -> Result<usize, SysError> {
 /// validate_type_id(type_id)?;
 /// ```
 pub fn validate_type_id(type_id: [u8; 32]) -> Result<(), SysError> {
+    // after this checking, there are 3 cases:
+    // 1. 0 input cell and 1 output cell, it's minting operation
+    // 2. 1 input cell and 1 output cell, it's transfer operation
+    // 3. 1 input cell and 0 output cell, it's burning operation(allowed)
     if is_cell_present(1, Source::GroupInput) || is_cell_present(1, Source::GroupOutput) {
         return Err(SysError::TypeIDError);
     }
 
-    // mint
+    // case 1: minting operation
     if !is_cell_present(0, Source::GroupInput) {
         let index = locate_index()? as u64;
         let input = load_input(0, Source::Input)?;
@@ -83,8 +87,7 @@ pub fn validate_type_id(type_id: [u8; 32]) -> Result<(), SysError> {
             return Err(SysError::TypeIDError);
         }
     }
-    // For the `else` part, Destroy an old cell with a specific type id and
-    // create a new cell with the same type id in the same transaction.
+    // case 2 & 3: for the `else` part, it's transfer operation or burning operation
     Ok(())
 }
 
