@@ -4,10 +4,10 @@ CC := riscv64-unknown-elf-gcc
 default: integration
 
 publish-crate:
-	cargo publish --target ${TARGET} -p ckb-std
+	cargo publish --features build-with-clang --target ${TARGET} -p ckb-std
 
 publish-crate-dryrun:
-	cargo publish --dry-run --target ${TARGET} -p ckb-std --allow-dirty
+	cargo publish --dry-run --features build-with-clang --target ${TARGET} -p ckb-std --allow-dirty
 
 publish: publish-crate
 
