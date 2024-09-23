@@ -47,11 +47,11 @@ macro_rules! debug {
 macro_rules! debug {
 
     ($fmt:literal) => {
-        #[cfg(std)]
+        #[cfg(not(std))]
         println!("{}", format!($fmt));
     };
     ($fmt:literal, $($args:expr),+) => {
-        #[cfg(std)]
+        #[cfg(not(std))]
         println!("{}", format!($fmt, $($args), +));
     };
 }
