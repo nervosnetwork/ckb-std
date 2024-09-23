@@ -71,7 +71,7 @@ pub fn validate_type_id(type_id: [u8; 32]) -> Result<(), SysError> {
 
     // mint
     if !is_cell_present(0, Source::GroupInput) {
-        let index = locate_index()?;
+        let index = locate_index()? as u64;
         let input = load_input(0, Source::Input)?;
         let mut blake2b = new_blake2b();
         blake2b.update(input.as_slice());
