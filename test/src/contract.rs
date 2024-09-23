@@ -1,7 +1,7 @@
 use super::util::dump_mock_tx;
 use ckb_testtool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
 use ckb_testtool::context::Context;
-use ckb_x64_simulator::RunningSetup;
+use ckb_x64_simulator::{RunningSetup, RunningType};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -86,6 +86,7 @@ fn it_works() {
         script_index: 0,
         vm_version: 1,
         native_binaries: HashMap::default(),
+        run_type: Some(RunningType::Executable),
     };
     dump_mock_tx(test_case_name, &tx, &context, &setup);
 
