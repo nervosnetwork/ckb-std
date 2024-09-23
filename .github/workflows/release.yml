@@ -21,4 +21,4 @@ jobs:
       - name: Push
         run: |
           cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          cargo publish
+          make publish-crate
