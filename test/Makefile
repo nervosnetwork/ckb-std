@@ -6,8 +6,7 @@ test: build
 
 build:
 	make -C shared-lib all-via-docker
-	cd .. && capsule build
-	cd .. && RUSTFLAGS="-C target-feature=-a" capsule build -n ckb-std-tests
+	cd ../contracts && RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf
 
 clean:
 	rm -rf ../build

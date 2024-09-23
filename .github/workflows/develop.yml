@@ -1,4 +1,4 @@
-name: Develop Clang
+name: Develop
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ jobs:
     - name: Deps
       run: |
         rustup target add riscv64imac-unknown-none-elf
-        wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 16 && rm llvm.sh
+        wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18 && rm llvm.sh
     - name: Test
       run: |
-        cargo build --verbose --target=riscv64imac-unknown-none-elf --features=build-with-clang
+        make test
