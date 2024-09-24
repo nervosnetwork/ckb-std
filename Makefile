@@ -23,6 +23,6 @@ test: publish-crate-dryrun
 	make -C test test
 
 check:
-	cargo check --target ${TARGET} --examples
+	cargo check --target ${TARGET} --examples --features type-id,build-with-clang
 
 .PHONY: test check
