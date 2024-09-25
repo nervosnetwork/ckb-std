@@ -35,7 +35,7 @@ pub mod dynamic_loading;
 pub mod dynamic_loading_c_impl;
 #[cfg(feature = "allocator")]
 pub use buddy_alloc;
-#[cfg(feature = "dummy-atomic")]
+#[cfg(all(target_arch = "riscv64", feature = "dummy-atomic"))]
 pub mod dummy_atomic;
 #[cfg(feature = "log")]
 pub mod logger;
