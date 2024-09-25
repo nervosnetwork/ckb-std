@@ -9,8 +9,10 @@ build:
 	cd ../contracts && RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf
 
 build-examples:
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example always_failure --target riscv64imac-unknown-none-elf
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example always_success --target riscv64imac-unknown-none-elf
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example atomic --target riscv64imac-unknown-none-elf
 	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example type_id --target riscv64imac-unknown-none-elf --features "type-id"
-	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example main --target riscv64imac-unknown-none-elf
 
 clean:
 	rm -rf ../build
