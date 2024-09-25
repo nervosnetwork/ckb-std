@@ -64,6 +64,7 @@ fn build_mock_tx(tx: &core::TransactionView, context: &Context) -> MockTransacti
         inputs: mock_inputs,
         cell_deps: mock_cell_deps,
         header_deps: vec![],
+        extensions: Default::default(),
     };
     MockTransaction {
         mock_info,

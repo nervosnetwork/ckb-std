@@ -263,7 +263,8 @@ fn test_dynamic_loading_c_impl(context: &mut ContextType) {
 fn test_vm_version() {
     let version = syscalls::vm_version().unwrap();
     debug!("vm version: {}", version);
-    assert_eq!(version, 1);
+    // currently, version 1(before hardfork) and 2(after hardfork) are both ok
+    assert!(version == 1 || version == 2);
 }
 
 fn test_current_cycles() {

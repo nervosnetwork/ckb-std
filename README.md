@@ -1,5 +1,5 @@
 # ckb-std
-[![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std) 
+[![Crates.io](https://img.shields.io/crates/v/ckb-std.svg)](https://crates.io/crates/ckb-std)
 
 This library contains several modules that help you write CKB contract with Rust.
 
@@ -17,6 +17,7 @@ This library contains several modules that help you write CKB contract with Rust
 * `default_alloc!` macro: defines global allocator for no-std rust
 * `dummy_atomic` module: dummy atomic operations
 * `logger` module: colored logger implementation
+* `type_id` module: Type ID implementation (feature `type-id`)
 ### Memory allocator
 
 Default allocator uses a mixed allocation strategy:

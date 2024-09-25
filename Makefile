@@ -4,7 +4,10 @@ CC := riscv64-unknown-elf-gcc
 default: integration
 
 publish-crate:
-	cargo publish -p ckb-std
+	cargo publish --features build-with-clang --target ${TARGET} -p ckb-std
+
+publish-crate-dryrun:
+	cargo publish --dry-run --features build-with-clang --target ${TARGET} -p ckb-std --allow-dirty
 
 publish: publish-crate
 
@@ -16,10 +19,10 @@ test-shared-lib:
 
 integration: check
 
-test:
+test: publish-crate-dryrun
 	make -C test test
 
 check:
-	cargo check --target ${TARGET} --examples
+	cargo check --target ${TARGET} --examples --features type-id,build-with-clang
 
 .PHONY: test check

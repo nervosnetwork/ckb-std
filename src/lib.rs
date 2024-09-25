@@ -41,3 +41,5 @@ pub mod dummy_atomic;
 pub mod logger;
 #[cfg(feature = "log")]
 pub use log;
+#[cfg(feature = "type-id")]
+pub mod type_id;
