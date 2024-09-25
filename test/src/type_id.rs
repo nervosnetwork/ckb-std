@@ -9,7 +9,7 @@ const MAX_CYCLES: u64 = 1000_0000;
 fn build_bins() -> (Bytes, Bytes) {
     let always_success_bin = {
         let mut buf = Vec::new();
-        File::open("../target/riscv64imac-unknown-none-elf/debug/examples/main")
+        File::open("../target/riscv64imac-unknown-none-elf/debug/examples/always_success")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
