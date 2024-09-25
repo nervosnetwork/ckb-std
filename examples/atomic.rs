@@ -77,7 +77,6 @@ fn uint_max() {
     assert_eq!(x.load(SeqCst), 0xf731);
 }
 
-#[no_mangle]
 fn main() -> i8 {
     bool_compare_exchange();
     bool_and();
