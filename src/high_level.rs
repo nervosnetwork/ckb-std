@@ -1,5 +1,4 @@
 use crate::ckb_constants::*;
-use crate::debug;
 use crate::error::SysError;
 use crate::syscalls;
 use alloc::{ffi::CString, string::String, vec, vec::Vec};
@@ -567,8 +566,7 @@ impl<T, F: Fn(usize, Source) -> Result<T, SysError>> Iterator for QueryIter<F> {
             }
             Err(SysError::IndexOutOfBound) => None,
             Err(err) => {
-                debug!("QueryIter error {:?}", err);
-                panic!("QueryIter query_fn return an error")
+                panic!("QueryIter error {:?}", err);
             }
         }
     }
