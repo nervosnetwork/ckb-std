@@ -43,3 +43,5 @@ pub mod logger;
 pub use log;
 #[cfg(feature = "type-id")]
 pub mod type_id;
+#[cfg(feature = "native-simulator")]
+pub use ckb_x64_simulator::set_script_info;
