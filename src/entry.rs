@@ -79,5 +79,14 @@ macro_rules! entry_simulator {
             $crate::env::set_argv(argv);
             $main()
         }
+
+        #[no_mangle]
+        unsafe extern "C" fn __set_script_info(
+            ptr: *mut core::ffi::c_void,
+            tx_ctx_id: u64,
+            proc_ctx_id: u64,
+        ) {
+            ckb_std::set_script_info(ptr, tx_ctx_id, proc_ctx_id)
+        }
     };
 }
