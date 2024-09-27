@@ -6,13 +6,13 @@ test: build build-examples
 
 build:
 	make -C shared-lib all-via-docker
-	cd ../contracts && RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf
+	cd ../contracts && RUSTFLAGS="-C target-feature=-a" cargo build --release --target riscv64imac-unknown-none-elf
 
 build-examples:
-	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example always_failure --target riscv64imac-unknown-none-elf
-	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example always_success --target riscv64imac-unknown-none-elf
-	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example atomic --target riscv64imac-unknown-none-elf
-	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example type_id --target riscv64imac-unknown-none-elf --features "type-id"
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --release --target riscv64imac-unknown-none-elf --features build-with-clang --example always_failure
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --release --target riscv64imac-unknown-none-elf --features build-with-clang --example always_success
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --release --target riscv64imac-unknown-none-elf --features build-with-clang --example atomic
+	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --release --target riscv64imac-unknown-none-elf --features build-with-clang,type-id --example type_id
 
 clean:
 	rm -rf ../build
