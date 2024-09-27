@@ -4,6 +4,5 @@ resolver = "2"
 
 [profile.release]
 overflow-checks = true
-opt-level = 's'
-lto = true
+strip = true
 codegen-units = 1

@@ -14,7 +14,7 @@ fn it_works() {
     let mut context = Context::default();
     let contract_bin = {
         let mut buf = Vec::new();
-        File::open("../contracts/target/riscv64imac-unknown-none-elf/debug/ckb-std-tests")
+        File::open("../contracts/target/riscv64imac-unknown-none-elf/release/ckb-std-tests")
             .unwrap()
             .read_to_end(&mut buf)
             .expect("read code");
