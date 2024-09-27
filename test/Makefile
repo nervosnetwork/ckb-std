@@ -6,8 +6,7 @@ test: build build-examples
 
 build:
 	make -C shared-lib all-via-docker
-	cd ../contracts && RUSTFLAGS="-C target-feature=-a" cargo build --target riscv64imac-unknown-none-elf
-
+	cd ../contracts && RUSTFLAGS="-C target-feature=-a --cfg debug_assertions" cargo build --target riscv64imac-unknown-none-elf --release 
 build-examples:
 	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example always_failure --target riscv64imac-unknown-none-elf
 	cd ../examples && RUSTFLAGS="-C target-feature=-a" cargo build --features build-with-clang --example always_success --target riscv64imac-unknown-none-elf
