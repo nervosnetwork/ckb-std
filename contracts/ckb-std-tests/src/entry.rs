@@ -805,6 +805,19 @@ pub fn main() -> Result<(), Error> {
     test_query();
     test_calc_data_hash();
 
+    // Context should not be dropped.
+    #[cfg(target_arch = "riscv64")]
+    #[allow(deprecated)]
+    let mut old_context = unsafe { ContextTypeOld::new() };
+    #[cfg(target_arch = "riscv64")]
+    test_dynamic_loading(&mut old_context);
+
+    // Context should not be dropped.
+    #[cfg(target_arch = "riscv64")]
+    let mut context = unsafe { ContextType::new() };
+    #[cfg(target_arch = "riscv64")]
+    test_dynamic_loading_c_impl(&mut context);
+
     test_vm_version();
     test_current_cycles();
     test_since();
@@ -813,16 +826,6 @@ pub fn main() -> Result<(), Error> {
         test_atomic();
         test_atomic2();
         test_log();
-    }
-
-    #[cfg(target_arch = "riscv64")]
-    unsafe {
-        let mut context = ContextType::new();
-        #[allow(deprecated)]
-        let mut old_context = ContextTypeOld::new();
-
-        test_dynamic_loading(&mut old_context);
-        test_dynamic_loading_c_impl(&mut context);
     }
 
     Ok(())
