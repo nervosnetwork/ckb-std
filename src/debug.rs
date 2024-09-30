@@ -47,9 +47,11 @@ macro_rules! debug {
 macro_rules! debug {
 
     ($fmt:literal) => {
-        println!("{}", format!($fmt));
+        #[cfg(debug_assertions)]
+        $crate::syscalls::debug(format!($fmt));
     };
     ($fmt:literal, $($args:expr),+) => {
-        println!("{}", format!($fmt, $($args), +));
+        #[cfg(debug_assertions)]
+        $crate::syscalls::debug(format!($fmt, $($args), +));
     };
 }
