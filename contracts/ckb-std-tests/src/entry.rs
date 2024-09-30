@@ -22,6 +22,10 @@ use ckb_std::{dynamic_loading, dynamic_loading_c_impl};
 use core::ffi::c_void;
 #[cfg(target_arch = "riscv64")]
 use core::mem::size_of_val;
+#[cfg(target_arch = "riscv64")]
+use lazy_static::lazy_static;
+#[cfg(target_arch = "riscv64")]
+use spin::Mutex;
 
 fn new_blake2b() -> Blake2b {
     const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
@@ -795,6 +799,19 @@ fn test_log() {
     ckb_std::log::error!("this is error");
 }
 
+#[cfg(target_arch = "riscv64")]
+lazy_static! {
+    // Context should not be dropped.
+    static ref old_context: Mutex<ContextTypeOld> = {
+        #[allow(deprecated)]
+        Mutex::new(unsafe { ContextTypeOld::new() })
+    };
+    // Context should not be dropped.
+    static ref new_context: Mutex<ContextType> = {
+        Mutex::new(unsafe { ContextType::new() })
+    };
+}
+
 pub fn main() -> Result<(), Error> {
     test_basic();
     test_load_data();
@@ -805,6 +822,11 @@ pub fn main() -> Result<(), Error> {
     test_query();
     test_calc_data_hash();
 
+    #[cfg(target_arch = "riscv64")]
+    test_dynamic_loading(&mut old_context.lock());
+    #[cfg(target_arch = "riscv64")]
+    test_dynamic_loading_c_impl(&mut new_context.lock());
+
     test_vm_version();
     test_current_cycles();
     test_since();
@@ -813,16 +835,6 @@ pub fn main() -> Result<(), Error> {
         test_atomic();
         test_atomic2();
         test_log();
-    }
-
-    #[cfg(target_arch = "riscv64")]
-    unsafe {
-        let mut context = ContextType::new();
-        #[allow(deprecated)]
-        let mut old_context = ContextTypeOld::new();
-
-        test_dynamic_loading(&mut old_context);
-        test_dynamic_loading_c_impl(&mut context);
     }
 
     Ok(())
