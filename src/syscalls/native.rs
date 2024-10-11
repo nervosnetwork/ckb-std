@@ -720,7 +720,7 @@ pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
 /// This syscall retrieves the file descriptors available to the current process, which are passed in from the parent
 /// process. These results are copied from the inherited_fds parameter of the Spawn syscall.
 /// Note: available after ckb2023.
-pub fn inherited_fds(fds: &mut [u64]) {
+pub fn inherited_fds(fds: &mut [u64]) -> u64 {
     let mut l: u64 = fds.len() as u64;
     unsafe {
         syscall(
@@ -734,6 +734,7 @@ pub fn inherited_fds(fds: &mut [u64]) {
             SYS_INHERITED_FDS,
         )
     };
+    l
 }
 
 /// This syscall manually closes a file descriptor. After calling this, any attempt to read/write the file descriptor
