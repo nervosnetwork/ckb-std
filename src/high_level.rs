@@ -713,3 +713,10 @@ pub fn spawn_cell(
     syscalls::spawn(index, Source::CellDep, 0, 0, &mut spgs)?;
     Ok(process_id)
 }
+
+// Get inherited file descriptors.
+pub fn inherited_fds() -> Vec<u64> {
+    let mut fds = [0u64; 64];
+    let l = syscalls::inherited_fds(&mut fds);
+    fds[..l as usize].to_vec()
+}

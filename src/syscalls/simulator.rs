@@ -300,7 +300,7 @@ pub fn write(_fd: u64, _buffer: &[u8]) -> Result<usize, SysError> {
     panic!("This is not supported in the native-simulator!");
 }
 
-pub fn inherited_fds(_fds: &mut [u64]) {
+pub fn inherited_fds(_fds: &mut [u64]) -> u64 {
     panic!("This is not supported in the native-simulator!");
 }
 
