@@ -715,6 +715,12 @@ pub fn spawn_cell(
 }
 
 /// Get inherited file descriptors.
+///
+/// # Example
+///
+/// ```
+/// let fds = inherited_fds();
+/// ```
 pub fn inherited_fds() -> Vec<u64> {
     let mut fds = [0u64; 64];
     let l = syscalls::inherited_fds(&mut fds);
