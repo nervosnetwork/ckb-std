@@ -20,20 +20,24 @@
 #[macro_export]
 macro_rules! default_alloc {
     () => {
-        $crate::default_alloc!(4 * 1024, 516 * 1024, 64);
+        $crate::default_alloc!({ 4 * 1024 }, { 516 * 1024 }, 64);
     };
     ($fixed_block_heap_size:expr, $heap_size:expr, $min_block_size:expr) => {
-        static mut _BUDDY_HEAP: [u8; $heap_size] = [0u8; $heap_size];
-        static mut _FIXED_BLOCK_HEAP: [u8; $fixed_block_heap_size] = [0u8; $fixed_block_heap_size];
+        #[repr(align(64))]
+        struct _AlignedHeap<const N: usize>([u8; N]);
+
+        static mut _BUDDY_HEAP: _AlignedHeap<$heap_size> = _AlignedHeap([0u8; $heap_size]);
+        static mut _FIXED_BLOCK_HEAP: _AlignedHeap<$fixed_block_heap_size> =
+            _AlignedHeap([0u8; $fixed_block_heap_size]);
 
         #[global_allocator]
         static ALLOC: $crate::buddy_alloc::NonThreadsafeAlloc = unsafe {
             let fast_param = $crate::buddy_alloc::FastAllocParam::new(
-                _FIXED_BLOCK_HEAP.as_ptr(),
+                _FIXED_BLOCK_HEAP.0.as_ptr(),
                 $fixed_block_heap_size,
             );
             let buddy_param = $crate::buddy_alloc::BuddyAllocParam::new_with_zero_filled(
-                _BUDDY_HEAP.as_ptr(),
+                _BUDDY_HEAP.0.as_ptr(),
                 $heap_size,
                 $min_block_size,
             );
