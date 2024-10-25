@@ -41,8 +41,8 @@ type-id = ["ckb-hash", "ckb-types"]
 cc = "1.0"
 
 [dependencies]
-ckb-types = { package = "ckb-gen-types", version = "0.118", default-features = false, optional = true }
-ckb-hash = { version = "0.118", default-features = false, features = [
+ckb-types = { package = "ckb-gen-types", version = "0.119", default-features = false, optional = true }
+ckb-hash = { version = "0.119", default-features = false, features = [
   "ckb-contract",
 ], optional = true }
 
