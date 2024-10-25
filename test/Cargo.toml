@@ -7,7 +7,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ckb-x64-simulator = "0.9.2"
+ckb-x64-simulator = "0.10"
 ckb-testtool = "0.13.1"
 serde_json = "1.0"
 ckb-mock-tx-types = "0.119.0"
