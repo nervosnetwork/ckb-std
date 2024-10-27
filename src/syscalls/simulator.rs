@@ -357,7 +357,7 @@ pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
 
 pub fn inherited_fds(fds: &mut [u64]) -> u64 {
     let mut l = fds.len();
-    sim::ckb_inherited_fds(fds.as_mut_ptr(), &mut l as *mut usize)
+    sim::ckb_inherited_fds(fds.as_mut_ptr(), &mut l as *mut usize) as u64
 }
 
 pub fn close(fd: u64) -> Result<(), SysError> {
