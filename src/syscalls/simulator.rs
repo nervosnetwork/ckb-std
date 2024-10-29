@@ -235,7 +235,7 @@ pub fn exec(
     // argc: i32,
     _argv: &[&CStr],
 ) -> u64 {
-    panic!("please use exec_cell instead");
+    panic!("Please use exec_cell instread");
 }
 
 pub fn exec_cell(
@@ -300,7 +300,7 @@ pub fn spawn(
     _bounds: usize,
     _spgs: &mut SpawnArgs,
 ) -> Result<u64, SysError> {
-    panic!("please use exec_cell instead");
+    panic!("Please use spawn_cell instread");
 }
 
 pub fn wait(pid: u64) -> Result<i8, SysError> {
