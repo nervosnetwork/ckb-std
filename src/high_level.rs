@@ -700,18 +700,23 @@ pub fn spawn_cell(
     argv: &[&CStr],
     inherited_fds: &[u64],
 ) -> Result<u64, SysError> {
-    let index = look_for_dep_with_hash2(code_hash, hash_type)?;
-    let argc = argv.len();
-    let mut process_id: u64 = 0;
-    let argv_ptr: Vec<*const i8> = argv.iter().map(|e| e.as_ptr()).collect();
-    let mut spgs = syscalls::SpawnArgs {
-        argc: argc as u64,
-        argv: argv_ptr.as_ptr(),
-        process_id: &mut process_id as *mut u64,
-        inherited_fds: inherited_fds.as_ptr(),
-    };
-    syscalls::spawn(index, Source::CellDep, 0, 0, &mut spgs)?;
-    Ok(process_id)
+    #[cfg(not(feature = "native-simulator"))]
+    {
+        let index = look_for_dep_with_hash2(code_hash, hash_type)?;
+        let argc = argv.len();
+        let mut process_id: u64 = 0;
+        let argv_ptr: Vec<*const i8> = argv.iter().map(|e| e.as_ptr()).collect();
+        let mut spgs = syscalls::SpawnArgs {
+            argc: argc as u64,
+            argv: argv_ptr.as_ptr(),
+            process_id: &mut process_id as *mut u64,
+            inherited_fds: inherited_fds.as_ptr(),
+        };
+        syscalls::spawn(index, Source::CellDep, 0, 0, &mut spgs)?;
+        Ok(process_id)
+    }
+    #[cfg(feature = "native-simulator")]
+    syscalls::spawn_cell(code_hash, hash_type, argv, inherited_fds)
 }
 
 /// Get inherited file descriptors.
