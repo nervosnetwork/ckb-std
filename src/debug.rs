@@ -32,11 +32,15 @@
 #[macro_export]
 macro_rules! debug {
     ($fmt:literal) => {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "native-simulator"))]
         $crate::syscalls::debug(format!($fmt));
+        #[cfg(all(debug_assertions, not(feature = "native-simulator")))]
+        $crate::syscalls::debug(alloc::format!($fmt));
     };
     ($fmt:literal, $($args:expr),+) => {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "native-simulator"))]
         $crate::syscalls::debug(format!($fmt, $($args), +));
+        #[cfg(all(debug_assertions, not(feature = "native-simulator")))]
+        $crate::syscalls::debug(alloc::format!($fmt, $($args), +));
     };
 }
