@@ -619,8 +619,8 @@ pub struct SpawnArgs {
 ///
 /// Specific system calls are responsible for changing the state of a process within this scheduler:
 /// * spawn: Creates a new process, initializing it in the Runnable state.
-/// * read: Attempts to read data from a file descriptor. If data is unavailable, the process state changes to
-///     WaitForRead.
+/// * read: Attempts to read data from a file descriptor. If data is unavailable or is less than expected, the process
+///     state changes to WaitForRead.
 /// * write: Attempts to write data to a file descriptor. If the operation is blocked due to data needing to be read by
 ///     another process, the process enters the WaitForWrite state.
 /// * wait: Waits for a target process to exit. Once the target process has terminated, the waiting process transitions
