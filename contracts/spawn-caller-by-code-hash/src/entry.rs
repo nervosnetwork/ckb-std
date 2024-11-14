@@ -12,7 +12,7 @@ pub fn main() -> Result<(), Error> {
         CStr::from_bytes_with_nul(b"world\0").unwrap(),
     ];
     let mut std_fds: [u64; 2] = [0, 0];
-    let mut son_fds: [u64; 3] = [0, 0, 0];
+    let mut son_fds: [u64; 2] = [0, 0];
     let (r0, w0) = syscalls::pipe()?;
     std_fds[0] = r0;
     son_fds[1] = w0;
