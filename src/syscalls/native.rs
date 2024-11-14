@@ -605,7 +605,7 @@ pub struct SpawnArgs {
 /// behavior, message handling, and priority rules. The scheduler manages virtual processes, transitioning them through
 /// various states based on operations and interactions, to ensure efficient scheduling.
 ///
-/// # Thread States
+/// # Process States
 ///
 /// Each process within this scheduler has one of the following six states:
 /// * Runnable: The process is ready to execute.
@@ -622,7 +622,8 @@ pub struct SpawnArgs {
 /// * read: Attempts to read data from a file descriptor. If data is unavailable or is less than expected, the process
 ///     state changes to WaitForRead.
 /// * write: Attempts to write data to a file descriptor. If the operation is blocked due to data needing to be read by
-///     another process, the process enters the WaitForWrite state.
+///     another process, the process enters the WaitForWrite state. The process will stay in state WaitForWrite until
+///     all data has been consumed.
 /// * wait: Waits for a target process to exit. Once the target process has terminated, the waiting process transitions
 ///     to Runnable.
 ///
