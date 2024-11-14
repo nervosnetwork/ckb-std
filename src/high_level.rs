@@ -700,6 +700,8 @@ pub fn spawn_cell(
     argv: &[&CStr],
     inherited_fds: &[u64],
 ) -> Result<u64, SysError> {
+    let mut inherited_fds = Vec::from(inherited_fds);
+    inherited_fds.push(0);
     #[cfg(not(feature = "native-simulator"))]
     {
         let index = look_for_dep_with_hash2(code_hash, hash_type)?;
@@ -716,7 +718,7 @@ pub fn spawn_cell(
         Ok(process_id)
     }
     #[cfg(feature = "native-simulator")]
-    syscalls::spawn_cell(code_hash, hash_type, argv, inherited_fds)
+    syscalls::spawn_cell(code_hash, hash_type, argv, &inherited_fds)
 }
 
 /// Get inherited file descriptors.
