@@ -599,7 +599,7 @@ pub struct SpawnArgs {
 ///
 /// Returns success or a syscall error.
 ///
-/// # Scheduler Algorithm
+/// # Scheduler Algorithm V1
 ///
 /// This document describes the design and functionality of a scheduler algorithm, covering process states, system call
 /// behavior, message handling, and priority rules. The scheduler manages virtual processes, transitioning them through
@@ -607,12 +607,13 @@ pub struct SpawnArgs {
 ///
 /// # Thread States
 ///
-/// Each process within this scheduler has one of the following five states:
+/// Each process within this scheduler has one of the following six states:
 /// * Runnable: The process is ready to execute.
+/// * Running: The process is running.
 /// * Terminated: The process has completed its execution.
-/// * Wait: The process is waiting for another process to exit before it can continue.
-/// * WaitForWrite: The process is waiting for another process to read data it wants to write.
 /// * WaitForRead: The process is waiting for data to be available for it to read.
+/// * WaitForWrite: The process is waiting for another process to read data it wants to write.
+/// * WaitForExit: The process is waiting for another process to exit before it can continue.
 ///
 /// # System Calls and State Transitions
 ///
@@ -625,18 +626,19 @@ pub struct SpawnArgs {
 /// * wait: Waits for a target process to exit. Once the target process has terminated, the waiting process transitions
 ///     to Runnable.
 ///
-/// # Message Handling and State Recovery
+/// # IO Handling and State Recovery
 ///
-/// Message handling allows processes in certain states to transition back to Runnable when specific conditions are met:
+/// IO handling allows processes in certain states to transition back to Runnable when specific conditions are met:
 /// * A WaitForRead process becomes Runnable once the needed data has been read successfully.
 /// * A WaitForWrite process transitions to Runnable once its data has been successfully read by another process.
 ///
-/// # Thread Priority
+/// # Process Priority
 ///
 /// The scheduler assigns incremental IDs to processes, establishing an execution order:
 /// * The root process has an ID of 0.
 /// * When multiple processes are in the Runnable state, the scheduler selects the process with the lowest ID to execute
-///     first. This ensures a predictable and fair ordering of execution for processes ready to run.
+///     first. This ensures a predictable and fair ordering of execution for processes ready to run. The selected
+///     process status is changed to Running, and it continues to run until its status is changed.
 pub fn spawn(
     index: usize,
     source: Source,
