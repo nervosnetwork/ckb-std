@@ -590,7 +590,7 @@ pub struct SpawnArgs {
 /// The parent process calls the Spawn system call, which creates a new process (a child process) that is an
 /// independent ckb-vm instance. It's important to note that the parent process will not be blocked by the child
 /// process as a result of this syscall.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 ///
 /// # Arguments
 ///
@@ -598,6 +598,48 @@ pub struct SpawnArgs {
 /// * `spgs` - spawn arguments.
 ///
 /// Returns success or a syscall error.
+///
+/// # Scheduler Algorithm V1
+///
+/// This document describes the design and functionality of a scheduler algorithm, covering process states, system call
+/// behavior, message handling, and priority rules. The scheduler manages virtual processes, transitioning them through
+/// various states based on operations and interactions, to ensure efficient scheduling.
+///
+/// # Process States
+///
+/// Each process within this scheduler has one of the following six states:
+/// * Runnable: The process is ready to execute.
+/// * Running: The process is running.
+/// * Terminated: The process has completed its execution.
+/// * WaitForRead: The process is waiting for data to be available for it to read.
+/// * WaitForWrite: The process is waiting for another process to read data it wants to write.
+/// * WaitForExit: The process is waiting for another process to exit before it can continue.
+///
+/// # System Calls and State Transitions
+///
+/// Specific system calls are responsible for changing the state of a process within this scheduler:
+/// * spawn: Creates a new process, initializing it in the Runnable state.
+/// * read: Attempts to read data from a file descriptor. If data is unavailable or is less than expected, the process
+///     state changes to WaitForRead.
+/// * write: Attempts to write data to a file descriptor. If the operation is blocked due to data needing to be read by
+///     another process, the process enters the WaitForWrite state. The process will stay in state WaitForWrite until
+///     all data has been consumed.
+/// * wait: Waits for a target process to exit. Once the target process has terminated, the waiting process transitions
+///     to Runnable.
+///
+/// # IO Handling and State Recovery
+///
+/// IO handling allows processes in certain states to transition back to Runnable when specific conditions are met:
+/// * A WaitForRead process becomes Runnable once the needed data has been read successfully.
+/// * A WaitForWrite process transitions to Runnable once its data has been successfully read by another process.
+///
+/// # Process Priority
+///
+/// The scheduler assigns incremental IDs to processes, establishing an execution order:
+/// * The root process has an ID of 0.
+/// * When multiple processes are in the Runnable state, the scheduler selects the process with the lowest ID to execute
+///     first. This ensures a predictable and fair ordering of execution for processes ready to run. The selected
+///     process status is changed to Running, and it continues to run until its status is changed.
 pub fn spawn(
     index: usize,
     source: Source,
@@ -629,7 +671,7 @@ pub fn spawn(
 }
 
 /// The syscall pauses until the execution of a process specified by pid has ended.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 ///
 /// # Arguments
 ///
@@ -647,14 +689,14 @@ pub fn wait(pid: u64) -> Result<i8, SysError> {
 }
 
 /// This syscall is used to get the current process id. Root process ID is 0.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn process_id() -> u64 {
     unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_PROCESS_ID) }
 }
 
 /// This syscall create a pipe with read-write pair of file descriptions. The file descriptor with read permission is
 /// located at fds[0], and the corresponding file descriptor with write permission is located at fds[1].
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn pipe() -> Result<(u64, u64), SysError> {
     let mut fds: [u64; 2] = [0, 0];
     let ret = unsafe { syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_PIPE) };
@@ -667,7 +709,7 @@ pub fn pipe() -> Result<(u64, u64), SysError> {
 
 /// This syscall reads data from a pipe via a file descriptor. The syscall Read attempts to read up to value pointed by
 /// length bytes from file descriptor fd into the buffer, and the actual length of data read is returned.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
     let mut l: u64 = buffer.len() as u64;
     let ret = unsafe {
@@ -693,7 +735,7 @@ pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
 
 /// This syscall writes data to a pipe via a file descriptor. The syscall Write writes up to value pointed by length
 /// bytes from the buffer, and the actual length of data written is returned.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
     let mut l: u64 = buffer.len() as u64;
     let ret = unsafe {
@@ -719,7 +761,7 @@ pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
 
 /// This syscall retrieves the file descriptors available to the current process, which are passed in from the parent
 /// process. These results are copied from the inherited_fds parameter of the Spawn syscall.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn inherited_fds(fds: &mut [u64]) -> u64 {
     let mut l: u64 = fds.len() as u64;
     unsafe {
@@ -739,7 +781,7 @@ pub fn inherited_fds(fds: &mut [u64]) -> u64 {
 
 /// This syscall manually closes a file descriptor. After calling this, any attempt to read/write the file descriptor
 /// pointed to the other end would fail.
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn close(fd: u64) -> Result<(), SysError> {
     let ret = unsafe { syscall(fd, 0, 0, 0, 0, 0, 0, SYS_CLOSE) };
     match ret {
@@ -759,7 +801,7 @@ pub fn close(fd: u64) -> Result<(), SysError> {
 /// * `index` - index of cell
 /// * `source` - source of cell
 ///
-/// Note: available after ckb2023.
+/// Note: available after ckb 2nd hardfork.
 pub fn load_block_extension(
     buf: &mut [u8],
     offset: usize,
