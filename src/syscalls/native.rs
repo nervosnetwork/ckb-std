@@ -735,6 +735,10 @@ pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
 
 /// This syscall writes data to a pipe via a file descriptor. The syscall Write writes up to value pointed by length
 /// bytes from the buffer, and the actual length of data written is returned.
+///
+/// If buffer is empty and fd is avaliable, then write() can still succeed: A data with a length of 0 is written to the
+/// pipe. The peer needs to use a read() syscall to consume the empty data, and read() will returns Ok(0).
+///
 /// Note: available after ckb 2nd hardfork.
 pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
     let mut l: u64 = buffer.len() as u64;
