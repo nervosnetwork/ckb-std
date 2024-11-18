@@ -738,6 +738,9 @@ pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
 /// Note: available after ckb 2nd hardfork.
 pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
     let mut l: u64 = buffer.len() as u64;
+    if l == 0 {
+        return Ok(0);
+    }
     let ret = unsafe {
         syscall(
             fd,

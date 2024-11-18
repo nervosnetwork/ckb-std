@@ -345,6 +345,9 @@ pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
 
 pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
     let mut l = buffer.len();
+    if l == 0 {
+        return Ok(0);
+    }
     let ret = sim::ckb_write(fd, buffer.as_ptr() as *mut c_void, &mut l as *mut usize) as u64;
     match ret {
         0 => Ok(l as usize),
