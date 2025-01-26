@@ -5,6 +5,7 @@ use core::result::Result;
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
 
 use crate::error::Error;
+extern crate alloc;
 
 pub fn main() -> Result<(), Error> {
     let argv = ckb_std::env::argv();
