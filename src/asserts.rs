@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-const DEFAULT_PANIC_EXIT_CODE: i8 = -1;
+pub const DEFAULT_PANIC_EXIT_CODE: i8 = -1;
 
 pub static mut __PANIC_EXIT_CODE: i8 = DEFAULT_PANIC_EXIT_CODE;
 
@@ -15,7 +15,7 @@ macro_rules! set_error_assert {
     ($code:expr, $($arg:tt)*) => {{
         $crate::asserts::set_panic_exit_code($code);
         assert!($($arg)*);
-        $crate::asserts::set_panic_exit_code(DEFAULT_PANIC_EXIT_CODE);
+        $crate::asserts::set_panic_exit_code($crate::asserts::DEFAULT_PANIC_EXIT_CODE);
     }};
 }
 
@@ -24,7 +24,7 @@ macro_rules! set_error_assert_eq {
     ($code:expr, $($arg:tt)*) => {{
         $crate::asserts::set_panic_exit_code($code);
         assert_eq!($($arg)*);
-        $crate::asserts::set_panic_exit_code(DEFAULT_PANIC_EXIT_CODE);
+        $crate::asserts::set_panic_exit_code($crate::asserts::DEFAULT_PANIC_EXIT_CODE);
     }};
 }
 
