@@ -13,7 +13,9 @@ pub fn set_panic_exit_code(code: i8) {
 #[macro_export]
 macro_rules! assert {
     ($code:expr, $($arg:tt)*) => {{
-        $crate::asserts::set_panic_exit_code($code);
+        #[allow(trivial_numeric_casts)]
+        #[allow(clippy::unnecessary_cast)]
+        $crate::asserts::set_panic_exit_code($code as i8);
         core::assert!($($arg)*);
         $crate::asserts::set_panic_exit_code($crate::asserts::DEFAULT_PANIC_EXIT_CODE);
     }};
@@ -22,7 +24,9 @@ macro_rules! assert {
 #[macro_export]
 macro_rules! assert_eq {
     ($code:expr, $($arg:tt)*) => {{
-        $crate::asserts::set_panic_exit_code($code);
+        #[allow(trivial_numeric_casts)]
+        #[allow(clippy::unnecessary_cast)]
+        $crate::asserts::set_panic_exit_code($code as i8);
         core::assert_eq!($($arg)*);
         $crate::asserts::set_panic_exit_code($crate::asserts::DEFAULT_PANIC_EXIT_CODE);
     }};
@@ -31,7 +35,9 @@ macro_rules! assert_eq {
 #[macro_export]
 macro_rules! assert_ne {
     ($code:expr, $($arg:tt)*) => {{
-        $crate::asserts::set_panic_exit_code($code);
+        #[allow(trivial_numeric_casts)]
+        #[allow(clippy::unnecessary_cast)]
+        $crate::asserts::set_panic_exit_code($code as i8);
         core::assert_ne!($($arg)*);
         $crate::asserts::set_panic_exit_code($crate::asserts::DEFAULT_PANIC_EXIT_CODE);
     }};
