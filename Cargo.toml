@@ -1,6 +1,6 @@
 [package]
 name = "ckb-std"
-version = "0.17.0"
+version = "0.17.1"
 authors = ["Nervos network"]
 edition = "2021"
 license = "MIT"
@@ -41,8 +41,8 @@ type-id = ["ckb-hash", "ckb-types"]
 cc = "1.0"
 
 [dependencies]
-ckb-types = { package = "ckb-gen-types", version = "0.200.0-rc1", default-features = false, optional = true }
-ckb-hash = { version = "0.200.0-rc1", default-features = false, features = [
+ckb-types = { package = "ckb-gen-types", version = "0.200.0", default-features = false, optional = true }
+ckb-hash = { version = "0.200.0", default-features = false, features = [
   "ckb-contract",
 ], optional = true }
 
