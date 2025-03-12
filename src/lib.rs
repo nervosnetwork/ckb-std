@@ -13,6 +13,7 @@
 
 extern crate alloc;
 
+pub mod asserts;
 pub mod ckb_constants;
 #[doc(hidden)]
 pub mod debug;

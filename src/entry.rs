@@ -54,7 +54,7 @@ macro_rules! entry {
         #[panic_handler]
         fn panic_handler(panic_info: &core::panic::PanicInfo) -> ! {
             $crate::debug!("{}", panic_info);
-            $crate::syscalls::exit(-1)
+            $crate::syscalls::exit(unsafe { $crate::asserts::__PANIC_EXIT_CODE })
         }
     };
 }
