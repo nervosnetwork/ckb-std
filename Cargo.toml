@@ -1,8 +1,8 @@
 [package]
 name = "ckb-std"
-version = "0.17.1"
+version = "0.17.2"
 authors = ["Nervos network"]
-edition = "2021"
+edition = "2024"
 license = "MIT"
 repository = "https://github.com/nervosnetwork/ckb-std"
 description = "This library contains serveral modules help you write CKB contract with Rust"

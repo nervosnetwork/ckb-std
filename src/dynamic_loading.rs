@@ -235,34 +235,38 @@ impl Library {
     ///
     /// Return None if not found the symbol
     pub unsafe fn get<S>(&self, symbol: &[u8]) -> Option<Symbol<S>> {
-        unsafe fn cmp_raw_str(ptr: *const u8, s: &[u8]) -> bool {
-            let mut i = 0;
-            for c in s {
-                let sym_c = *ptr.add(i);
-                // return false if symbol string is end
-                if sym_c == 0 {
-                    return false;
+        unsafe {
+            unsafe fn cmp_raw_str(ptr: *const u8, s: &[u8]) -> bool {
+                unsafe {
+                    let mut i = 0;
+                    for c in s {
+                        let sym_c = *ptr.add(i);
+                        // return false if symbol string is end
+                        if sym_c == 0 {
+                            return false;
+                        }
+                        if &sym_c != c {
+                            return false;
+                        }
+                        i += 1;
+                    }
+                    let term_c = *ptr.add(i);
+                    // return false if symbol string is not terminated
+                    term_c == 0
                 }
-                if &sym_c != c {
-                    return false;
+            }
+
+            for i in 0..self.dynsym_size {
+                let sym = self.dynsyms.add(i);
+                let str_ptr = self.dynstr.add((*sym).st_name as usize);
+                if cmp_raw_str(str_ptr, symbol) {
+                    let sym_ptr = self.base_addr.add((*sym).st_value as usize);
+                    return Some(Symbol::new(sym_ptr));
                 }
-                i += 1;
             }
-            let term_c = *ptr.add(i);
-            // return false if symbol string is not terminated
-            term_c == 0
-        }
 
-        for i in 0..self.dynsym_size {
-            let sym = self.dynsyms.add(i);
-            let str_ptr = self.dynstr.add((*sym).st_name as usize);
-            if cmp_raw_str(str_ptr, symbol) {
-                let sym_ptr = self.base_addr.add((*sym).st_value as usize);
-                return Some(Symbol::new(sym_ptr));
-            }
+            return None;
         }
-
-        return None;
     }
 }
 
@@ -284,7 +288,7 @@ impl<T> CKBDLContext<T> {
     ///
     /// Create instance of dynamic loading context
     pub unsafe fn new() -> Self {
-        zeroed()
+        unsafe { zeroed() }
     }
 
     /// Load a shared library from dep cells

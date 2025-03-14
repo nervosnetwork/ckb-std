@@ -1,7 +1,7 @@
 //! Inspection and manipulation of the program’s environment.
 
 use core::{
-    ffi::{c_char, CStr},
+    ffi::{CStr, c_char},
     fmt::Debug,
     ops::Deref,
 };
@@ -57,5 +57,5 @@ pub fn argv() -> &'static [Arg] {
 #[doc(hidden)]
 #[inline]
 pub unsafe fn set_argv(argv: &'static [Arg]) {
-    ARGV = argv
+    unsafe { ARGV = argv }
 }

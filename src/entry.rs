@@ -17,12 +17,12 @@ macro_rules! entry {
         extern crate alloc;
 
         #[cfg(not(target_arch = "riscv64"))]
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         pub extern "C" fn _start() -> ! {
             panic!("ckb_std::entry is only valid for riscv64 target")
         }
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         unsafe extern "C" fn __ckb_std_main(
             argc: core::ffi::c_int,
             // Arg is the same as *const c_char ABI wise.
@@ -65,7 +65,7 @@ macro_rules! entry_simulator {
     ($main:path) => {
         extern crate alloc;
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         unsafe extern "C" fn __ckb_std_main(
             argc: core::ffi::c_int,
             // Arg is the same as *const c_char ABI wise.
@@ -80,7 +80,7 @@ macro_rules! entry_simulator {
             $main()
         }
 
-        #[no_mangle]
+        #[unsafe(no_mangle)]
         unsafe extern "C" fn __set_script_info(
             ptr: *mut core::ffi::c_void,
             tx_ctx_id: u64,

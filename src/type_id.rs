@@ -11,7 +11,7 @@
 use crate::{
     ckb_constants::Source,
     error::SysError,
-    high_level::{load_cell_type_hash, load_input, load_script, load_script_hash, QueryIter},
+    high_level::{QueryIter, load_cell_type_hash, load_input, load_script, load_script_hash},
     syscalls::load_cell,
 };
 use ckb_hash::new_blake2b;

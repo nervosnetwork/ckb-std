@@ -164,27 +164,27 @@ fn atomic_nand_fetch<T: BitAnd<Output = T> + Not<Output = T> + Copy>(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_exchange_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_exchange(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_exchange_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_exchange(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_exchange_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_exchange(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_exchange_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_exchange(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_compare_exchange_1(
     ptr: *mut c_void,
     expected: *mut c_void,
@@ -196,7 +196,7 @@ pub extern "C" fn __atomic_compare_exchange_1(
     atomic_compare_exchange(ptr, expected, desired)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_compare_exchange_2(
     ptr: *mut c_void,
     expected: *mut c_void,
@@ -208,7 +208,7 @@ pub extern "C" fn __atomic_compare_exchange_2(
     atomic_compare_exchange(ptr, expected, desired)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_compare_exchange_4(
     ptr: *mut c_void,
     expected: *mut c_void,
@@ -220,7 +220,7 @@ pub extern "C" fn __atomic_compare_exchange_4(
     atomic_compare_exchange(ptr, expected, desired)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_compare_exchange_8(
     ptr: *mut c_void,
     expected: *mut c_void,
@@ -232,7 +232,7 @@ pub extern "C" fn __atomic_compare_exchange_8(
     atomic_compare_exchange(ptr, expected, desired)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_load_1(ptr: *const c_void, _memorder: isize) -> u8 {
     unsafe {
         let p = ptr as *mut u8;
@@ -240,7 +240,7 @@ pub extern "C" fn __atomic_load_1(ptr: *const c_void, _memorder: isize) -> u8 {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_load_2(ptr: *const c_void, _memorder: isize) -> u16 {
     unsafe {
         let p = ptr as *mut u16;
@@ -248,7 +248,7 @@ pub extern "C" fn __atomic_load_2(ptr: *const c_void, _memorder: isize) -> u16 {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_load_4(ptr: *const c_void, _memorder: isize) -> u32 {
     unsafe {
         let p = ptr as *mut u32;
@@ -256,7 +256,7 @@ pub extern "C" fn __atomic_load_4(ptr: *const c_void, _memorder: isize) -> u32 {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_load_8(ptr: *const c_void, _memorder: isize) -> u64 {
     unsafe {
         let p = ptr as *mut u64;
@@ -264,7 +264,7 @@ pub extern "C" fn __atomic_load_8(ptr: *const c_void, _memorder: isize) -> u64 {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_store_1(ptr: *mut c_void, val: u8, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u8;
@@ -272,7 +272,7 @@ pub extern "C" fn __atomic_store_1(ptr: *mut c_void, val: u8, _memorder: isize) 
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_store_2(ptr: *mut c_void, val: u16, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u16;
@@ -280,7 +280,7 @@ pub extern "C" fn __atomic_store_2(ptr: *mut c_void, val: u16, _memorder: isize)
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_store_4(ptr: *mut c_void, val: u32, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u32;
@@ -288,7 +288,7 @@ pub extern "C" fn __atomic_store_4(ptr: *mut c_void, val: u32, _memorder: isize)
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_store_8(ptr: *mut c_void, val: u64, _memorder: isize) {
     unsafe {
         let p = ptr as *mut u64;
@@ -296,242 +296,242 @@ pub extern "C" fn __atomic_store_8(ptr: *mut c_void, val: u64, _memorder: isize)
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_add_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_fetch_add(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_add_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_fetch_add(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_add_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_fetch_add(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_add_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_fetch_add(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_sub_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_fetch_sub(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_sub_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_fetch_sub(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_sub_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_fetch_sub(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_sub_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_fetch_sub(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_and_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_fetch_and(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_and_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_fetch_and(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_and_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_fetch_and(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_and_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_fetch_and(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_xor_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_fetch_xor(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_xor_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_fetch_xor(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_xor_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_fetch_xor(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_xor_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_fetch_xor(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_or_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_fetch_or(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_or_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_fetch_or(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_or_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_fetch_or(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_or_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_fetch_or(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_nand_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_fetch_nand(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_nand_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_fetch_nand(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_nand_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_fetch_nand(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_fetch_nand_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_fetch_nand(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_add_fetch_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_add_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_add_fetch_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_add_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_add_fetch_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_add_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_add_fetch_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_add_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_sub_fetch_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_sub_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_sub_fetch_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_sub_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_sub_fetch_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_sub_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_sub_fetch_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_sub_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_and_fetch_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_and_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_and_fetch_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_and_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_and_fetch_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_and_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_and_fetch_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_and_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_xor_fetch_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_xor_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_xor_fetch_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_xor_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_xor_fetch_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_xor_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_xor_fetch_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_xor_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_or_fetch_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_or_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_or_fetch_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_or_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_or_fetch_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_or_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_or_fetch_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_or_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_nand_fetch_1(ptr: *mut c_void, val: u8, _memorder: isize) -> u8 {
     atomic_nand_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_nand_fetch_2(ptr: *mut c_void, val: u16, _memorder: isize) -> u16 {
     atomic_nand_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_nand_fetch_4(ptr: *mut c_void, val: u32, _memorder: isize) -> u32 {
     atomic_nand_fetch(ptr, val)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn __atomic_nand_fetch_8(ptr: *mut c_void, val: u64, _memorder: isize) -> u64 {
     atomic_nand_fetch(ptr, val)
 }
