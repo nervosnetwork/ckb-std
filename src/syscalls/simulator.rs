@@ -2,7 +2,7 @@ use crate::{ckb_constants::*, error::SysError};
 use ckb_types::core::ScriptHashType;
 use ckb_x64_simulator as sim;
 use core::convert::Infallible;
-use core::ffi::{c_void, CStr};
+use core::ffi::{CStr, c_void};
 
 pub fn exit(code: i8) -> ! {
     sim::ckb_exit(code);

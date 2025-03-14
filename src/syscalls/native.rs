@@ -14,18 +14,20 @@ unsafe fn syscall(
     a6: u64,
     a7: u64,
 ) -> u64 {
-    asm!(
-      "ecall",
-      inout("a0") a0,
-      in("a1") a1,
-      in("a2") a2,
-      in("a3") a3,
-      in("a4") a4,
-      in("a5") a5,
-      in("a6") a6,
-      in("a7") a7
-    );
-    a0
+    unsafe {
+        asm!(
+          "ecall",
+          inout("a0") a0,
+          in("a1") a1,
+          in("a2") a2,
+          in("a3") a3,
+          in("a4") a4,
+          in("a5") a5,
+          in("a6") a6,
+          in("a7") a7
+        );
+        a0
+    }
 }
 
 #[cfg(not(target_arch = "riscv64"))]

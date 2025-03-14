@@ -22,7 +22,7 @@ pub fn main() -> Result<(), Error> {
     let mut pid: u64 = 0;
     let mut spgs = syscalls::SpawnArgs {
         argc: argc,
-        argv: argv.as_ptr(),
+        argv: argv.as_ptr() as *const *const i8,
         process_id: &mut pid as *mut u64,
         inherited_fds: son_fds.as_ptr(),
     };

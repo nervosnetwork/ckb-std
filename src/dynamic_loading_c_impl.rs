@@ -7,7 +7,7 @@ use core::mem::{size_of, zeroed};
 use core::ptr::null;
 
 #[link(name = "dl-c-impl", kind = "static")]
-extern "C" {
+unsafe extern "C" {
     fn ckb_dlopen2(
         dep_cell_hash: *const u8,
         hash_type: u8,
@@ -87,23 +87,25 @@ impl Library {
     ///
     /// Return None if not found the symbol
     pub unsafe fn get<S>(&self, symbol: &[u8]) -> Option<Symbol<S>> {
-        let mut s = symbol.to_vec();
-        if s.len() > 0 {
-            if s[s.len() - 1] != 0 {
-                s.push(0);
+        unsafe {
+            let mut s = symbol.to_vec();
+            if s.len() > 0 {
+                if s[s.len() - 1] != 0 {
+                    s.push(0);
+                }
+            } else {
+                panic!("symbol with zero length");
             }
-        } else {
-            panic!("symbol with zero length");
-        }
-        let ptr = ckb_dlsym(self.handle, s.as_ptr());
-        if ptr == 0 {
-            debug!(
-                "warning, ckb_dlsym returns 0, handle = {:?}, symbol = {:?}",
-                self.handle, symbol
-            );
-            None
-        } else {
-            Some(Symbol::new(ptr))
+            let ptr = ckb_dlsym(self.handle, s.as_ptr());
+            if ptr == 0 {
+                debug!(
+                    "warning, ckb_dlsym returns 0, handle = {:?}, symbol = {:?}",
+                    self.handle, symbol
+                );
+                None
+            } else {
+                Some(Symbol::new(ptr))
+            }
         }
     }
 }
@@ -117,7 +119,7 @@ pub struct CKBDLContext<T>(T);
 
 impl<T> CKBDLContext<T> {
     pub unsafe fn new() -> Self {
-        zeroed()
+        unsafe { zeroed() }
     }
     pub fn load_with_offset<'a>(
         &'a mut self,
