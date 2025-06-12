@@ -8,7 +8,7 @@ entry!(main);
 default_alloc!();
 
 fn main() -> i8 {
-    match check_type_id(0) {
+    match check_type_id(0, 32) {
         Ok(_) => 0,
         Err(_) => -10,
     }

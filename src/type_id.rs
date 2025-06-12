@@ -14,6 +14,7 @@ use crate::{
     high_level::{QueryIter, load_cell_type_hash, load_input, load_script, load_script_hash},
     syscalls::load_cell,
 };
+use alloc::vec::Vec;
 use ckb_hash::new_blake2b;
 use ckb_types::prelude::Entity;
 
@@ -44,7 +45,7 @@ fn locate_index() -> Result<usize, SysError> {
 ///
 /// # Arguments
 ///
-/// * `type_id` - A 32-byte array representing the Type ID to validate.
+/// * `type_id` - A slice representing the Type ID to validate.
 ///
 /// # Returns
 ///
@@ -62,9 +63,9 @@ fn locate_index() -> Result<usize, SysError> {
 /// use ckb_std::type_id::validate_type_id;
 ///
 /// let type_id = [0u8; 32];
-/// validate_type_id(type_id)?;
+/// validate_type_id(&type_id)?;
 /// ```
-pub fn validate_type_id(type_id: [u8; 32]) -> Result<(), SysError> {
+pub fn validate_type_id(type_id: &[u8]) -> Result<(), SysError> {
     // after this checking, there are 3 cases:
     // 1. 0 input cell and 1 output cell, it's minting operation
     // 2. 1 input cell and 1 output cell, it's transfer operation
@@ -82,8 +83,10 @@ pub fn validate_type_id(type_id: [u8; 32]) -> Result<(), SysError> {
         blake2b.update(&index.to_le_bytes());
         let mut ret = [0; 32];
         blake2b.finalize(&mut ret);
-
-        if ret != type_id {
+        if type_id.len() > ret.len() {
+            return Err(SysError::TypeIDError);
+        }
+        if &ret[..type_id.len()] != type_id {
             return Err(SysError::TypeIDError);
         }
     }
@@ -91,28 +94,27 @@ pub fn validate_type_id(type_id: [u8; 32]) -> Result<(), SysError> {
     Ok(())
 }
 
-fn load_id_from_args(offset: usize) -> Result<[u8; 32], SysError> {
+fn load_id_from_args(offset: usize, length: usize) -> Result<Vec<u8>, SysError> {
     let script = load_script()?;
     let args = script.as_reader().args();
     let args_data = args.raw_data();
 
-    args_data
-        .get(offset..offset + 32)
+    Ok(args_data
+        .get(offset..offset + length)
         .ok_or(SysError::TypeIDError)?
-        .try_into()
-        .map_err(|_| SysError::TypeIDError)
+        .to_vec())
 }
 
 ///
 /// Validates that the script follows the Type ID rule.
 ///
-/// This function checks if the Type ID (a 32-byte value) stored in the script's `args`
+/// This function checks if the Type ID (variable length) stored in the script's `args`
 /// at the specified offset is valid according to the Type ID rules.
 ///
 /// # Arguments
 ///
 /// * `offset` - The byte offset in the script's `args` where the Type ID starts.
-///
+/// * `length` - The length of Type ID
 /// # Returns
 ///
 /// * `Ok(())` if the Type ID is valid.
@@ -125,7 +127,7 @@ fn load_id_from_args(offset: usize) -> Result<[u8; 32], SysError> {
 ///
 /// fn main() -> Result<(), ckb_std::error::SysError> {
 ///     // Check the Type ID stored at the beginning of the script args
-///     check_type_id(0)?;
+///     check_type_id(0, 32)?;
 ///     Ok(())
 /// }
 /// ```
@@ -134,8 +136,8 @@ fn load_id_from_args(offset: usize) -> Result<[u8; 32], SysError> {
 ///
 /// This function internally calls `load_id_from_args` to retrieve the Type ID
 /// and then `validate_type_id` to perform the actual validation.
-pub fn check_type_id(offset: usize) -> Result<(), SysError> {
-    let type_id = load_id_from_args(offset)?;
-    validate_type_id(type_id)?;
+pub fn check_type_id(offset: usize, length: usize) -> Result<(), SysError> {
+    let type_id = load_id_from_args(offset, length)?;
+    validate_type_id(&type_id)?;
     Ok(())
 }
