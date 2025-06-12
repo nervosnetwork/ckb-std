@@ -1,3 +1,5 @@
+use int_enum::IntEnum;
+
 pub const SYS_EXIT: u64 = 93;
 pub const SYS_VM_VERSION: u64 = 2041;
 pub const SYS_CURRENT_CYCLES: u64 = 2042;
@@ -27,7 +29,7 @@ pub const SYS_CLOSE: u64 = 2608;
 pub const SYS_LOAD_BLOCK_EXTENSION: u64 = 2104;
 
 pub const CKB_SUCCESS: u64 = 0;
-#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, IntEnum)]
 #[repr(u64)]
 pub enum Source {
     Input = 1,
@@ -38,7 +40,7 @@ pub enum Source {
     GroupOutput = 0x0100000000000002,
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, IntEnum)]
 #[repr(u64)]
 pub enum CellField {
     Capacity = 0,
@@ -50,7 +52,7 @@ pub enum CellField {
     OccupiedCapacity = 6,
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, IntEnum)]
 #[repr(u64)]
 pub enum HeaderField {
     EpochNumber = 0,
@@ -58,7 +60,7 @@ pub enum HeaderField {
     EpochLength = 2,
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Copy)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, IntEnum)]
 #[repr(u64)]
 pub enum InputField {
     OutPoint = 0,

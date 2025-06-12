@@ -28,6 +28,7 @@ pub enum SysError {
 }
 
 impl SysError {
+    #[allow(dead_code)]
     pub(crate) fn build_syscall_result(
         errno: u64,
         load_len: usize,

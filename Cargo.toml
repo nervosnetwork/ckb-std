@@ -27,6 +27,7 @@ default = ["allocator", "calc-hash", "ckb-types", "dummy-atomic", "libc"]
 calc-hash = ["ckb-types/calc-hash"]
 allocator = ["buddy-alloc"]
 native-simulator = ["ckb-x64-simulator"]
+stub-syscalls = []
 dlopen-c = ["libc"]
 build-with-clang = []
 libc = []
@@ -50,6 +51,7 @@ buddy-alloc = { version = "0.6", optional = true }
 ckb-x64-simulator = { version = "0.11", optional = true }
 gcd = "2.3"
 log = { version = "0.4", optional = true, default-features = false }
+int-enum = "1.2.0"
 
 [workspace]
 exclude = ["test"]

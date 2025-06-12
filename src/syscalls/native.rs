@@ -1,53 +1,10 @@
-use crate::{ckb_constants::*, error::SysError};
-#[cfg(target_arch = "riscv64")]
-use core::arch::asm;
+use crate::{ckb_constants::*, error::SysError, syscalls::internal::syscall};
 use core::ffi::CStr;
-
-#[cfg(target_arch = "riscv64")]
-unsafe fn syscall(
-    mut a0: u64,
-    a1: u64,
-    a2: u64,
-    a3: u64,
-    a4: u64,
-    a5: u64,
-    a6: u64,
-    a7: u64,
-) -> u64 {
-    unsafe {
-        asm!(
-          "ecall",
-          inout("a0") a0,
-          in("a1") a1,
-          in("a2") a2,
-          in("a3") a3,
-          in("a4") a4,
-          in("a5") a5,
-          in("a6") a6,
-          in("a7") a7
-        );
-        a0
-    }
-}
-
-#[cfg(not(target_arch = "riscv64"))]
-unsafe fn syscall(
-    _a0: u64,
-    _a1: u64,
-    _a2: u64,
-    _a3: u64,
-    _a4: u64,
-    _a5: u64,
-    _a6: u64,
-    _a7: u64,
-) -> u64 {
-    u64::MAX
-}
 
 /// Exit, this script will be terminated after the exit syscall.
 /// exit code `0` represents verification is success, others represent error code.
 pub fn exit(code: i8) -> ! {
-    unsafe { syscall(code as u64, 0, 0, 0, 0, 0, 0, SYS_EXIT) };
+    unsafe { syscall(code as u64, 0, 0, 0, 0, 0, SYS_EXIT) };
     loop {}
 }
 
@@ -60,7 +17,6 @@ fn syscall_load(
     a3: u64,
     a4: u64,
     a5: u64,
-    a6: u64,
     syscall_num: u64,
 ) -> Result<usize, SysError> {
     let mut actual_data_len = len;
@@ -73,7 +29,6 @@ fn syscall_load(
             a3,
             a4,
             a5,
-            a6,
             syscall_num,
         )
     };
@@ -101,7 +56,6 @@ pub fn load_tx_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
         buf.as_mut_ptr(),
         buf.len(),
         offset,
-        0,
         0,
         0,
         0,
@@ -133,7 +87,6 @@ pub fn load_script_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError
         0,
         0,
         0,
-        0,
         SYS_LOAD_SCRIPT_HASH,
     )
 }
@@ -160,7 +113,6 @@ pub fn load_cell(
         offset,
         index as u64,
         source as u64,
-        0,
         0,
         SYS_LOAD_CELL,
     )
@@ -189,7 +141,6 @@ pub fn load_input(
         index as u64,
         source as u64,
         0,
-        0,
         SYS_LOAD_INPUT,
     )
 }
@@ -216,7 +167,6 @@ pub fn load_header(
         offset,
         index as u64,
         source as u64,
-        0,
         0,
         SYS_LOAD_HEADER,
     )
@@ -245,7 +195,6 @@ pub fn load_witness(
         index as u64,
         source as u64,
         0,
-        0,
         SYS_LOAD_WITNESS,
     )
 }
@@ -263,7 +212,6 @@ pub fn load_transaction(buf: &mut [u8], offset: usize) -> Result<usize, SysError
         buf.as_mut_ptr(),
         buf.len(),
         offset,
-        0,
         0,
         0,
         0,
@@ -304,7 +252,6 @@ pub fn load_cell_by_field(
         index as u64,
         source as u64,
         field as u64,
-        0,
         SYS_LOAD_CELL_BY_FIELD,
     )
 }
@@ -342,7 +289,6 @@ pub fn load_header_by_field(
         index as u64,
         source as u64,
         field as u64,
-        0,
         SYS_LOAD_HEADER_BY_FIELD,
     )
 }
@@ -380,7 +326,6 @@ pub fn load_input_by_field(
         index as u64,
         source as u64,
         field as u64,
-        0,
         SYS_LOAD_INPUT_BY_FIELD,
     )
 }
@@ -408,7 +353,6 @@ pub fn load_cell_data(
         index as u64,
         source as u64,
         0,
-        0,
         SYS_LOAD_CELL_DATA,
     )
 }
@@ -429,7 +373,6 @@ pub fn load_script(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
         0,
         0,
         0,
-        0,
         SYS_LOAD_SCRIPT,
     )
 }
@@ -445,7 +388,7 @@ pub fn debug(mut s: alloc::string::String) {
     s.push('\0');
     let c_str = s.into_bytes();
     unsafe {
-        syscall(c_str.as_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_DEBUG);
+        syscall(c_str.as_ptr() as u64, 0, 0, 0, 0, 0, SYS_DEBUG);
     }
 }
 
@@ -473,7 +416,6 @@ pub fn load_cell_data_raw(
         offset,
         index as u64,
         source as u64,
-        0,
         0,
         SYS_LOAD_CELL_DATA,
     )
@@ -507,7 +449,6 @@ pub fn load_cell_code(
             content_size as u64,
             index as u64,
             source as u64,
-            0,
             SYS_LOAD_CELL_DATA_AS_CODE,
         )
     };
@@ -520,7 +461,7 @@ pub fn load_cell_code(
 ///
 /// This syscall consumes 500 cycles.
 pub fn vm_version() -> Result<u64, SysError> {
-    let ret = unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_VM_VERSION) };
+    let ret = unsafe { syscall(0, 0, 0, 0, 0, 0, SYS_VM_VERSION) };
     match ret {
         1 | 2 => Ok(ret),
         _ => Err(SysError::Unknown(ret)),
@@ -530,7 +471,7 @@ pub fn vm_version() -> Result<u64, SysError> {
 /// *Current Cycles* returns current cycle consumption just before executing this syscall.
 ///  This syscall consumes 500 cycles.
 pub fn current_cycles() -> u64 {
-    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_CURRENT_CYCLES) }
+    unsafe { syscall(0, 0, 0, 0, 0, 0, SYS_CURRENT_CYCLES) }
 }
 
 /// Exec runs an executable file from specified cell data in the context of an
@@ -571,23 +512,12 @@ pub fn exec(index: usize, source: Source, place: usize, bounds: usize, argv: &[&
             bounds as u64,
             argc as u64,
             argv_ptr.as_ptr() as u64,
-            0,
             SYS_EXEC,
         )
     }
 }
 
-#[repr(C)]
-pub struct SpawnArgs {
-    /// argc contains the number of arguments passed to the program.
-    pub argc: u64,
-    /// argv is a one-dimensional array of strings.
-    pub argv: *const *const i8,
-    /// a pointer used to save the process_id of the child process.
-    pub process_id: *mut u64,
-    /// an array representing the file descriptors passed to the child process. It must end with zero.
-    pub inherited_fds: *const u64,
-}
+pub use crate::syscalls::internal::SpawnArgs;
 
 /// The parent process calls the Spawn system call, which creates a new process (a child process) that is an
 /// independent ckb-vm instance. It's important to note that the parent process will not be blocked by the child
@@ -657,7 +587,6 @@ pub fn spawn(
             bounds as u64,
             spgs as *mut SpawnArgs as u64,
             0,
-            0,
             SYS_SPAWN,
         )
     };
@@ -682,7 +611,7 @@ pub fn spawn(
 /// Returns exit code.
 pub fn wait(pid: u64) -> Result<i8, SysError> {
     let mut code: u64 = 0;
-    let ret = unsafe { syscall(pid, &mut code as *mut u64 as u64, 0, 0, 0, 0, 0, SYS_WAIT) };
+    let ret = unsafe { syscall(pid, &mut code as *mut u64 as u64, 0, 0, 0, 0, SYS_WAIT) };
     match ret {
         0 => Ok(code as i8),
         5 => Err(SysError::WaitFailure),
@@ -693,7 +622,7 @@ pub fn wait(pid: u64) -> Result<i8, SysError> {
 /// This syscall is used to get the current process id. Root process ID is 0.
 /// Note: available after ckb 2nd hardfork.
 pub fn process_id() -> u64 {
-    unsafe { syscall(0, 0, 0, 0, 0, 0, 0, SYS_PROCESS_ID) }
+    unsafe { syscall(0, 0, 0, 0, 0, 0, SYS_PROCESS_ID) }
 }
 
 /// This syscall create a pipe with read-write pair of file descriptions. The file descriptor with read permission is
@@ -701,7 +630,7 @@ pub fn process_id() -> u64 {
 /// Note: available after ckb 2nd hardfork.
 pub fn pipe() -> Result<(u64, u64), SysError> {
     let mut fds: [u64; 2] = [0, 0];
-    let ret = unsafe { syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, 0, SYS_PIPE) };
+    let ret = unsafe { syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, SYS_PIPE) };
     match ret {
         0 => Ok((fds[0], fds[1])),
         9 => Err(SysError::MaxFdsCreated),
@@ -719,7 +648,6 @@ pub fn read(fd: u64, buffer: &mut [u8]) -> Result<usize, SysError> {
             fd,
             buffer.as_mut_ptr() as u64,
             &mut l as *mut u64 as u64,
-            0,
             0,
             0,
             0,
@@ -752,7 +680,6 @@ pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
             0,
             0,
             0,
-            0,
             SYS_WRITE,
         )
     };
@@ -778,7 +705,6 @@ pub fn inherited_fds(fds: &mut [u64]) -> u64 {
             0,
             0,
             0,
-            0,
             SYS_INHERITED_FDS,
         )
     };
@@ -789,7 +715,7 @@ pub fn inherited_fds(fds: &mut [u64]) -> u64 {
 /// pointed to the other end would fail.
 /// Note: available after ckb 2nd hardfork.
 pub fn close(fd: u64) -> Result<(), SysError> {
-    let ret = unsafe { syscall(fd, 0, 0, 0, 0, 0, 0, SYS_CLOSE) };
+    let ret = unsafe { syscall(fd, 0, 0, 0, 0, 0, SYS_CLOSE) };
     match ret {
         0 => Ok(()),
         6 => Err(SysError::InvalidFd),
@@ -820,7 +746,6 @@ pub fn load_block_extension(
         offset,
         index as u64,
         source as u64,
-        0,
         0,
         SYS_LOAD_BLOCK_EXTENSION,
     )
