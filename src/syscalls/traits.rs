@@ -1,7 +1,7 @@
 use crate::{
     ckb_constants::{self as consts, CellField, HeaderField, InputField, Source},
     error::SysError,
-    syscalls::internal::{SpawnArgs, syscall},
+    syscalls::internal::SpawnArgs,
 };
 use alloc::string::String;
 use core::ffi::CStr;
@@ -140,22 +140,68 @@ pub trait SyscallImpls {
     }
 }
 
+pub trait SyscallExecutor {
+    fn syscall(&self, a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, n: u64) -> u64;
+}
+
 /// A default SyscallImpls implementation in case you feel like the new
 /// interface
-pub struct DefaultSyscallImpls {}
+pub struct DefaultSyscallImpls<E: SyscallExecutor>(E);
 
-impl SyscallImpls for DefaultSyscallImpls {
+impl<E: SyscallExecutor> DefaultSyscallImpls<E> {
+    pub fn new(e: E) -> Self {
+        Self(e)
+    }
+
+    fn syscall_load(
+        &self,
+        buf: &mut [u8],
+        offset: usize,
+        a3: u64,
+        a4: u64,
+        a5: u64,
+        syscall_num: u64,
+    ) -> IoResult {
+        let mut actual_data_len: u64 = buf.len() as u64;
+        let len_ptr: *mut u64 = &mut actual_data_len;
+        let ret = self.0.syscall(
+            buf.as_ptr() as u64,
+            len_ptr as u64,
+            offset as u64,
+            a3,
+            a4,
+            a5,
+            syscall_num,
+        );
+        match ret {
+            0 => {
+                if actual_data_len > buf.len() as u64 {
+                    IoResult::PartialLoaded {
+                        loaded: buf.len(),
+                        available: actual_data_len as usize,
+                    }
+                } else {
+                    IoResult::FullyLoaded(actual_data_len as usize)
+                }
+            }
+            _ => IoResult::Error(ret.try_into().unwrap()),
+        }
+    }
+}
+
+impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
     fn debug(&self, s: &CStr) {
-        unsafe { syscall(s.as_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_DEBUG) };
+        self.0
+            .syscall(s.as_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_DEBUG);
     }
 
     fn exit(&self, code: i8) -> ! {
-        unsafe { syscall(code as u64, 0, 0, 0, 0, 0, consts::SYS_EXIT) };
+        self.0.syscall(code as u64, 0, 0, 0, 0, 0, consts::SYS_EXIT);
         unreachable!()
     }
 
     fn load_cell(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -173,7 +219,7 @@ impl SyscallImpls for DefaultSyscallImpls {
         source: Source,
         field: CellField,
     ) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -192,17 +238,15 @@ impl SyscallImpls for DefaultSyscallImpls {
         index: usize,
         source: Source,
     ) -> Result<(), Error> {
-        build_result(unsafe {
-            syscall(
-                buf_ptr as u64,
-                len as u64,
-                content_offset as u64,
-                content_size as u64,
-                index as u64,
-                source as u64,
-                consts::SYS_LOAD_CELL_DATA_AS_CODE,
-            )
-        })
+        build_result(self.0.syscall(
+            buf_ptr as u64,
+            len as u64,
+            content_offset as u64,
+            content_size as u64,
+            index as u64,
+            source as u64,
+            consts::SYS_LOAD_CELL_DATA_AS_CODE,
+        ))
     }
 
     fn load_cell_data(
@@ -212,7 +256,7 @@ impl SyscallImpls for DefaultSyscallImpls {
         index: usize,
         source: Source,
     ) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -223,7 +267,7 @@ impl SyscallImpls for DefaultSyscallImpls {
     }
 
     fn load_header(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -241,7 +285,7 @@ impl SyscallImpls for DefaultSyscallImpls {
         source: Source,
         field: HeaderField,
     ) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -252,7 +296,7 @@ impl SyscallImpls for DefaultSyscallImpls {
     }
 
     fn load_input(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -270,7 +314,7 @@ impl SyscallImpls for DefaultSyscallImpls {
         source: Source,
         field: InputField,
     ) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -281,19 +325,19 @@ impl SyscallImpls for DefaultSyscallImpls {
     }
 
     fn load_script(&self, buf: &mut [u8], offset: usize) -> IoResult {
-        syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_SCRIPT)
+        self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_SCRIPT)
     }
 
     fn load_script_hash(&self, buf: &mut [u8], offset: usize) -> IoResult {
-        syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_SCRIPT_HASH)
+        self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_SCRIPT_HASH)
     }
 
     fn load_transaction(&self, buf: &mut [u8], offset: usize) -> IoResult {
-        syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_TRANSACTION)
+        self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_TRANSACTION)
     }
 
     fn load_tx_hash(&self, buf: &mut [u8], offset: usize) -> IoResult {
-        syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_TX_HASH)
+        self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_TX_HASH)
     }
 
     fn load_witness(
@@ -303,7 +347,7 @@ impl SyscallImpls for DefaultSyscallImpls {
         index: usize,
         source: Source,
     ) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -314,11 +358,11 @@ impl SyscallImpls for DefaultSyscallImpls {
     }
 
     fn vm_version(&self) -> u64 {
-        unsafe { syscall(0, 0, 0, 0, 0, 0, consts::SYS_VM_VERSION) }
+        self.0.syscall(0, 0, 0, 0, 0, 0, consts::SYS_VM_VERSION)
     }
 
     fn current_cycles(&self) -> u64 {
-        unsafe { syscall(0, 0, 0, 0, 0, 0, consts::SYS_CURRENT_CYCLES) }
+        self.0.syscall(0, 0, 0, 0, 0, 0, consts::SYS_CURRENT_CYCLES)
     }
 
     fn exec(
@@ -332,17 +376,15 @@ impl SyscallImpls for DefaultSyscallImpls {
         let argv_ptr: alloc::vec::Vec<*const i8> =
             argv.iter().map(|e| e.as_ptr() as *const i8).collect();
 
-        build_result(unsafe {
-            syscall(
-                index as u64,
-                source as u64,
-                place as u64,
-                bounds as u64,
-                argv.len() as u64,
-                argv_ptr.as_ptr() as u64,
-                consts::SYS_EXEC,
-            )
-        })
+        build_result(self.0.syscall(
+            index as u64,
+            source as u64,
+            place as u64,
+            bounds as u64,
+            argv.len() as u64,
+            argv_ptr.as_ptr() as u64,
+            consts::SYS_EXEC,
+        ))
     }
 
     fn spawn(
@@ -368,96 +410,89 @@ impl SyscallImpls for DefaultSyscallImpls {
             inherited_fds: fds_with_terminator.as_ptr(),
         };
 
-        build_result(unsafe {
-            syscall(
-                index as u64,
-                source as u64,
-                place as u64,
-                bounds as u64,
-                &mut spgs as *mut _ as u64,
-                0,
-                consts::SYS_SPAWN,
-            )
-        })
+        build_result(self.0.syscall(
+            index as u64,
+            source as u64,
+            place as u64,
+            bounds as u64,
+            &mut spgs as *mut _ as u64,
+            0,
+            consts::SYS_SPAWN,
+        ))
         .map(|_| process_id)
     }
 
     fn pipe(&self) -> Result<(u64, u64), Error> {
         let mut fds: [u64; 2] = [0, 0];
-        build_result(unsafe { syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_PIPE) })
-            .map(|_| (fds[0], fds[1]))
+        build_result(
+            self.0
+                .syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_PIPE),
+        )
+        .map(|_| (fds[0], fds[1]))
     }
 
     fn inherited_fds(&self, fds: &mut [u64]) -> Result<usize, Error> {
         let mut length: u64 = fds.len() as u64;
-        build_result(unsafe {
-            syscall(
-                fds.as_mut_ptr() as u64,
-                &mut length as *mut _ as u64,
-                0,
-                0,
-                0,
-                0,
-                consts::SYS_INHERITED_FDS,
-            )
-        })
+        build_result(self.0.syscall(
+            fds.as_mut_ptr() as u64,
+            &mut length as *mut _ as u64,
+            0,
+            0,
+            0,
+            0,
+            consts::SYS_INHERITED_FDS,
+        ))
         .map(|_| length as usize)
     }
 
     fn read(&self, fd: u64, buffer: &mut [u8]) -> Result<usize, Error> {
         let mut length: u64 = buffer.len() as u64;
-        build_result(unsafe {
-            syscall(
-                fd,
-                buffer.as_mut_ptr() as u64,
-                &mut length as *mut _ as u64,
-                0,
-                0,
-                0,
-                consts::SYS_READ,
-            )
-        })
+        build_result(self.0.syscall(
+            fd,
+            buffer.as_mut_ptr() as u64,
+            &mut length as *mut _ as u64,
+            0,
+            0,
+            0,
+            consts::SYS_READ,
+        ))
         .map(|_| length as usize)
     }
 
     fn write(&self, fd: u64, buffer: &[u8]) -> Result<usize, Error> {
         let mut length: u64 = buffer.len() as u64;
-        build_result(unsafe {
-            syscall(
-                fd,
-                buffer.as_ptr() as u64,
-                &mut length as *mut _ as u64,
-                0,
-                0,
-                0,
-                consts::SYS_WRITE,
-            )
-        })
+        build_result(self.0.syscall(
+            fd,
+            buffer.as_ptr() as u64,
+            &mut length as *mut _ as u64,
+            0,
+            0,
+            0,
+            consts::SYS_WRITE,
+        ))
         .map(|_| length as usize)
     }
 
     fn close(&self, fd: u64) -> Result<(), Error> {
-        build_result(unsafe { syscall(fd, 0, 0, 0, 0, 0, consts::SYS_CLOSE) })
+        build_result(self.0.syscall(fd, 0, 0, 0, 0, 0, consts::SYS_CLOSE))
     }
 
     fn wait(&self, pid: u64) -> Result<i8, Error> {
         let mut code: u64 = u64::MAX;
-        build_result(unsafe {
-            syscall(
-                pid,
-                &mut code as *mut _ as u64,
-                0,
-                0,
-                0,
-                0,
-                consts::SYS_WAIT,
-            )
-        })
+        build_result(self.0.syscall(
+            pid,
+            &mut code as *mut _ as u64,
+            0,
+            0,
+            0,
+            0,
+            consts::SYS_WAIT,
+        ))
         .map(|_| code as i8)
     }
 
     fn process_id(&self) -> u64 {
-        unsafe { syscall(0, 0, 0, 0, 0, 0, consts::SYS_PROCESS_ID) }
+        self.0.syscall(0, 0, 0, 0, 0, 0, consts::SYS_PROCESS_ID)
     }
 
     fn load_block_extension(
@@ -467,7 +502,7 @@ impl SyscallImpls for DefaultSyscallImpls {
         index: usize,
         source: Source,
     ) -> IoResult {
-        syscall_load(
+        self.syscall_load(
             buf,
             offset,
             index as u64,
@@ -475,42 +510,6 @@ impl SyscallImpls for DefaultSyscallImpls {
             0,
             consts::SYS_LOAD_BLOCK_EXTENSION,
         )
-    }
-}
-
-fn syscall_load(
-    buf: &mut [u8],
-    offset: usize,
-    a3: u64,
-    a4: u64,
-    a5: u64,
-    syscall_num: u64,
-) -> IoResult {
-    let mut actual_data_len: u64 = buf.len() as u64;
-    let len_ptr: *mut u64 = &mut actual_data_len;
-    let ret = unsafe {
-        syscall(
-            buf.as_ptr() as u64,
-            len_ptr as u64,
-            offset as u64,
-            a3,
-            a4,
-            a5,
-            syscall_num,
-        )
-    };
-    match ret {
-        0 => {
-            if actual_data_len > buf.len() as u64 {
-                IoResult::PartialLoaded {
-                    loaded: buf.len(),
-                    available: actual_data_len as usize,
-                }
-            } else {
-                IoResult::FullyLoaded(actual_data_len as usize)
-            }
-        }
-        _ => IoResult::Error(ret.try_into().unwrap()),
     }
 }
 
