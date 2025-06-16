@@ -3,7 +3,7 @@ use crate::{
     error::SysError,
     syscalls::internal::SpawnArgs,
 };
-use alloc::string::String;
+use alloc::{string::String, vec::Vec};
 use core::ffi::CStr;
 
 /// This trait serves several purposes:
@@ -510,6 +510,224 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             0,
             consts::SYS_LOAD_BLOCK_EXTENSION,
         )
+    }
+}
+
+/// This is the inverse of DefaultSyscallImpls: given a general syscall function,
+/// we map the syscalls to a SyscallImpls trait impl. This way we are taking care
+/// of the unsafe part for you, where in Rust you can just deal with SyscallImpls.
+pub fn syscall_to_impls<S: SyscallImpls>(
+    impls: &S,
+    n: u64,
+    a0: u64,
+    a1: u64,
+    a2: u64,
+    a3: u64,
+    a4: u64,
+    a5: u64,
+) -> u64 {
+    match n {
+        consts::SYS_DEBUG => {
+            impls.debug(unsafe { CStr::from_ptr(a0 as *const _) });
+            0
+        }
+        consts::SYS_EXIT => impls.exit(a0 as i8),
+        consts::SYS_LOAD_CELL => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            impls.load_cell(buf, a2 as usize, a3 as usize, source)
+        }),
+        consts::SYS_LOAD_CELL_BY_FIELD => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            let field: CellField = a5.try_into().expect("parse cell field");
+            impls.load_cell_by_field(buf, a2 as usize, a3 as usize, source, field)
+        }),
+        consts::SYS_LOAD_CELL_DATA_AS_CODE => {
+            let source: Source = a5.try_into().expect("parse source");
+            match impls.load_cell_code(
+                a0 as *mut u8,
+                a1 as usize,
+                a2 as usize,
+                a3 as usize,
+                a4 as usize,
+                source,
+            ) {
+                Ok(()) => 0,
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_LOAD_CELL_DATA => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            impls.load_cell_data(buf, a2 as usize, a3 as usize, source)
+        }),
+        consts::SYS_LOAD_HEADER => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            impls.load_header(buf, a2 as usize, a3 as usize, source)
+        }),
+        consts::SYS_LOAD_HEADER_BY_FIELD => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            let field: HeaderField = a5.try_into().expect("parse header field");
+            impls.load_header_by_field(buf, a2 as usize, a3 as usize, source, field)
+        }),
+        consts::SYS_LOAD_INPUT => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            impls.load_input(buf, a2 as usize, a3 as usize, source)
+        }),
+        consts::SYS_LOAD_INPUT_BY_FIELD => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            let field: InputField = a5.try_into().expect("parse input field");
+            impls.load_input_by_field(buf, a2 as usize, a3 as usize, source, field)
+        }),
+        consts::SYS_LOAD_SCRIPT => load_to_impls(a0, a1, |buf| impls.load_script(buf, a2 as usize)),
+        consts::SYS_LOAD_SCRIPT_HASH => {
+            load_to_impls(a0, a1, |buf| impls.load_script_hash(buf, a2 as usize))
+        }
+        consts::SYS_LOAD_TRANSACTION => {
+            load_to_impls(a0, a1, |buf| impls.load_transaction(buf, a2 as usize))
+        }
+        consts::SYS_LOAD_TX_HASH => {
+            load_to_impls(a0, a1, |buf| impls.load_tx_hash(buf, a2 as usize))
+        }
+        consts::SYS_LOAD_WITNESS => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            impls.load_witness(buf, a2 as usize, a3 as usize, source)
+        }),
+        consts::SYS_VM_VERSION => impls.vm_version(),
+        consts::SYS_CURRENT_CYCLES => impls.current_cycles(),
+        consts::SYS_EXEC => {
+            let source: Source = a1.try_into().expect("parse source");
+            let argv = build_argv(a4, a5 as *const *const i8);
+            match impls.exec(a0 as usize, source, a2 as usize, a3 as usize, &argv) {
+                Ok(()) => 0,
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_SPAWN => {
+            let source: Source = a1.try_into().expect("parse source");
+            let spgs_addr = a4 as *mut SpawnArgs;
+            let spgs: &mut SpawnArgs = unsafe { &mut *spgs_addr };
+
+            let argv = build_argv(spgs.argc, spgs.argv);
+            let mut fds = Vec::new();
+            let mut fd_ptr: *const u64 = spgs.inherited_fds;
+            loop {
+                let fd = unsafe { fd_ptr.read() };
+                if fd == 0 {
+                    break;
+                }
+                fds.push(fd);
+                fd_ptr = unsafe { fd_ptr.offset(1) };
+            }
+            match impls.spawn(a0 as usize, source, a2 as usize, a3 as usize, &argv, &fds) {
+                Ok(process_id) => {
+                    unsafe { spgs.process_id.write(process_id) };
+                    0
+                }
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_PIPE => {
+            let fds = a0 as *mut u64;
+            match impls.pipe() {
+                Ok((fd1, fd2)) => {
+                    unsafe { fds.write(fd1) };
+                    unsafe { fds.offset(1).write(fd2) };
+                    0
+                }
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_INHERITED_FDS => {
+            let fds_ptr = a0 as *mut u64;
+            let length_ptr = a1 as *mut u64;
+            let length = unsafe { length_ptr.read() } as usize;
+            let fds = unsafe { core::slice::from_raw_parts_mut(fds_ptr, length) };
+
+            match impls.inherited_fds(fds) {
+                Ok(actual_length) => {
+                    unsafe { length_ptr.write(actual_length as u64) };
+                    0
+                }
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_READ => {
+            let buffer_ptr = a1 as *mut u8;
+            let length_ptr = a2 as *mut u64;
+            let length = unsafe { length_ptr.read() } as usize;
+            let buffer = unsafe { core::slice::from_raw_parts_mut(buffer_ptr, length) };
+
+            match impls.read(a0, buffer) {
+                Ok(read) => {
+                    unsafe { length_ptr.write(read as u64) };
+                    0
+                }
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_WRITE => {
+            let buffer_ptr = a1 as *const u8;
+            let length_ptr = a2 as *mut u64;
+            let length = unsafe { length_ptr.read() } as usize;
+            let buffer = unsafe { core::slice::from_raw_parts(buffer_ptr, length) };
+
+            match impls.write(a0, buffer) {
+                Ok(read) => {
+                    unsafe { length_ptr.write(read as u64) };
+                    0
+                }
+                Err(e) => e.into(),
+            }
+        }
+        consts::SYS_CLOSE => match impls.close(a0) {
+            Ok(()) => 0,
+            Err(e) => e.into(),
+        },
+        consts::SYS_WAIT => match impls.wait(a0) {
+            Ok(exit_code) => {
+                let p = a1 as *mut i8;
+                unsafe { p.write(exit_code) };
+                0
+            }
+            Err(e) => e.into(),
+        },
+        consts::SYS_PROCESS_ID => impls.process_id(),
+        consts::SYS_LOAD_BLOCK_EXTENSION => load_to_impls(a0, a1, |buf| {
+            let source: Source = a4.try_into().expect("parse source");
+            impls.load_block_extension(buf, a2 as usize, a3 as usize, source)
+        }),
+        _ => panic!("Unknown syscall: {}", n),
+    }
+}
+
+fn build_argv<'a>(argc: u64, argv_ptr: *const *const i8) -> Vec<&'a CStr> {
+    let mut argv = Vec::with_capacity(argc as usize);
+    for i in 0..argc as isize {
+        let p: *const i8 = unsafe { argv_ptr.offset(i as isize).read() };
+        argv.push(unsafe { CStr::from_ptr(p as *const _) });
+    }
+    argv
+}
+
+fn load_to_impls<F>(a0: u64, a1: u64, f: F) -> u64
+where
+    F: Fn(&mut [u8]) -> IoResult,
+{
+    let buf_ptr = a0 as *mut u8;
+    let length_ptr = a1 as *mut u64;
+
+    let length = unsafe { length_ptr.read() };
+    let buf = unsafe { core::slice::from_raw_parts_mut(buf_ptr, length as usize) };
+
+    match f(buf) {
+        IoResult::FullyLoaded(loaded) => {
+            unsafe { length_ptr.write(loaded as u64) };
+            0
+        }
+        IoResult::PartialLoaded { available, .. } => {
+            unsafe { length_ptr.write(available as u64) };
+            0
+        }
+        IoResult::Error(e) => e.into(),
     }
 }
 
