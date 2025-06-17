@@ -36,121 +36,13 @@ use core::ffi::CStr;
 /// provided by a single trait. It also attempts to clear and unify syscall
 /// APIs, in a clear and easy to understand fashion.
 pub trait SyscallImpls {
-    fn debug(&self, s: &CStr);
-    fn exit(&self, code: i8) -> !;
-    fn load_cell(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult;
-    fn load_cell_by_field(
-        &self,
-        buf: &mut [u8],
-        offset: usize,
-        index: usize,
-        source: Source,
-        field: CellField,
-    ) -> IoResult;
-    fn load_cell_code(
-        &self,
-        buf_ptr: *mut u8,
-        len: usize,
-        content_offset: usize,
-        content_size: usize,
-        index: usize,
-        source: Source,
-    ) -> Result<(), Error>;
-    fn load_cell_data(
-        &self,
-        buf: &mut [u8],
-        offset: usize,
-        index: usize,
-        source: Source,
-    ) -> IoResult;
-    fn load_header(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult;
-    fn load_header_by_field(
-        &self,
-        buf: &mut [u8],
-        offset: usize,
-        index: usize,
-        source: Source,
-        field: HeaderField,
-    ) -> IoResult;
-    fn load_input(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult;
-    fn load_input_by_field(
-        &self,
-        buf: &mut [u8],
-        offset: usize,
-        index: usize,
-        source: Source,
-        field: InputField,
-    ) -> IoResult;
-    fn load_script(&self, buf: &mut [u8], offset: usize) -> IoResult;
-    fn load_script_hash(&self, buf: &mut [u8], offset: usize) -> IoResult;
-    fn load_transaction(&self, buf: &mut [u8], offset: usize) -> IoResult;
-    fn load_tx_hash(&self, buf: &mut [u8], offset: usize) -> IoResult;
-    fn load_witness(&self, buf: &mut [u8], offset: usize, index: usize, source: Source)
-    -> IoResult;
-
-    fn vm_version(&self) -> u64;
-    fn current_cycles(&self) -> u64;
-    fn exec(
-        &self,
-        index: usize,
-        source: Source,
-        place: usize,
-        bounds: usize,
-        argv: &[&CStr],
-    ) -> Result<(), Error>;
-
-    /// Spawned process ID is returned when the syscall succeeds
-    fn spawn(
-        &self,
-        index: usize,
-        source: Source,
-        place: usize,
-        bounds: usize,
-        argv: &[&CStr],
-        inherited_fds: &[u64],
-    ) -> Result<u64, Error>;
-    fn pipe(&self) -> Result<(u64, u64), Error>;
-    /// Number of available fds is returned when the syscall succeeds, which
-    /// can be bigger than the length of the passed argument `fds` slice
-    fn inherited_fds(&self, fds: &mut [u64]) -> Result<usize, Error>;
-    /// Number of read bytes is returned when the syscall succeeds. Note
-    /// this syscall works unlike the `load_*` syscalls, it only returns
-    /// the number of bytes read to passed buffer. The syscall has no way
-    /// of knowing how many bytes are availble to read.
-    fn read(&self, fd: u64, buffer: &mut [u8]) -> Result<usize, Error>;
-    /// Number of written bytes is returned when the syscall succeeds.
-    fn write(&self, fd: u64, buffer: &[u8]) -> Result<usize, Error>;
-    fn close(&self, fd: u64) -> Result<(), Error>;
-    /// Exit code of waited process is returned when the syscall succeeds.
-    fn wait(&self, pid: u64) -> Result<i8, Error>;
-    fn process_id(&self) -> u64;
-    fn load_block_extension(
-        &self,
-        buf: &mut [u8],
-        offset: usize,
-        index: usize,
-        source: Source,
-    ) -> IoResult;
-
-    fn debug_s(&self, mut s: String) {
-        s.push('\0');
-        let bytes = s.into_bytes();
-        let c_str = CStr::from_bytes_until_nul(&bytes).unwrap();
-        self.debug(c_str)
-    }
-}
-
-pub trait SyscallExecutor {
-    fn syscall(&self, a0: u64, a1: u64, a2: u64, a3: u64, a4: u64, a5: u64, n: u64) -> u64;
-}
-
-/// A default SyscallImpls implementation in case you feel like the new
-/// interface
-pub struct DefaultSyscallImpls<E: SyscallExecutor>(E);
-
-impl<E: SyscallExecutor> DefaultSyscallImpls<E> {
-    pub fn new(e: E) -> Self {
-        Self(e)
+    /// There are 2 ways you can implement this trait: you can either implement
+    /// this generic syscall function, where you detect the syscall by the last
+    /// `n` field, or you can implement each invididual syscall in a type-safe
+    /// way. Dummy implementations are provided for each trait method so one can
+    /// override only the needed ones.
+    fn syscall(&self, _a0: u64, _a1: u64, _a2: u64, _a3: u64, _a4: u64, _a5: u64, _n: u64) -> u64 {
+        panic!("Default syscall function is not yet implemented!")
     }
 
     fn syscall_load(
@@ -164,7 +56,7 @@ impl<E: SyscallExecutor> DefaultSyscallImpls<E> {
     ) -> IoResult {
         let mut actual_data_len: u64 = buf.len() as u64;
         let len_ptr: *mut u64 = &mut actual_data_len;
-        let ret = self.0.syscall(
+        let ret = self.syscall(
             buf.as_ptr() as u64,
             len_ptr as u64,
             offset as u64,
@@ -187,19 +79,14 @@ impl<E: SyscallExecutor> DefaultSyscallImpls<E> {
             _ => IoResult::Error(ret.try_into().unwrap()),
         }
     }
-}
 
-impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
     fn debug(&self, s: &CStr) {
-        self.0
-            .syscall(s.as_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_DEBUG);
+        self.syscall(s.as_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_DEBUG);
     }
-
     fn exit(&self, code: i8) -> ! {
-        self.0.syscall(code as u64, 0, 0, 0, 0, 0, consts::SYS_EXIT);
+        self.syscall(code as u64, 0, 0, 0, 0, 0, consts::SYS_EXIT);
         unreachable!()
     }
-
     fn load_cell(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult {
         self.syscall_load(
             buf,
@@ -210,7 +97,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_CELL,
         )
     }
-
     fn load_cell_by_field(
         &self,
         buf: &mut [u8],
@@ -228,7 +114,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_CELL_BY_FIELD,
         )
     }
-
     fn load_cell_code(
         &self,
         buf_ptr: *mut u8,
@@ -238,7 +123,7 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         index: usize,
         source: Source,
     ) -> Result<(), Error> {
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             buf_ptr as u64,
             len as u64,
             content_offset as u64,
@@ -248,7 +133,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_CELL_DATA_AS_CODE,
         ))
     }
-
     fn load_cell_data(
         &self,
         buf: &mut [u8],
@@ -265,7 +149,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_CELL_DATA,
         )
     }
-
     fn load_header(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult {
         self.syscall_load(
             buf,
@@ -276,7 +159,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_HEADER,
         )
     }
-
     fn load_header_by_field(
         &self,
         buf: &mut [u8],
@@ -294,7 +176,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_HEADER_BY_FIELD,
         )
     }
-
     fn load_input(&self, buf: &mut [u8], offset: usize, index: usize, source: Source) -> IoResult {
         self.syscall_load(
             buf,
@@ -305,7 +186,6 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_INPUT,
         )
     }
-
     fn load_input_by_field(
         &self,
         buf: &mut [u8],
@@ -323,23 +203,18 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             consts::SYS_LOAD_INPUT_BY_FIELD,
         )
     }
-
     fn load_script(&self, buf: &mut [u8], offset: usize) -> IoResult {
         self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_SCRIPT)
     }
-
     fn load_script_hash(&self, buf: &mut [u8], offset: usize) -> IoResult {
         self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_SCRIPT_HASH)
     }
-
     fn load_transaction(&self, buf: &mut [u8], offset: usize) -> IoResult {
         self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_TRANSACTION)
     }
-
     fn load_tx_hash(&self, buf: &mut [u8], offset: usize) -> IoResult {
         self.syscall_load(buf, offset, 0, 0, 0, consts::SYS_LOAD_TX_HASH)
     }
-
     fn load_witness(
         &self,
         buf: &mut [u8],
@@ -358,13 +233,11 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
     }
 
     fn vm_version(&self) -> u64 {
-        self.0.syscall(0, 0, 0, 0, 0, 0, consts::SYS_VM_VERSION)
+        self.syscall(0, 0, 0, 0, 0, 0, consts::SYS_VM_VERSION)
     }
-
     fn current_cycles(&self) -> u64 {
-        self.0.syscall(0, 0, 0, 0, 0, 0, consts::SYS_CURRENT_CYCLES)
+        self.syscall(0, 0, 0, 0, 0, 0, consts::SYS_CURRENT_CYCLES)
     }
-
     fn exec(
         &self,
         index: usize,
@@ -376,7 +249,7 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         let argv_ptr: alloc::vec::Vec<*const i8> =
             argv.iter().map(|e| e.as_ptr() as *const i8).collect();
 
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             index as u64,
             source as u64,
             place as u64,
@@ -387,6 +260,7 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         ))
     }
 
+    /// Spawned process ID is returned when the syscall succeeds
     fn spawn(
         &self,
         index: usize,
@@ -410,7 +284,7 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             inherited_fds: fds_with_terminator.as_ptr(),
         };
 
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             index as u64,
             source as u64,
             place as u64,
@@ -421,19 +295,16 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         ))
         .map(|_| process_id)
     }
-
     fn pipe(&self) -> Result<(u64, u64), Error> {
         let mut fds: [u64; 2] = [0, 0];
-        build_result(
-            self.0
-                .syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_PIPE),
-        )
-        .map(|_| (fds[0], fds[1]))
+        build_result(self.syscall(fds.as_mut_ptr() as u64, 0, 0, 0, 0, 0, consts::SYS_PIPE))
+            .map(|_| (fds[0], fds[1]))
     }
-
+    /// Number of available fds is returned when the syscall succeeds, which
+    /// can be bigger than the length of the passed argument `fds` slice
     fn inherited_fds(&self, fds: &mut [u64]) -> Result<usize, Error> {
         let mut length: u64 = fds.len() as u64;
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             fds.as_mut_ptr() as u64,
             &mut length as *mut _ as u64,
             0,
@@ -444,10 +315,13 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         ))
         .map(|_| length as usize)
     }
-
+    /// Number of read bytes is returned when the syscall succeeds. Note
+    /// this syscall works unlike the `load_*` syscalls, it only returns
+    /// the number of bytes read to passed buffer. The syscall has no way
+    /// of knowing how many bytes are availble to read.
     fn read(&self, fd: u64, buffer: &mut [u8]) -> Result<usize, Error> {
         let mut length: u64 = buffer.len() as u64;
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             fd,
             buffer.as_mut_ptr() as u64,
             &mut length as *mut _ as u64,
@@ -458,10 +332,10 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         ))
         .map(|_| length as usize)
     }
-
+    /// Number of written bytes is returned when the syscall succeeds.
     fn write(&self, fd: u64, buffer: &[u8]) -> Result<usize, Error> {
         let mut length: u64 = buffer.len() as u64;
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             fd,
             buffer.as_ptr() as u64,
             &mut length as *mut _ as u64,
@@ -472,14 +346,13 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         ))
         .map(|_| length as usize)
     }
-
     fn close(&self, fd: u64) -> Result<(), Error> {
-        build_result(self.0.syscall(fd, 0, 0, 0, 0, 0, consts::SYS_CLOSE))
+        build_result(self.syscall(fd, 0, 0, 0, 0, 0, consts::SYS_CLOSE))
     }
-
+    /// Exit code of waited process is returned when the syscall succeeds.
     fn wait(&self, pid: u64) -> Result<i8, Error> {
         let mut code: u64 = u64::MAX;
-        build_result(self.0.syscall(
+        build_result(self.syscall(
             pid,
             &mut code as *mut _ as u64,
             0,
@@ -490,11 +363,9 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
         ))
         .map(|_| code as i8)
     }
-
     fn process_id(&self) -> u64 {
-        self.0.syscall(0, 0, 0, 0, 0, 0, consts::SYS_PROCESS_ID)
+        self.syscall(0, 0, 0, 0, 0, 0, consts::SYS_PROCESS_ID)
     }
-
     fn load_block_extension(
         &self,
         buf: &mut [u8],
@@ -510,6 +381,13 @@ impl<E: SyscallExecutor> SyscallImpls for DefaultSyscallImpls<E> {
             0,
             consts::SYS_LOAD_BLOCK_EXTENSION,
         )
+    }
+
+    fn debug_s(&self, mut s: String) {
+        s.push('\0');
+        let bytes = s.into_bytes();
+        let c_str = CStr::from_bytes_until_nul(&bytes).unwrap();
+        self.debug(c_str)
     }
 }
 
