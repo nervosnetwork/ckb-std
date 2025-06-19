@@ -11,6 +11,11 @@ use core::ffi::CStr;
 
 pub use crate::syscalls::internal::SpawnArgs;
 
+// We cannot use OnceCell here: some fuzzer engines(such as AFL++) reuse the
+// same process to run multiple iterations of fuzzed code. For each iteration,
+// a new object implementing SyscallImpls is likely required. In this case,
+// current value needs to be updated multiple times, which will not be possible
+// with OnceCell.
 static mut IMPLS: Option<Box<dyn SyscallImpls>> = None;
 
 /// Initializes a new SyscallImpls trait impl.
