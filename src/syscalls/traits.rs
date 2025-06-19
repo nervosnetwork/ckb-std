@@ -394,7 +394,7 @@ pub trait SyscallImpls {
 /// This is the inverse of DefaultSyscallImpls: given a general syscall function,
 /// we map the syscalls to a SyscallImpls trait impl. This way we are taking care
 /// of the unsafe part for you, where in Rust you can just deal with SyscallImpls.
-pub fn syscall_to_impls<S: SyscallImpls>(
+pub fn syscall_to_impls<S: SyscallImpls + ?Sized>(
     impls: &S,
     n: u64,
     a0: u64,

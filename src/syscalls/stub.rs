@@ -260,3 +260,28 @@ pub fn write(fd: u64, buffer: &[u8]) -> Result<usize, SysError> {
     let written = get().write(fd, buffer)?;
     Ok(written)
 }
+
+// SAFETY: this is hidden under a feature, and is only designed to
+// override existing function of the same name.
+#[cfg(feature = "stub-c-syscalls")]
+#[unsafe(no_mangle)]
+pub extern "C" fn __internal_syscall(
+    n: core::ffi::c_long,
+    a0: core::ffi::c_long,
+    a1: core::ffi::c_long,
+    a2: core::ffi::c_long,
+    a3: core::ffi::c_long,
+    a4: core::ffi::c_long,
+    a5: core::ffi::c_long,
+) -> core::ffi::c_long {
+    crate::syscalls::traits::syscall_to_impls(
+        &**get(),
+        n as u64,
+        a0 as u64,
+        a1 as u64,
+        a2 as u64,
+        a3 as u64,
+        a4 as u64,
+        a5 as u64,
+    ) as core::ffi::c_long
+}
