@@ -222,7 +222,7 @@ pub fn spawn(
     let mut argv = Vec::with_capacity(spgs.argc as usize);
     for i in 0..spgs.argc {
         let p = unsafe { spgs.argv.offset(i as isize).read() };
-        argv.push(unsafe { CStr::from_ptr(p) });
+        argv.push(unsafe { CStr::from_ptr(p as *const _) });
     }
     let mut fds = Vec::new();
     {
