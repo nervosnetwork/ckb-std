@@ -105,7 +105,7 @@ pub fn load_cell_code(
 ) -> Result<usize, SysError> {
     let result = get().load_cell_code(buf_ptr, len, content_offset, content_size, index, source);
     match result {
-        Ok(()) => Ok(len),
+        Ok(_) => Ok(len),
         Err(e) => Err(e.into()),
     }
 }

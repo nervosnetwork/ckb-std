@@ -122,7 +122,7 @@ pub trait SyscallImpls {
         content_size: usize,
         index: usize,
         source: Source,
-    ) -> Result<(), Error> {
+    ) -> Result<Vec<MemoryPageResult>, Error> {
         build_result(self.syscall(
             buf_ptr as u64,
             len as u64,
@@ -132,6 +132,7 @@ pub trait SyscallImpls {
             source as u64,
             consts::SYS_LOAD_CELL_DATA_AS_CODE,
         ))
+        .and_then(|_| Ok(Vec::new()))
     }
     fn load_cell_data(
         &self,
@@ -429,7 +430,7 @@ pub fn syscall_to_impls<S: SyscallImpls + ?Sized>(
                 a4 as usize,
                 source,
             ) {
-                Ok(()) => 0,
+                Ok(_) => 0,
                 Err(e) => e.into(),
             }
         }
@@ -736,4 +737,12 @@ impl From<Error> for SysError {
             Error::Other(e) => SysError::Unknown(e),
         }
     }
+}
+
+/// MemoryPageResult captures response from load cell code.
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct MemoryPageResult {
+    pub page_start: u64,
+    pub data: [u8; 4096],
+    pub flag: u8,
 }
