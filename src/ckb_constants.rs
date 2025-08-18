@@ -66,3 +66,10 @@ pub enum InputField {
     OutPoint = 0,
     Since = 1,
 }
+
+#[derive(Eq, PartialEq, Debug, Clone, Copy, IntEnum)]
+#[repr(u64)]
+pub enum Place {
+    Cell = 0,
+    Witness = 1,
+}

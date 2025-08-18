@@ -1,5 +1,5 @@
 use crate::{
-    ckb_constants::{self as consts, CellField, HeaderField, InputField, Source},
+    ckb_constants::{self as consts, CellField, HeaderField, InputField, Place, Source},
     error::SysError,
     syscalls::internal::SpawnArgs,
 };
@@ -242,8 +242,8 @@ pub trait SyscallImpls {
         &self,
         index: usize,
         source: Source,
-        place: usize,
-        bounds: usize,
+        place: Place,
+        bounds: Bounds,
         argv: &[&CStr],
     ) -> Result<(), Error> {
         let argv_ptr: alloc::vec::Vec<*const i8> =
@@ -253,7 +253,7 @@ pub trait SyscallImpls {
             index as u64,
             source as u64,
             place as u64,
-            bounds as u64,
+            bounds.into(),
             argv.len() as u64,
             argv_ptr.as_ptr() as u64,
             consts::SYS_EXEC,
@@ -265,8 +265,8 @@ pub trait SyscallImpls {
         &self,
         index: usize,
         source: Source,
-        place: usize,
-        bounds: usize,
+        place: Place,
+        bounds: Bounds,
         argv: &[&CStr],
         inherited_fds: &[u64],
     ) -> Result<u64, Error> {
@@ -288,7 +288,7 @@ pub trait SyscallImpls {
             index as u64,
             source as u64,
             place as u64,
-            bounds as u64,
+            bounds.into(),
             &mut spgs as *mut _ as u64,
             0,
             consts::SYS_SPAWN,
@@ -474,13 +474,17 @@ pub fn syscall_to_impls<S: SyscallImpls + ?Sized>(
         consts::SYS_EXEC => {
             let source: Source = a1.try_into().expect("parse source");
             let argv = build_argv(a4, a5 as *const *const i8);
-            match impls.exec(a0 as usize, source, a2 as usize, a3 as usize, &argv) {
+            let place = a2.try_into().expect("parse place");
+            let bounds = a3.into();
+            match impls.exec(a0 as usize, source, place, bounds, &argv) {
                 Ok(()) => 0,
                 Err(e) => e.into(),
             }
         }
         consts::SYS_SPAWN => {
             let source: Source = a1.try_into().expect("parse source");
+            let place = a2.try_into().expect("parse place");
+            let bounds = a3.into();
             let spgs_addr = a4 as *mut SpawnArgs;
             let spgs: &mut SpawnArgs = unsafe { &mut *spgs_addr };
 
@@ -495,7 +499,7 @@ pub fn syscall_to_impls<S: SyscallImpls + ?Sized>(
                 fds.push(fd);
                 fd_ptr = unsafe { fd_ptr.offset(1) };
             }
-            match impls.spawn(a0 as usize, source, a2 as usize, a3 as usize, &argv, &fds) {
+            match impls.spawn(a0 as usize, source, place, bounds, &argv, &fds) {
                 Ok(process_id) => {
                     unsafe { spgs.process_id.write(process_id) };
                     0
@@ -606,6 +610,49 @@ where
             0
         }
         IoResult::Error(e) => e.into(),
+    }
+}
+
+/// Bounds for exec / spawn syscalls
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Bounds {
+    offset: u32,
+    length: u32,
+}
+
+impl Bounds {
+    pub fn new_till_end(offset: u32) -> Self {
+        Self { offset, length: 0 }
+    }
+
+    pub fn new(offset: u32, length: u32) -> Self {
+        Self { offset, length }
+    }
+
+    pub fn offset(&self) -> u32 {
+        self.offset
+    }
+
+    /// Only returns length when user provides a length. In case user uses
+    /// 0 to denote reading to the end, this method returns None.
+    pub fn length(&self) -> Option<u32> {
+        if self.length == 0 {
+            None
+        } else {
+            Some(self.length)
+        }
+    }
+}
+
+impl From<Bounds> for u64 {
+    fn from(bounds: Bounds) -> u64 {
+        ((bounds.offset as u64) << 32) | (bounds.length as u64)
+    }
+}
+
+impl From<u64> for Bounds {
+    fn from(val: u64) -> Bounds {
+        Bounds::new((val >> 32) as u32, val as u32)
     }
 }
 
