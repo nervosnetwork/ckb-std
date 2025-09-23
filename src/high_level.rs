@@ -683,6 +683,8 @@ pub fn exec_cell(
 
 /// Spawn a cell in cell dep.
 ///
+/// Return the process id or a syscall error
+///
 /// # Arguments
 ///
 /// * `code_hash` - the code hash to search cell in cell deps.
