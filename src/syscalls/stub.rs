@@ -2,9 +2,9 @@
 //! an impl of SyscallImpls trait.
 
 use crate::{
-    ckb_constants::{CellField, HeaderField, InputField, Source},
+    ckb_constants::{CellField, HeaderField, InputField, Place, Source},
     error::SysError,
-    syscalls::traits::SyscallImpls,
+    syscalls::traits::{Bounds, SyscallImpls},
 };
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::ffi::CStr;
@@ -48,7 +48,13 @@ pub fn debug(s: String) {
 }
 
 pub fn exec(index: usize, source: Source, place: usize, bounds: usize, argv: &[&CStr]) -> u64 {
-    let result = get().exec(index, source, place, bounds, argv);
+    let result = get().exec(
+        index,
+        source,
+        Place::try_from(place as u64).unwrap(),
+        Bounds::from(bounds as u64),
+        argv,
+    );
     match result {
         Ok(_) => 0,
         Err(e) => e.into(),
@@ -236,7 +242,14 @@ pub fn spawn(
             i += 1;
         }
     }
-    let process_id = get().spawn(index, source, place, bounds, &argv, &fds)?;
+    let process_id = get().spawn(
+        index,
+        source,
+        Place::try_from(place as u64).unwrap(),
+        Bounds::from(bounds as u64),
+        &argv,
+        &fds,
+    )?;
     unsafe { spgs.process_id.write(process_id) }
     Ok(process_id)
 }
