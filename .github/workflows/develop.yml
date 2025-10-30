@@ -17,4 +17,5 @@ jobs:
         wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 18 && rm llvm.sh
     - name: Test
       run: |
+        cargo build --features=stub-syscalls
         make test
