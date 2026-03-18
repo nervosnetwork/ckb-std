@@ -1,4 +1,6 @@
 use std::env;
+use std::io;
+use std::process::Output;
 
 fn main() {
     println!("cargo:rerun-if-changed=c/dlopen.c");
@@ -26,9 +28,49 @@ fn main() {
     }
 }
 
+fn show_clang_version(clang: &str) -> io::Result<Output> {
+    std::process::Command::new(clang).arg("--version").output()
+}
+
+fn find_clang() -> String {
+    // The 1st, check if the CLANG environment variable is set and valid.
+    if let Ok(clang) = std::env::var("CLANG") {
+        match show_clang_version(&clang) {
+            Ok(ok) => println!("{}", String::from_utf8_lossy(&ok.stdout)),
+            Err(_) => panic!(
+                "Clang compiler not found. Error CLANG environment: {}",
+                clang
+            ),
+        }
+        return clang;
+    }
+
+    // The 2nd, try clang-22, clang-21, ..., clang-19 in order.
+    for version in [22, 21, 20, 19, 30, 29, 28, 27, 26, 25, 24, 23] {
+        let clang = format!("clang-{}", version);
+        match show_clang_version(&clang) {
+            Ok(ok) => {
+                println!("{}", String::from_utf8_lossy(&ok.stdout));
+                return clang;
+            }
+            Err(_) => continue,
+        }
+    }
+
+    // The 3rd, try clang.
+    match show_clang_version("clang") {
+        Ok(ok) => {
+            println!("{}", String::from_utf8_lossy(&ok.stdout));
+            return "clang".to_string();
+        }
+        Err(_) => panic!(
+            "Clang compiler not found. Please set the CLANG environment variable to the path of your clang executable."
+        ),
+    }
+}
+
 fn setup_compiler_flags(build: &mut cc::Build) {
     build
-        .static_flag(true)
         .flag("-fno-builtin-printf")
         .flag("-fno-builtin-memcmp")
         .flag("-nostdinc")
@@ -42,10 +84,7 @@ fn setup_compiler_flags(build: &mut cc::Build) {
         .flag("-Wno-nonnull")
         .include("c/ckb-c-stdlib/libc");
 
-    let clang = match std::env::var_os("CLANG") {
-        Some(val) => val,
-        None => "clang-18".into(),
-    };
+    let clang = find_clang();
 
     if cfg!(feature = "build-with-clang") {
         build.compiler(clang);
