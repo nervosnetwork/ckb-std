@@ -9,7 +9,7 @@
 //! * `default_alloc!` and `libc_alloc!` macro: defines global allocator for no-std rust
 
 #![cfg_attr(not(feature = "native-simulator"), no_std)]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 extern crate alloc;
 
