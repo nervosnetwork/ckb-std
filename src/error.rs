@@ -2,8 +2,16 @@
 #[derive(Eq, PartialEq, Debug, Clone, Copy)]
 pub enum SysError {
     /// Index out of bound
+    ///
+    /// `index` is past the last item of `source`, or `source` does not apply to the syscall,
+    /// such as loading an input or a header from `Source::Output`.
+    /// [`QueryIter`](crate::high_level::QueryIter) treats it as the end of iteration,
+    /// so iterating over the wrong source silently yields nothing.
     IndexOutOfBound,
     /// Field is missing for the target
+    ///
+    /// The item exists but lacks the requested value, for example the type script of a cell
+    /// without one, or the header of an input or dep cell whose block hash is not in `header_deps`.
     ItemMissing,
     /// The data did not fit in the buffer; contains the data length from `offset`
     ///
@@ -17,6 +25,9 @@ pub enum SysError {
     /// See [Partial Loading](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md#partial-loading).
     LengthNotEnough(usize),
     /// Data encoding error
+    ///
+    /// Loaded bytes do not parse as the expected Molecule type in the high-level loaders,
+    /// or as hex in `decode_hex`; `spawn` also returns it for an out-of-bound slice.
     Encoding,
 
     /// Failed to wait. Its value is 5.
