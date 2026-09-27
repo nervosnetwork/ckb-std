@@ -5,7 +5,16 @@ pub enum SysError {
     IndexOutOfBound,
     /// Field is missing for the target
     ItemMissing,
-    /// Buffer length is not enough, error contains actual data length
+    /// The data did not fit in the buffer; contains the data length from `offset`
+    ///
+    /// This is not a failed load: the buffer is already filled with the first bytes of
+    /// the data from `offset`, and the value is the full length of that data.
+    /// For example, with 100 bytes of data, a 32-byte buffer and `offset` 0,
+    /// the buffer holds bytes `0..32` and the error is `LengthNotEnough(100)`;
+    /// calling again with `offset` 32 loads bytes `32..64` and returns `LengthNotEnough(68)`.
+    ///
+    /// When only a prefix is needed, treat this error as success.
+    /// See [Partial Loading](https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0009-vm-syscalls/0009-vm-syscalls.md#partial-loading).
     LengthNotEnough(usize),
     /// Data encoding error
     Encoding,

@@ -59,7 +59,8 @@ fn syscall_load(
 
 /// Load transaction hash
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -87,7 +88,8 @@ pub fn load_tx_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError> {
 
 /// Load script hash
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -115,7 +117,8 @@ pub fn load_script_hash(buf: &mut [u8], offset: usize) -> Result<usize, SysError
 
 /// Load cell
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -142,7 +145,8 @@ pub fn load_cell(
 
 /// Load input
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -169,7 +173,8 @@ pub fn load_input(
 
 /// Load header
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -196,7 +201,8 @@ pub fn load_header(
 
 /// Load witness
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -223,7 +229,8 @@ pub fn load_witness(
 
 /// Load transaction
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -243,7 +250,8 @@ pub fn load_transaction(buf: &mut [u8], offset: usize) -> Result<usize, SysError
 
 /// Load cell by field
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -280,7 +288,8 @@ pub fn load_cell_by_field(
 
 /// Load header by field
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -317,7 +326,8 @@ pub fn load_header_by_field(
 
 /// Load input by field
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -354,7 +364,8 @@ pub fn load_input_by_field(
 
 /// Load cell data, read cell data
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -381,7 +392,8 @@ pub fn load_cell_data(
 
 /// Load script
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -416,7 +428,8 @@ pub fn debug(mut s: alloc::string::String) {
 
 /// Load cell data, read cell data
 ///
-/// Return the loaded data length or a syscall error
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
@@ -738,6 +751,9 @@ pub fn close(fd: u64) -> Result<(), SysError> {
 
 /// Load extension field associated either with an input cell, a dep cell, or
 /// a header dep based on source and index value.
+///
+/// Return the loaded data length or a syscall error;
+/// when the buffer is too small, see [`SysError::LengthNotEnough`]
 ///
 /// # Arguments
 ///
