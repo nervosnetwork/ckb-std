@@ -155,6 +155,7 @@ pub fn load_header(index: usize, source: Source) -> Result<Header, SysError> {
 ///
 /// **Note:** This function can panic if the underlying data is too large,
 /// potentially causing an out-of-memory error.
+/// To bound memory, load into a fixed-size buffer with [`syscalls::load_witness`].
 pub fn load_witness(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
     load_data(|buf, offset| syscalls::load_witness(buf, offset, index, source))
 }
@@ -484,6 +485,7 @@ pub fn load_input_out_point(index: usize, source: Source) -> Result<OutPoint, Sy
 ///
 /// **Note:** This function can panic if the underlying data is too large,
 /// potentially causing an out-of-memory error.
+/// To bound memory, load into a fixed-size buffer with [`syscalls::load_cell_data`].
 pub fn load_cell_data(index: usize, source: Source) -> Result<Vec<u8>, SysError> {
     load_data(|buf, offset| syscalls::load_cell_data(buf, offset, index, source))
 }
