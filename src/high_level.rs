@@ -641,13 +641,21 @@ pub fn encode_hex(data: &[u8]) -> CString {
 }
 
 pub fn decode_hex(data: &CStr) -> Result<Vec<u8>, SysError> {
-    let data = data.to_str().unwrap();
+    fn digit(byte: u8) -> Result<u8, SysError> {
+        match byte {
+            b'0'..=b'9' => Ok(byte - b'0'),
+            b'a'..=b'f' => Ok(byte - b'a' + 10),
+            b'A'..=b'F' => Ok(byte - b'A' + 10),
+            _ => Err(SysError::Encoding),
+        }
+    }
+
+    let data = data.to_bytes();
     if data.len() & 1 != 0 {
         return Err(SysError::Encoding);
     }
-    (0..data.len())
-        .step_by(2)
-        .map(|i| u8::from_str_radix(&data[i..i + 2], 16).map_err(|_| SysError::Encoding))
+    data.chunks_exact(2)
+        .map(|pair| Ok((digit(pair[0])? << 4) | digit(pair[1])?))
         .collect()
 }
 

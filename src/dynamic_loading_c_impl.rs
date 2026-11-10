@@ -121,6 +121,10 @@ impl<T> CKBDLContext<T> {
     pub unsafe fn new() -> Self {
         unsafe { zeroed() }
     }
+
+    /// Load a library into a range within this context.
+    /// `size` must be a multiple of 4096, and the entire range
+    /// must fit within `size_of::<Self>()`.
     pub fn load_with_offset<'a>(
         &'a mut self,
         code_hash: &[u8],
@@ -131,9 +135,15 @@ impl<T> CKBDLContext<T> {
         if size_of::<Library>() > RISCV_PGSIZE || size < RISCV_PGSIZE {
             return Err(Error::ContextFailure);
         }
-        // size must aligned to page size
-        if ((size >> RISCV_PGSIZE_SHIFT) << RISCV_PGSIZE_SHIFT) != size {
+        // The size must be page aligned.
+        if size % RISCV_PGSIZE != 0 {
             return Err(Error::InvalidAlign);
+        }
+        if offset
+            .checked_add(size)
+            .is_none_or(|end| end > size_of::<Self>())
+        {
+            return Err(Error::ContextFailure);
         }
         let from_type_id = match hash_type {
             ScriptHashType::Type => 1,
@@ -144,7 +154,7 @@ impl<T> CKBDLContext<T> {
             let mut consumed_size: usize = 0;
             let mut library = Library::new();
             let aligned_size = size;
-            let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
+            let aligned_addr = (self as *mut Self).cast::<u8>().add(offset);
             let code = ckb_dlopen2(
                 code_hash.as_ptr(),
                 from_type_id,

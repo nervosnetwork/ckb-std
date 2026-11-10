@@ -167,6 +167,22 @@ type ContextTypeOld = dynamic_loading::CKBDLContext<[u8; 64 * 1024]>;
 
 #[cfg(target_arch = "riscv64")]
 fn test_dynamic_loading(context: &mut ContextTypeOld) {
+    let capacity = size_of_val(context);
+    for (offset, size) in [
+        (0, capacity + 4096),
+        (capacity, 4096),
+        (capacity + 4096, 4096),
+        (4096, capacity),
+        (usize::MAX - 4095, 4096),
+        (0, usize::MAX - 4095),
+    ] {
+        #[allow(deprecated)]
+        let result = context.load_with_offset(&CODE_HASH_SHARED_LIB, offset, size);
+        assert_eq!(result.err(), Some(dynamic_loading::Error::ContextFailure));
+    }
+    #[allow(deprecated)]
+    let result = context.load_with_offset(&CODE_HASH_SHARED_LIB, 0, 4097);
+    assert_eq!(result.err(), Some(dynamic_loading::Error::InvalidAlign));
     unsafe {
         #[allow(deprecated)]
         let lib = context
@@ -218,6 +234,27 @@ type ContextType = dynamic_loading_c_impl::CKBDLContext<[u8; 64 * 1024]>;
 
 #[cfg(target_arch = "riscv64")]
 fn test_dynamic_loading_c_impl(context: &mut ContextType) {
+    let capacity = size_of_val(context);
+    for (offset, size) in [
+        (0, capacity + 4096),
+        (capacity, 4096),
+        (capacity + 4096, 4096),
+        (4096, capacity),
+        (usize::MAX - 4095, 4096),
+        (0, usize::MAX - 4095),
+    ] {
+        let result =
+            context.load_with_offset(&CODE_HASH_SHARED_LIB, ScriptHashType::Data, offset, size);
+        assert_eq!(
+            result.err(),
+            Some(dynamic_loading_c_impl::Error::ContextFailure)
+        );
+    }
+    let result = context.load_with_offset(&CODE_HASH_SHARED_LIB, ScriptHashType::Data, 0, 4097);
+    assert_eq!(
+        result.err(),
+        Some(dynamic_loading_c_impl::Error::InvalidAlign)
+    );
     unsafe {
         #[allow(deprecated)]
         let lib = context
