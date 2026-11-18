@@ -301,6 +301,8 @@ impl<T> CKBDLContext<T> {
     /// See module level documentation for details
     ///
     /// This function is used for loading multiple libraries.
+    /// `size` must be a multiple of 4096, and the entire range
+    /// must fit within `size_of::<Self>()`.
     ///
     /// # Example
     ///
@@ -329,15 +331,21 @@ impl<T> CKBDLContext<T> {
             return Err(Error::ContextFailure);
         }
 
-        // size must aligned to page size
-        if ((size >> RISCV_PGSIZE_SHIFT) << RISCV_PGSIZE_SHIFT) != size {
+        // The size must be page aligned.
+        if size % RISCV_PGSIZE != 0 {
             return Err(Error::InvalidAlign);
+        }
+        if offset
+            .checked_add(size)
+            .is_none_or(|end| end > size_of::<Self>())
+        {
+            return Err(Error::ContextFailure);
         }
 
         unsafe {
             // initialize context
             let aligned_size = size;
-            let aligned_addr = (&mut self.0 as *mut T).cast::<u8>().add(offset);
+            let aligned_addr = (self as *mut Self).cast::<u8>().add(offset);
             let mut library = Library::new();
             library.base_addr = aligned_addr;
 
